@@ -157,12 +157,12 @@ export async function DELETE(request: Request) {
 function normalizeLengthMinutes(value?: number, label?: string) {
   if (value && storyLengthOptions.some((item) => item.minutes === value)) return value;
   const matched = storyLengthOptions.find((item) => lengthLabelMatches(item, label));
-  return matched?.minutes ?? 45;
+  return matched?.minutes ?? 7;
 }
 
 function normalizeLengthLabel(value?: string, minutes?: number) {
   const matched = storyLengthOptions.find((item) => lengthLabelMatches(item, value) || item.minutes === minutes);
-  return matched?.label ?? "45-60 min";
+  return matched?.label ?? "7 min";
 }
 
 function lengthLabelMatches(item: { label: string; minutes: number }, label?: string) {

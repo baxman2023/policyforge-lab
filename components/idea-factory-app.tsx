@@ -973,7 +973,7 @@ const defaultSettings: UserSettings = {
   autoModelRouting: true,
   preferredTone: "Helpful, local, consultative",
   narrationStyle: "Journalistic",
-  defaultLengthMinutes: 10,
+  defaultLengthMinutes: 7,
   ttsPauseMarkers: false,
   openRouterApiKey: "",
   anthropicApiKey: "",
@@ -1166,7 +1166,7 @@ const campaignAssetOptions: Array<{
   length: string;
   sourceType: string;
 }> = [
-  { key: "video", label: "Video Campaign", detail: "Script plus Business Campaign Kit, thumbnails, Shorts hooks, and Macaly prompt.", contentMode: "LOCAL_LEAD_GEN", format: "STANDALONE", length: "10 minutes", sourceType: "Agency knowledge, Texas market context, carrier guidelines" },
+  { key: "video", label: "HeyGen Video Campaign", detail: "7-10 minute script, scene cards, scene background prompts, Business Campaign Kit, thumbnails, Shorts hooks, and Macaly prompt.", contentMode: "LOCAL_LEAD_GEN", format: "STANDALONE", length: "7 minutes", sourceType: "Agency knowledge, Texas market context, carrier guidelines" },
   { key: "article", label: "SEO Article", detail: "Website-ready article, FAQ, topical map, GBP post, email, and landing page prompt.", contentMode: "EXPERT_AUTHORITY", format: "ARTICLE", length: "Feature article - about 2,000 words", sourceType: "Local SEO research and service-area pages" },
   { key: "landing-page", label: "Macaly Landing Page", detail: "Generate ideas whose campaign kit produces a Macaly prompt optimized for forms and CTAs.", contentMode: "LOCAL_LEAD_GEN", format: "ARTICLE", length: "Feature article - about 2,000 words", sourceType: "Agency knowledge, Texas market context, carrier guidelines" },
   { key: "gbp-social", label: "GBP + Social Push", detail: "Short campaign ideas for Google Business Profile, Facebook, email, and phone follow-up.", contentMode: "REPURPOSE_MULTIPLIER", format: "ARTICLE", length: "Brief article - about 900 words", sourceType: "Client FAQs and policy review notes" },
@@ -3310,7 +3310,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
 
   async function runMonthlyAuto() {
     const confirmed = window.confirm(
-      "Create a monthly publishing batch?\n\nBaxter Growth Lab will create 6 standalone video projects with randomized 30, 45, or 60 minute targets, plus one 5-episode series, then schedule them after any existing future calendar items."
+      "Create a monthly publishing batch?\n\nBaxter Growth Lab will create 6 standalone HeyGen video projects with randomized 7, 10, or 20 minute targets, plus one 5-episode series, then schedule them after any existing future calendar items."
     );
     if (!confirmed) return;
     if (!activeChannelId) {
@@ -3469,6 +3469,11 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           currentProject = await executeProjectPass(currentProject, passType, material);
         }
 
+        if (settings.hasRunwareApiKey && supportsSceneBackgrounds(currentProject) && sceneBackgroundPromptCount(currentProject) > sceneBackgroundAssetsForProject(currentProject).length) {
+          setAutoStep("HeyGen Backgrounds");
+          currentProject = (await executeSceneBackgrounds(currentProject)).project;
+        }
+
         if (settings.hasRunwareApiKey && supportsThumbnails(currentProject)) {
           setAutoStep("Thumbnails");
           currentProject = (await executeProjectThumbnails(currentProject)).project;
@@ -3492,7 +3497,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     }
 
     const sequence = episodeAutoSequenceForProject(selectedProject);
-    const needsOnlyThumbnails = !sequence.length && supportsThumbnails(selectedProject) && (selectedProject.thumbnails?.length ?? 0) < requiredThumbnailCountForProject(selectedProject);
+    const needsOnlyThumbnails = !sequence.length && supportsThumbnails(selectedProject) && thumbnailAssetsForProject(selectedProject).length < requiredThumbnailCountForProject(selectedProject);
     if (!sequence.length && !needsOnlyThumbnails) {
       setMessage(`Episode Fully Auto has nothing left to run for "${selectedProject.title}".`);
       return;
@@ -3517,7 +3522,12 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           currentProject = await executeProjectPass(currentProject, passType, material);
         }
 
-        if (settings.hasRunwareApiKey && supportsThumbnails(currentProject) && (currentProject.thumbnails?.length ?? 0) < requiredThumbnailCountForProject(currentProject)) {
+        if (settings.hasRunwareApiKey && supportsSceneBackgrounds(currentProject) && sceneBackgroundPromptCount(currentProject) > sceneBackgroundAssetsForProject(currentProject).length) {
+          setAutoStep("HeyGen Backgrounds");
+          currentProject = (await executeSceneBackgrounds(currentProject)).project;
+        }
+
+        if (settings.hasRunwareApiKey && supportsThumbnails(currentProject) && thumbnailAssetsForProject(currentProject).length < requiredThumbnailCountForProject(currentProject)) {
           setAutoStep("Thumbnails");
           currentProject = (await executeProjectThumbnails(currentProject)).project;
         }
@@ -3618,7 +3628,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
 
-    const needsWork = eligibleProjects.filter((project) => !latestDraftForPass(project, "PUBLISHING_PACK") || (project.thumbnails?.length ?? 0) < requiredThumbnailCountForProject(project));
+    const needsWork = eligibleProjects.filter((project) => !latestDraftForPass(project, "PUBLISHING_PACK") || thumbnailAssetsForProject(project).length < requiredThumbnailCountForProject(project));
     if (!needsWork.length) {
       setMessage("Every video project already has a Business Campaign Kit and the required thumbnails.");
       return;
@@ -3643,7 +3653,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             packed += 1;
           }
 
-          if ((currentProject.thumbnails?.length ?? 0) < requiredThumbnailCountForProject(currentProject)) {
+          if (thumbnailAssetsForProject(currentProject).length < requiredThumbnailCountForProject(currentProject)) {
             setAutoStep(`Thumbnails: ${project.title}`);
             const result = await executeProjectThumbnails(currentProject);
             currentProject = result.project;
@@ -3673,6 +3683,44 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     return {
       project: refreshed.projects.find((item) => item.id === project.id) ?? project,
       thumbnailCount: payload.thumbnails.length
+    };
+  }
+
+  async function generateSceneBackgroundsForProject(project = selectedProject) {
+    if (!project) {
+      setMessage("Create or select a video project before generating HeyGen scene backgrounds.");
+      return;
+    }
+    if (!supportsSceneBackgrounds(project)) {
+      setMessage("HeyGen scene backgrounds are only generated for video projects.");
+      return;
+    }
+    if (!latestDraftForPass(project, "SCENE_CARDS")) {
+      setMessage("Create Scene Cards before generating HeyGen scene backgrounds.");
+      return;
+    }
+
+    await runAction(`scene-backgrounds-${project.id}`, async () => {
+      const result = await executeSceneBackgrounds(project);
+      setMessage(`${result.backgroundCount} HeyGen scene background${result.backgroundCount === 1 ? "" : "s"} generated for "${project.title}".`);
+    }, { errorKey: "scene-backgrounds" });
+  }
+
+  async function executeSceneBackgrounds(project: StoryProject) {
+    const payload = await fetchJson<{ backgrounds: ThumbnailAsset[] }>(`/api/projects/${project.id}/scene-backgrounds`, {
+      method: "POST"
+    });
+    setProjects((current) =>
+      current.map((item) =>
+        item.id === project.id
+          ? { ...item, thumbnails: [...payload.backgrounds, ...(item.thumbnails ?? [])] }
+          : item
+      )
+    );
+    const refreshed = await loadProjectsAndIdeas();
+    return {
+      project: refreshed.projects.find((item) => item.id === project.id) ?? project,
+      backgroundCount: payload.backgrounds.length
     };
   }
 
@@ -5493,7 +5541,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const projectDrafts = selectedProject?.drafts ?? [];
     const hasPass = (passType: ScriptPassType) => projectDrafts.some((draft) => draft.passType === passType);
     const hasIntro = hasPass("INTRO");
-    const thumbnailCount = selectedProject?.thumbnails?.length ?? 0;
+    const thumbnailCount = thumbnailAssetsForProject(selectedProject).length;
     const requiredThumbnailCount = selectedProject && projectHasEpisodePlan(selectedProject) ? 15 : 3;
     const hasSourceMaterial = Boolean(sourceMaterial.trim() || selectedProject?.sourceMaterial?.trim());
     const isEpisodicProject = selectedProject?.format === "EPISODIC_SERIES";
@@ -5511,6 +5559,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const selectedBookIllustrationModel = getBookIllustrationModelOption(bookIllustrationModel);
     const bookIllustrationPlan = selectedProject ? bookIllustrationPlansByProjectId[selectedProject.id] : undefined;
     const bookIllustrationCount = canCreateBookIllustrations ? selectedProject?.thumbnails?.filter(isBookIllustrationAsset).length ?? 0 : 0;
+    const sceneBackgroundCount = sceneBackgroundAssetsForProject(selectedProject).length;
+    const requiredSceneBackgroundCount = sceneBackgroundPromptCount(selectedProject);
     const bookIllustrationReady = hasPass("FINAL");
     const workflowNumberOffset = isEpisodicProject ? 1 : 0;
     const workflowNoun = projectOutputNoun(selectedProject?.format);
@@ -5805,7 +5855,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         id: "scene-cards",
         number: 15 + workflowNumberOffset,
         title: "Scene Cards",
-        description: "Production cues, visuals, on-screen text, SFX, and Shorts moments.",
+        description: "HeyGen scenes, visual cues, on-screen text, SFX, Shorts moments, and one background prompt per scene.",
         complete: hasPass("SCENE_CARDS"),
         enabled: hasPass("OUTRO"),
         busyKey: "pass-SCENE_CARDS",
@@ -5813,9 +5863,23 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         actionLabel: hasPass("SCENE_CARDS") ? "Rerun Scene Cards" : "Create Scene Cards",
         action: () => void generateProjectPass("SCENE_CARDS")
       },
+      ...(supportsSceneBackgrounds(selectedProject) ? [{
+        id: "scene-backgrounds",
+        number: 16 + workflowNumberOffset,
+        title: "HeyGen Backgrounds",
+        description: requiredSceneBackgroundCount
+          ? `Generate ${requiredSceneBackgroundCount} low-cost non-FLUX backgrounds from the Scene Cards.`
+          : "Generate one low-cost non-FLUX background image per HeyGen scene.",
+        complete: requiredSceneBackgroundCount > 0 && sceneBackgroundCount >= requiredSceneBackgroundCount,
+        enabled: hasPass("SCENE_CARDS") && requiredSceneBackgroundCount > 0,
+        busyKey: selectedProject ? `scene-backgrounds-${selectedProject.id}` : "scene-backgrounds",
+        errorKey: "scene-backgrounds",
+        actionLabel: sceneBackgroundCount ? "Regenerate Backgrounds" : "Create Backgrounds",
+        action: () => void generateSceneBackgroundsForProject()
+      }] : []),
       {
         id: "publishing-pack",
-        number: 15 + workflowNumberOffset,
+        number: 17 + workflowNumberOffset,
         title: publishingPackLabel(selectedProject?.format),
         description: isArticleProject ? "SEO metadata, image plan, Macaly prompt, and topical authority map." : isPodcastProject ? "Three episode titles, show notes, tags, and listener prompt." : isBookProject ? "Three book titles/subtitles, back-cover description, keywords, and reader prompt." : "Titles, description, CTA, tags, pinned comment, thumbnail prompts, and campaign assets.",
         complete: selectedProject && projectHasEpisodePlan(selectedProject) ? projectHasEpisodePublishingPack(selectedProject) : hasPass("PUBLISHING_PACK"),
@@ -5829,7 +5893,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       },
       ...(canCreateThumbnails ? [{
         id: "thumbnails",
-        number: 16 + workflowNumberOffset,
+        number: 18 + workflowNumberOffset,
         title: "Thumbnails",
         description: selectedProject && projectHasEpisodePlan(selectedProject) ? "Generate fifteen 16:9 Runware thumbnails from the five episode packs." : "Generate three 16:9 Runware thumbnails from the pack prompts.",
         complete: thumbnailCount >= requiredThumbnailCount,
@@ -8972,7 +9036,7 @@ function UploadReadinessPanel({
   const localReadyItems = [
     { label: "Script", ready: hasPublishableScript(project), detail: hasPublishableScript(project) ? "Final output is available." : "Run the workflow first." },
     { label: "Campaign Kit", ready: Boolean(latestDraftForPass(project, "PUBLISHING_PACK")), detail: latestDraftForPass(project, "PUBLISHING_PACK") ? "Campaign metadata exists." : "Create Business Campaign Kit." },
-    { label: "Images", ready: !supportsThumbnails(project) || (project.thumbnails?.length ?? 0) >= requiredThumbnailCountForProject(project), detail: supportsThumbnails(project) ? `${project.thumbnails?.length ?? 0}/${requiredThumbnailCountForProject(project)} thumbnails.` : "No thumbnail requirement." }
+    { label: "Images", ready: !supportsThumbnails(project) || thumbnailAssetsForProject(project).length >= requiredThumbnailCountForProject(project), detail: supportsThumbnails(project) ? `${thumbnailAssetsForProject(project).length}/${requiredThumbnailCountForProject(project)} thumbnails.` : "No thumbnail requirement." }
   ];
   return (
     <Panel title="Ready-To-Use Campaign Package">
@@ -9290,6 +9354,7 @@ function shouldTrackClientJob(label: string) {
     label.startsWith("pass-") ||
     label.startsWith("research-") ||
     label.includes("thumbnails") ||
+    label.includes("scene-backgrounds") ||
     label.includes("article-images") ||
     label.includes("book-illustration");
 }
@@ -9302,6 +9367,7 @@ function clientJobCopy(label: string) {
   if (label === "thumbnail-batch") return { label: "Batch Thumbnails", detail: "Creating missing packs and thumbnails." };
   if (label.startsWith("research-")) return { label: "Research Mode", detail: "Building source notes and verification targets." };
   if (label.includes("article-images")) return { label: "Article Images", detail: "Generating featured and inline article visuals." };
+  if (label.includes("scene-backgrounds")) return { label: "HeyGen Backgrounds", detail: "Generating low-cost non-FLUX scene backgrounds." };
   if (label.includes("book-illustration")) return { label: "Book Illustrations", detail: "Planning or generating manuscript artwork." };
   if (label.includes("thumbnails")) return { label: "Thumbnails", detail: "Generating visual assets." };
   if (label.startsWith("pass-")) {
@@ -9365,12 +9431,13 @@ function workflowRunForecast(
   steps: Array<{ complete: boolean; enabled: boolean; id: string }>,
   project: StoryProject
 ) {
-  const remainingSteps = steps.filter((step) => !step.complete && step.id !== "thumbnails" && step.id !== "article-images").length;
-  const imageSteps = steps.filter((step) => !step.complete && (step.id === "thumbnails" || step.id === "article-images")).length;
+  const imageStepIds = new Set(["thumbnails", "article-images", "scene-backgrounds"]);
+  const remainingSteps = steps.filter((step) => !step.complete && !imageStepIds.has(step.id)).length;
+  const imageSteps = steps.filter((step) => !step.complete && imageStepIds.has(step.id)).length;
   const baseMinutes = remainingSteps * (project.format === "EPISODIC_SERIES" ? 3 : 2) + imageSteps * 2;
-  const longOutputPenalty = project.targetWordCount >= 9000 || project.targetLengthMinutes >= 45 ? 6 : project.targetLengthMinutes >= 20 ? 3 : 0;
+  const longOutputPenalty = project.targetLengthMinutes >= 30 ? 4 : project.targetLengthMinutes >= 20 ? 2 : 0;
   const estimatedMinutes = Math.max(1, baseMinutes + longOutputPenalty);
-  const heavyRun = project.format === "EPISODIC_SERIES" || remainingSteps >= 8 || project.targetLengthMinutes >= 45;
+  const heavyRun = project.format === "EPISODIC_SERIES" || remainingSteps >= 8 || project.targetLengthMinutes >= 30;
   return {
     remainingSteps,
     estimatedMinutes,
@@ -9677,7 +9744,7 @@ function renderIdeaPowerPack(idea: StoryIdea) {
           <div>
             <h4>Source Preflight</h4>
             <p>{pack.sourceDepthPreflight?.thinRisk || "Run a dossier pass before scripting."}</p>
-            <p><strong>Best length:</strong> {pack.sourceDepthPreflight?.bestLengthMinutes || idea.recommendedLengthMinutes || 45} min</p>
+            <p><strong>Best length:</strong> {pack.sourceDepthPreflight?.bestLengthMinutes || idea.recommendedLengthMinutes || 7} min</p>
             {pack.sourceDepthPreflight?.mustVerify?.length ? <p><strong>Verify:</strong> {pack.sourceDepthPreflight.mustVerify.slice(0, 3).join(", ")}</p> : null}
           </div>
           <div>
@@ -9829,9 +9896,9 @@ function lengthLabel(idea: StoryIdea) {
   if (idea.estimatedLengthPotential) return idea.estimatedLengthPotential;
   const matched = storyLengthOptions.find((item) => item.minutes === idea.recommendedLengthMinutes);
   if (matched) return matched.label;
-  if (idea.lengthPotentialScore >= 92) return "45-60 min";
-  if (idea.lengthPotentialScore >= 80) return "30-45 min";
-  return "30-45 min";
+  if (idea.lengthPotentialScore >= 92) return "20 min";
+  if (idea.lengthPotentialScore >= 80) return "10 min";
+  return "7 min";
 }
 
 function depthStrengthLabel(score: number) {
@@ -9906,6 +9973,10 @@ function supportsThumbnails(project?: StoryProject | null) {
   return project?.format === "STANDALONE" || project?.format === "EPISODIC_SERIES";
 }
 
+function supportsSceneBackgrounds(project?: StoryProject | null) {
+  return project?.format === "STANDALONE" || project?.format === "EPISODIC_SERIES";
+}
+
 function supportsBookIllustrations(project?: StoryProject | null) {
   return project?.format === "SHORT_BOOK" || project?.format === "LONG_BOOK";
 }
@@ -9922,6 +9993,24 @@ function isBookIllustrationAsset(asset: ThumbnailAsset) {
   return /^Chapter \d+:/i.test(asset.title || "") || /^Book illustration mode:/im.test(asset.prompt || "");
 }
 
+function isSceneBackgroundAsset(asset: ThumbnailAsset) {
+  return /^HeyGen Scene \d+ Background:/i.test(asset.title || "") || /^HeyGen scene background/im.test(asset.prompt || "");
+}
+
+function thumbnailAssetsForProject(project?: StoryProject | null) {
+  return (project?.thumbnails ?? []).filter((asset) => !isArticleImageAsset(asset) && !isBookIllustrationAsset(asset) && !isSceneBackgroundAsset(asset));
+}
+
+function sceneBackgroundAssetsForProject(project?: StoryProject | null) {
+  return (project?.thumbnails ?? []).filter(isSceneBackgroundAsset);
+}
+
+function sceneBackgroundPromptCount(project?: StoryProject | null) {
+  const sceneCards = latestDraftForPass(project || undefined, "SCENE_CARDS")?.content || "";
+  const matches = sceneCards.match(/Scene\s+\d{1,2}\s+Background\s+Prompt\s*:/gi);
+  return matches?.length ?? 0;
+}
+
 function displayAssetsForProject(project: StoryProject) {
   const assets = project.thumbnails ?? [];
   if (project.format === "ARTICLE") return assets.filter(isArticleImageAsset);
@@ -9932,7 +10021,7 @@ function displayAssetsForProject(project: StoryProject) {
 function assetResultsLabel(project?: StoryProject | null) {
   if (project?.format === "ARTICLE") return "Article Images";
   if (supportsBookIllustrations(project)) return "Book Illustrations";
-  return "Generated Thumbnails";
+  return "HeyGen Video Assets";
 }
 
 function defaultBookIllustrationMax(format: StoryProjectFormat, mode: BookIllustrationMode) {
@@ -10226,7 +10315,7 @@ function targetSizeOptionsForFormat(format: StoryProjectFormat) {
 function defaultTargetLabelForFormat(format: StoryProjectFormat) {
   if (format === "SHORT_BOOK") return "Standard short book - about 15,000 words";
   if (format === "LONG_BOOK") return "Standard long form book - about 60,000 words";
-  return format === "ARTICLE" ? "Feature article - about 2,000 words" : "45-60 minutes";
+  return format === "ARTICLE" ? "Feature article - about 2,000 words" : "7 minutes";
 }
 
 function targetMinutesForProject(format: StoryProjectFormat, label: string, idea?: StoryIdea) {
@@ -10240,11 +10329,11 @@ function targetMinutesForProject(format: StoryProjectFormat, label: string, idea
     if (/deep|80,?000/i.test(label)) return 60;
     return 45;
   }
+  if (label.includes("7")) return 7;
   if (label.includes("10")) return 10;
   if (label.includes("20")) return 20;
   if (label.includes("30")) return 30;
-  if (label.includes("60") && !label.includes("45")) return 60;
-  return idea?.recommendedLengthMinutes || 45;
+  return Math.min(30, Math.max(7, idea?.recommendedLengthMinutes || 7));
 }
 
 function projectTargetDisplay(project: StoryProject) {
@@ -10283,7 +10372,7 @@ function normalizeOption(value: string | undefined, options: string[], fallback:
 
 function defaultDesiredLengthLabel(minutes: number) {
   const matched = storyLengthOptions.find((item) => item.minutes === minutes);
-  return matched?.label === "60 min" ? "60 minutes" : `${matched?.label ?? "45-60 min"}utes`;
+  return matched?.label.includes("min") ? matched.label.replace(" min", " minutes").replace(" max", " max") : "7 minutes";
 }
 
 function passLabel(passType: ScriptPassType) {
@@ -10556,7 +10645,7 @@ function projectReadinessState(project: StoryProject, slots: PublishingSlot[]) {
   const pack = latestDraftForPass(project, "PUBLISHING_PACK");
   const quality = latestDraftForPass(project, "QUALITY_GATE");
   const requiredThumbnails = requiredThumbnailCountForProject(project);
-  const thumbnailCount = project.thumbnails?.length ?? 0;
+  const thumbnailCount = thumbnailAssetsForProject(project).length;
   if (!body) {
     return { label: "Needs Script", className: "blocked", detail: "No publishable output exists yet.", nextAction: "Run the workflow" };
   }
@@ -10683,7 +10772,7 @@ function bestNextMoveItems(input: {
   if (strongestIdea) {
     items.push({
       title: `Build: ${strongestIdea.title}`,
-      detail: `${strongestIdea.totalScore}/100 score with ${strongestIdea.recommendedLengthMinutes || 45} minute potential.`,
+      detail: `${strongestIdea.totalScore}/100 score with ${strongestIdea.recommendedLengthMinutes || 7} minute potential.`,
       action: "Turn the highest-upside queued idea into the next project.",
       priority: "high",
       section: "idea-factory",
@@ -10881,7 +10970,7 @@ function commandCenterItems(input: {
 }) {
   const readyIdeas = input.ideas.filter((idea) => idea.status === "UNUSED" || idea.status === "SAVED").length;
   const scriptsWithoutPacks = input.projects.filter((project) => latestScriptDraft(project) && !latestDraftForPass(project, "PUBLISHING_PACK")).length;
-  const packsWithoutAssets = input.projects.filter((project) => latestDraftForPass(project, "PUBLISHING_PACK") && (!supportsThumbnails(project) || (project.thumbnails?.length ?? 0) < requiredThumbnailCountForProject(project))).length;
+  const packsWithoutAssets = input.projects.filter((project) => latestDraftForPass(project, "PUBLISHING_PACK") && (!supportsThumbnails(project) || thumbnailAssetsForProject(project).length < requiredThumbnailCountForProject(project))).length;
   const readyUnscheduled = input.projects.filter((project) => hasPublishableScript(project) && !projectHasCalendarSlot(project, input.slots) && !isUsedProjectStatus(project.status)).length;
   const needsQuality = qualityGateQueue(input.projects).length;
   const voiceReady = channelVoiceChecklist(input.blueprint).filter((item) => item.ready).length;
@@ -10956,7 +11045,7 @@ function creatorCockpitItems(input: {
   const readyIdeas = input.ideas.filter((idea) => idea.status === "UNUSED" || idea.status === "SAVED").length;
   const activeProjects = input.projects.filter((project) => !isUsedProjectStatus(project.status));
   const readyToUpload = input.projects.filter((project) => hasPublishableScript(project) && latestDraftForPass(project, "PUBLISHING_PACK")).length;
-  const needsUploadPackage = input.projects.filter((project) => hasPublishableScript(project) && latestDraftForPass(project, "PUBLISHING_PACK") && (!supportsThumbnails(project) || (project.thumbnails?.length ?? 0) >= requiredThumbnailCountForProject(project))).length;
+  const needsUploadPackage = input.projects.filter((project) => hasPublishableScript(project) && latestDraftForPass(project, "PUBLISHING_PACK") && (!supportsThumbnails(project) || thumbnailAssetsForProject(project).length >= requiredThumbnailCountForProject(project))).length;
   const analyticsConnected = Boolean(input.analytics?.connected);
   return [
     {
@@ -11004,7 +11093,7 @@ function qualityGateQueue(projects: StoryProject[]) {
       const script = latestScriptDraft(project);
       const quality = qualityScorecardForProject(project);
       const pack = latestDraftForPass(project, "PUBLISHING_PACK");
-      const thumbnailCount = project.thumbnails?.length ?? 0;
+      const thumbnailCount = thumbnailAssetsForProject(project).length;
       const requiredThumbnails = requiredThumbnailCountForProject(project);
       if (!script) {
         return { project, status: "Waiting for script", nextAction: "Run the script workflow before QA.", rank: 5 };
@@ -11060,8 +11149,11 @@ function scriptIntentMaterialBlock(project: StoryProject, intent: ScriptIntentLo
     `CTA: ${intent.cta}`,
     `Compliance boundary: ${intent.complianceBoundary}`,
     `Opening style: ${opening.label} - ${opening.instruction}`,
-    `Project format: ${formatProjectFormat(project.format)}`
-  ].join("\n");
+    `Project format: ${formatProjectFormat(project.format)}`,
+    supportsSceneBackgrounds(project)
+      ? "Video production target: HeyGen.com. Keep script runtime under 30 minutes; default toward 7-10 minutes. Write clean presenter narration and preserve clear scene breaks for background generation."
+      : ""
+  ].filter(Boolean).join("\n");
 }
 
 function withScriptIntentMaterial(project: StoryProject, material: string, intent: ScriptIntentLock, openingKey: ScriptOpeningKey) {
@@ -11258,13 +11350,13 @@ function pipelineBoard(projects: StoryProject[], ideas: StoryIdea[], slots: Publ
     .slice(0, 8)
     .map((project) => ({ id: project.id, projectId: project.id, title: project.title, meta: latestScriptDraft(project) ? `${latestScriptDraft(project)?.wordCount.toLocaleString()} words` : `${projectOutputNoun(project.format)} ready` }));
   const packItems: PipelineItem[] = projects
-    .filter((project) => latestDraftForPass(project, "PUBLISHING_PACK") && (!supportsThumbnails(project) || (project.thumbnails?.length ?? 0) < requiredThumbnailCountForProject(project)))
+    .filter((project) => latestDraftForPass(project, "PUBLISHING_PACK") && (!supportsThumbnails(project) || thumbnailAssetsForProject(project).length < requiredThumbnailCountForProject(project)))
     .slice(0, 8)
     .map((project) => ({ id: project.id, projectId: project.id, title: project.title, meta: `${publishingPackLabel(project.format)} ready` }));
   const thumbnailItems: PipelineItem[] = projects
-    .filter((project) => supportsThumbnails(project) && (project.thumbnails?.length ?? 0) >= requiredThumbnailCountForProject(project) && !slotProjectIds.has(project.id))
+    .filter((project) => supportsThumbnails(project) && thumbnailAssetsForProject(project).length >= requiredThumbnailCountForProject(project) && !slotProjectIds.has(project.id))
     .slice(0, 8)
-    .map((project) => ({ id: project.id, projectId: project.id, title: project.title, meta: `${project.thumbnails?.length ?? 0} thumbnails` }));
+    .map((project) => ({ id: project.id, projectId: project.id, title: project.title, meta: `${thumbnailAssetsForProject(project).length} thumbnails` }));
   const scheduledItems: PipelineItem[] = slots
     .filter((slot) => slot.status === "SCHEDULED")
     .slice(0, 8)
@@ -11289,7 +11381,7 @@ function agencyReadinessItems(projects: StoryProject[], settings: UserSettings, 
   const completedScript = projects.some((project) => Boolean(latestScriptDraft(project)));
   const publishingPack = projects.some((project) => Boolean(latestDraftForPass(project, "PUBLISHING_PACK")));
   const videoProjects = projects.filter((project) => supportsThumbnails(project));
-  const thumbnailSet = videoProjects.some((project) => (project.thumbnails?.length ?? 0) >= requiredThumbnailCountForProject(project));
+  const thumbnailSet = videoProjects.some((project) => thumbnailAssetsForProject(project).length >= requiredThumbnailCountForProject(project));
   const qualityGate = projects.some((project) => Boolean(latestDraftForPass(project, "QUALITY_GATE")));
   const blueprintReady = Boolean(channel?.description && blueprint.targetAudience.trim() && blueprint.thumbnailStyle.trim());
 

@@ -127,7 +127,7 @@ export function ideaGenerationPrompt(input: IdeaFactoryInput, existingTitles: st
       : input.projectFormat === "PODCAST_EPISODE"
         ? isBusinessMode
           ? "Clearly prefer ideas that can sustain a practical podcast episode with examples, objection handling, and a clear listener takeaway."
-          : "Clearly prefer ideas that can sustain the selected 10-60 minute podcast episode length with strong listening flow."
+          : "Clearly prefer ideas that can sustain the selected under-30-minute podcast episode length with strong listening flow."
         : isShortBook
           ? isBusinessMode
             ? "Clearly prefer ideas that can sustain a chaptered short book with enough expert substance, frameworks, examples, and reader action steps."
@@ -137,8 +137,8 @@ export function ideaGenerationPrompt(input: IdeaFactoryInput, existingTitles: st
               ? "Clearly prefer ideas that can sustain a full long form book with multiple frameworks, buyer education arcs, examples, proof points, and a strong practical payoff."
               : "Clearly prefer ideas that can sustain a full long form book with multiple research layers, chapter arcs, documented depth, and a strong reader payoff."
             : isBusinessMode
-              ? "Clearly prefer ideas that can sustain a complete video script with clear sections, real audience pain, examples, and a useful CTA path."
-              : "Clearly prefer ideas that can sustain the selected 10-60 minute spoken narrative length.";
+              ? "Clearly prefer ideas that can sustain a complete HeyGen-ready video script under 30 minutes, ideally 7-10 minutes, with clear sections, real audience pain, examples, and a useful CTA path."
+              : "Clearly prefer ideas that can sustain the selected under-30-minute spoken narrative length, ideally 7-10 minutes.";
 
   const contextLines = isBusinessMode
     ? `Content mode: ${contentModeLabel(contentMode)}
@@ -193,8 +193,8 @@ Return strict JSON with this shape:
       "category": "string",
       "summary": "string",
       "whyCompelling": "string",
-      "estimatedLengthPotential": "${isShortBook ? "Standard short book - about 15,000 words" : isLongBook ? "Standard long form book - about 60,000 words" : "45-60 min"}",
-      "recommendedLengthMinutes": 45,
+      "estimatedLengthPotential": "${isShortBook ? "Standard short book - about 15,000 words" : isLongBook ? "Standard long form book - about 60,000 words" : "7-10 min"}",
+      "recommendedLengthMinutes": 7,
       "recommendedTone": "${input.tone || "Mysterious & gripping"}",
       "recommendedNarrationStyle": "${isBusinessMode ? "Journalistic" : "Investigative documentary"}",
       "sourceType": "string",
@@ -294,7 +294,7 @@ ${modeRules}
 - In titleThumbnailPretest, create three packaging options that test different curiosity promises without clickbait or false claims.
 - In thumbnailFirstFit, apply the thumbnail-first rule: if the idea cannot be sold with one clear visual subject plus one mystery/evidence detail, score it lower and explain what stronger visual anchor is needed before scripting.
 - The firstFrameExpectation must say how the opening line or visual immediately pays off the title/thumbnail promise. Good ideas should let the first 5 seconds say or show what the viewer clicked for.
-- In sourceDepthPreflight, flag whether the idea can honestly support 10, 20, 30, 45, or 60 minutes and list the source types needed before writing.
+- In sourceDepthPreflight, flag whether the idea can honestly support 7, 10, 20, or 30 minutes and list the source types needed before writing. Never recommend a video or podcast longer than 30 minutes; prefer 7-10 minutes unless there is a concrete reason to go longer.
 - In analyticsFit, use only the YouTube performance guidance above. If no connected analytics exists, say the fit is based on general channel best practices.
 - In ideaCluster, show how the idea fits into a repeatable channel lane with follow-up videos and Shorts cutdowns.
 - In monetizationRisk, rate compliance, trust, and platform risk. Use educational framing and avoid promises about savings, coverage, eligibility, underwriting, carrier appetite, or claim outcomes.
@@ -1759,12 +1759,13 @@ ${ttsOutputRules}
     case "SCENE_CARDS":
       return `${shared}
 
-Create production Scene Cards for the completed ${outputName}.
+Create HeyGen production Scene Cards for the completed ${outputName}. This production workflow uses HeyGen.com for the presenter/video assembly and low-cost Runware/Z-Image backgrounds for each scene. Do not recommend FLUX.
 
 Output plain text with these exact sections:
 Production Overview
 Visual Style Rules
 Scene Cards
+HeyGen Scene Background Prompts
 On-Screen Text Moments
 B-Roll And Evidence Visuals
 Sound And Music Cues
@@ -1776,7 +1777,12 @@ Asset Checklist
 Rules:
 - This is a production file, not narration. Do not rewrite the script.
 - Keep final narration clean; put all visuals, SFX, music, captions, and editing notes here.
-- For each scene card include: approximate timestamp or section, narration beat, visual idea, on-screen text if any, SFX/music cue if useful, and asset prompt or source note.
+- Break the whole script into practical HeyGen scenes. For 7-10 minute videos, use roughly 8-14 scenes. For longer videos under 30 minutes, use enough scenes to keep visuals fresh without becoming excessive.
+- For each scene card include: scene number, approximate timestamp range, narration beat, HeyGen presenter direction, background visual idea, on-screen text if any, SFX/music cue if useful, and one background image prompt.
+- In the "HeyGen Scene Background Prompts" section, list every background in this exact parseable format:
+Scene 01 Background Prompt: [single 16:9 background image prompt, no text, no typography, no logos, no watermark, no fake UI, no FLUX, suitable behind a HeyGen presenter]
+- Provide exactly one Scene XX Background Prompt for every scene card. Use leading zeroes for scenes 01-09.
+- Background prompts must be clean 16:9 scene backdrops, not YouTube thumbnails, posters, ads, infographics, or text-heavy images. They should leave safe negative space for a HeyGen presenter.
 - For five-episode series, separate Scene Cards by Episode One through Episode Five.
 - Include 5-10 Shorts clip candidates with hook line, source moment, caption angle, and CTA back to the full video.
 - Do not request fake evidence, fake documents, fake real-person confessions, gore, exploitation, or exact copyrighted/celebrity styles.
@@ -2758,8 +2764,8 @@ export function fallbackIdeas(input?: Partial<IdeaFactoryInput>) {
       category: "Maritime Stories",
       summary: "A routine crossing becomes a puzzle when a vessel reappears without passengers, crew, or a clear distress signal.",
       whyCompelling: "It has a clean central mystery, a contained setting, and multiple plausible explanations to test.",
-      estimatedLengthPotential: "45-60 min",
-      recommendedLengthMinutes: 45,
+      estimatedLengthPotential: "20 min",
+      recommendedLengthMinutes: 20,
       recommendedTone: "Mysterious & gripping",
       recommendedNarrationStyle: "Investigative documentary",
       sourceType: "Mixed (Books, Articles, Podcasts)",
@@ -2781,8 +2787,8 @@ export function fallbackIdeas(input?: Partial<IdeaFactoryInput>) {
       category: "Aviation Incidents",
       summary: "A flight crew survives a navigation anomaly that later looks less like a mistake and more like a chain of small impossible choices.",
       whyCompelling: "Aviation stories naturally provide stakes, timelines, instruments, and expert disagreement.",
-      estimatedLengthPotential: "45-60 min",
-      recommendedLengthMinutes: 45,
+      estimatedLengthPotential: "20 min",
+      recommendedLengthMinutes: 20,
       recommendedTone: "Suspenseful",
       recommendedNarrationStyle: "Cinematic narration",
       sourceType: "Mixed (Books, Articles, Podcasts)",
@@ -2804,8 +2810,8 @@ export function fallbackIdeas(input?: Partial<IdeaFactoryInput>) {
       category: "Strange True Stories",
       summary: "A remote community experiences a repeated nighttime voice that becomes part rumor, part investigation, and part civic panic.",
       whyCompelling: "It combines witness testimony, local fear, and an eerie but grounded sound mystery.",
-      estimatedLengthPotential: "30-45 min",
-      recommendedLengthMinutes: 30,
+      estimatedLengthPotential: "10 min",
+      recommendedLengthMinutes: 10,
       recommendedTone: "Atmospheric",
       recommendedNarrationStyle: "Slow-burn mystery",
       sourceType: "Local archives and newspapers",

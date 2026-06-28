@@ -13,12 +13,20 @@ const ProjectSchema = z.object({
   storyIdeaId: z.string().optional(),
   title: z.string().min(3).optional(),
   format: z.nativeEnum(StoryProjectFormat).default(StoryProjectFormat.STANDALONE),
-  targetLengthMinutes: z.number().int().min(10).max(60).default(45),
+  targetLengthMinutes: z.number().int().min(7).max(60).default(7),
   tone: z.string().default("Mysterious & gripping"),
   narrationStyle: z.string().default("Calm suspense"),
   sponsorBlurb: z.string().optional(),
   sponsorLink: z.string().optional(),
   channelId: z.string().optional()
+}).superRefine((value, ctx) => {
+  if (isRuntimeScriptFormat(value.format) && value.targetLengthMinutes > 30) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["targetLengthMinutes"],
+      message: "HeyGen video and podcast scripts must be 30 minutes or less."
+    });
+  }
 });
 
 const storyProjectInclude = {
@@ -27,6 +35,10 @@ const storyProjectInclude = {
   thumbnails: { orderBy: { createdAt: "desc" as const }, take: 24 },
   publishingSlots: { orderBy: { scheduledDate: "asc" as const }, take: 20 }
 };
+
+function isRuntimeScriptFormat(format: StoryProjectFormat) {
+  return format === StoryProjectFormat.STANDALONE || format === StoryProjectFormat.EPISODIC_SERIES || format === StoryProjectFormat.PODCAST_EPISODE;
+}
 
 export async function GET(request: Request) {
   try {

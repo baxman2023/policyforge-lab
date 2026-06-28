@@ -20,7 +20,7 @@ const MonthlyAutoSchema = z.object({
   channelId: z.string().optional()
 });
 
-const standaloneLengths = [30, 45, 60] as const;
+const standaloneLengths = [7, 10, 20] as const;
 
 export async function POST(request: Request) {
   try {
@@ -120,8 +120,8 @@ export async function POST(request: Request) {
           storyIdeaId: seriesIdea.id,
           title: seriesIdea.title,
           format: StoryProjectFormat.EPISODIC_SERIES,
-          targetLengthMinutes: 30,
-          targetWordCount: targetWordsForMinutes(30),
+          targetLengthMinutes: 10,
+          targetWordCount: targetWordsForMinutes(10),
           tone: seriesIdea.recommendedTone || settings.preferredTone,
           narrationStyle: seriesIdea.recommendedNarrationStyle || settings.narrationStyle
         }

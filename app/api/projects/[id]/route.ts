@@ -1,4 +1,4 @@
-import { PublishingSlotStatus, StoryIdeaStatus, StoryProjectStatus } from "@prisma/client";
+import { PublishingSlotStatus, StoryIdeaStatus, StoryProjectFormat, StoryProjectStatus } from "@prisma/client";
 import { z } from "zod";
 import { auditLog } from "@/lib/audit";
 import { jsonError } from "@/lib/http";
@@ -13,7 +13,7 @@ const ProjectPatchSchema = z.object({
   sourceMaterial: z.string().optional(),
   sponsorBlurb: z.string().optional(),
   sponsorLink: z.string().optional(),
-  targetLengthMinutes: z.number().int().min(10).max(60).optional(),
+  targetLengthMinutes: z.number().int().min(7).max(60).optional(),
   platform: z.string().trim().optional(),
   publishedUrl: z.string().trim().optional(),
   notes: z.string().trim().optional()
@@ -38,6 +38,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       });
 
       if (!project) return null;
+      if (input.targetLengthMinutes !== undefined && isRuntimeScriptFormat(project.format) && input.targetLengthMinutes > 30) {
+        throw new Error("HeyGen video and podcast scripts must be 30 minutes or less.");
+      }
       const sponsorAllowed = supportsSponsorBlurb(project.format);
       const sponsorBlurb = sponsorAllowed ? normalizeSponsorBlurbForFormat(input.sponsorBlurb ?? project.sponsorBlurb ?? "", project.format) : null;
 
@@ -130,6 +133,10 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   } catch (error) {
     return jsonError(error, 400);
   }
+}
+
+function isRuntimeScriptFormat(format: StoryProjectFormat) {
+  return format === StoryProjectFormat.STANDALONE || format === StoryProjectFormat.EPISODIC_SERIES || format === StoryProjectFormat.PODCAST_EPISODE;
 }
 
 export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {

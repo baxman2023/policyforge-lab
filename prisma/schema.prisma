@@ -285,7 +285,7 @@ model UserSettings {
   autoModelRouting            Boolean  @default(true)
   preferredTone               String   @default("Mysterious & gripping")
   narrationStyle              String   @default("Calm suspense")
-  defaultLengthMinutes        Int      @default(45)
+  defaultLengthMinutes        Int      @default(7)
   defaultCategories           Json?
   ttsPauseMarkers             Boolean  @default(false)
   createdAt                   DateTime @default(now())
@@ -350,8 +350,8 @@ model StoryProject {
   storyIdeaId         String?
   title               String
   format              StoryProjectFormat @default(STANDALONE)
-  targetLengthMinutes Int                @default(45)
-  targetWordCount     Int                @default(7200)
+  targetLengthMinutes Int                @default(7)
+  targetWordCount     Int                @default(1120)
   tone                String             @default("Mysterious & gripping")
   narrationStyle      String             @default("Calm suspense")
   sourceMaterial      String?            @db.LongText
@@ -411,7 +411,7 @@ model PublishingSlot {
   status          PublishingSlotStatus @default(SCHEDULED)
   episodeNumber   Int?
   episodeCount    Int?
-  durationMinutes Int                  @default(45)
+  durationMinutes Int                  @default(7)
   batchId         String?
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt

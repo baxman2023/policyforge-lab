@@ -413,7 +413,7 @@ function normalizeLengthMinutes(value?: number, label?: string, format?: string)
     return 45;
   }
   const matched = storyLengthOptions.find((item) => lengthLabelMatches(item, label));
-  return matched?.minutes ?? 45;
+  return matched?.minutes ?? 7;
 }
 
 function normalizeLengthLabel(value?: string, minutes?: number, format?: string) {
@@ -428,7 +428,7 @@ function normalizeLengthLabel(value?: string, minutes?: number, format?: string)
     return "Standard long form book - about 60,000 words";
   }
   const matched = storyLengthOptions.find((item) => lengthLabelMatches(item, value) || item.minutes === minutes);
-  return matched?.label ?? "45-60 min";
+  return matched?.label ?? "7 min";
 }
 
 function lengthLabelMatches(item: { label: string; minutes: number }, label?: string) {
@@ -714,12 +714,11 @@ function optionalScore(value?: number) {
 }
 
 function normalizePowerLength(value?: number) {
-  if (!value) return 45;
+  if (!value) return 7;
+  if (value <= 8) return 7;
   if (value <= 15) return 10;
   if (value <= 25) return 20;
-  if (value <= 37) return 30;
-  if (value <= 52) return 45;
-  return 60;
+  return 30;
 }
 
 function normalizeRiskLevel(value: string | undefined, score: number): "Low" | "Medium" | "High" {

@@ -9,6 +9,7 @@ import { DEFAULT_THUMBNAIL_STYLE_GUIDE } from "@/lib/thumbnail-style";
 
 const RUNWARE_ENDPOINT = "https://api.runware.ai/v1";
 export const DEFAULT_RUNWARE_MODEL = "ideogram:4@0";
+export const DEFAULT_SCENE_BACKGROUND_MODEL = "runware:z-image@turbo";
 const DEFAULT_THUMBNAIL_DIMENSIONS = { width: 1024, height: 576 };
 const IDEOGRAM_THUMBNAIL_DIMENSIONS = { width: 2560, height: 1440 };
 const CHANNEL_BANNER_DIMENSIONS = { width: 2560, height: 1440 };
@@ -26,6 +27,8 @@ const BOOK_ILLUSTRATION_NEGATIVE_PROMPT =
   "low quality, blurry, cropped, distorted anatomy, extra fingers, gore, graphic injury, fake blood, horror poster, YouTube thumbnail, text, typography, label, caption, watermark, logo, UI chrome, meme, advertisement, modern stock-photo look";
 const ARTICLE_IMAGE_NEGATIVE_PROMPT =
   "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, text, typography, label, caption, watermark, logo, UI chrome, meme, advertisement, clickbait arrows, stock-photo cliche";
+const SCENE_BACKGROUND_NEGATIVE_PROMPT =
+  "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, poster, advertisement, text, typography, caption, label, watermark, logo, UI chrome, social media layout, clickbait arrows, cluttered foreground, busy background";
 
 type RunwareImageResponse = {
   data?: Array<{
@@ -316,6 +319,92 @@ export async function generateArticleImages(input: {
   return created;
 }
 
+export type SceneBackgroundPrompt = {
+  sceneNumber: number;
+  title: string;
+  prompt: string;
+};
+
+export async function generateSceneBackgrounds(input: {
+  userId: string;
+  storyProjectId: string;
+  scriptDraftId?: string;
+  prompts: SceneBackgroundPrompt[];
+}) {
+  const apiKey = await getRunwareApiKey(input.userId);
+  if (!apiKey) throw new RunwareConfigurationError("Add a Runware API key in Settings before generating HeyGen scene backgrounds.");
+
+  const model = DEFAULT_SCENE_BACKGROUND_MODEL;
+  const taskMap = new Map<string, SceneBackgroundPrompt & { variant: number }>();
+  const tasks = input.prompts.slice(0, 40).map((prompt, index) => {
+    const taskUUID = crypto.randomUUID();
+    const variant = Number.isFinite(prompt.sceneNumber) ? Math.max(1, Math.round(prompt.sceneNumber)) : index + 1;
+    taskMap.set(taskUUID, { ...prompt, variant });
+    return {
+      taskType: "imageInference",
+      taskUUID,
+      model,
+      positivePrompt: sceneBackgroundPositivePrompt(prompt),
+      width: DEFAULT_THUMBNAIL_DIMENSIONS.width,
+      height: DEFAULT_THUMBNAIL_DIMENSIONS.height,
+      numberResults: 1,
+      outputType: "URL",
+      outputFormat: "JPG",
+      outputQuality: 90,
+      includeCost: true,
+      negativePrompt: SCENE_BACKGROUND_NEGATIVE_PROMPT
+    };
+  });
+
+  const response = await fetch(RUNWARE_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(tasks)
+  });
+
+  const payload = (await response.json().catch(() => ({}))) as RunwareImageResponse;
+  if (!response.ok || payload.errors?.length) {
+    const messages = [...new Set(payload.errors?.map((error) => error.message).filter(Boolean))];
+    throw new Error(messages.join(" ") || `Runware request failed with status ${response.status}.`);
+  }
+
+  const created = [];
+  for (const item of payload.data ?? []) {
+    if (!item.taskUUID || !item.imageURL) continue;
+    const prompt = taskMap.get(item.taskUUID);
+    if (!prompt) continue;
+    created.push(
+      await prisma.thumbnailAsset.create({
+        data: {
+          storyProjectId: input.storyProjectId,
+          scriptDraftId: input.scriptDraftId,
+          variant: prompt.variant,
+          title: `HeyGen Scene ${String(prompt.variant).padStart(2, "0")} Background: ${prompt.title}`,
+          prompt: [
+            "HeyGen scene background",
+            `Scene: ${String(prompt.variant).padStart(2, "0")}`,
+            `Prompt: ${prompt.prompt}`
+          ].join("\n"),
+          imageUrl: item.imageURL,
+          imageUUID: item.imageUUID,
+          taskUUID: item.taskUUID,
+          modelUsed: model,
+          estimatedCost: Number(item.cost ?? 0.0006)
+        }
+      })
+    );
+  }
+
+  if (!created.length) {
+    throw new Error("Runware did not return any HeyGen scene background image URLs.");
+  }
+
+  return created;
+}
+
 export async function generateChannelBrandImages(input: {
   userId: string;
   logoPrompt: string;
@@ -447,6 +536,17 @@ function articleImagePositivePrompt(image: ArticleImagePlan) {
     `Image prompt: ${clampText(image.prompt, 1700)}`,
     "Make the image support the article's section visually and respectfully. Use credible objects, locations, people from behind or silhouettes when appropriate, documents, maps, environmental context, or service/business visuals when relevant. Avoid fabricated evidence, sensational imagery, and cheap stock-photo poses."
   ].filter(Boolean).join(" ").slice(0, 3200);
+}
+
+function sceneBackgroundPositivePrompt(prompt: SceneBackgroundPrompt) {
+  return [
+    "Clean 16:9 background image for a HeyGen presenter video, professional insurance education, designed to sit behind or beside a talking-head avatar.",
+    "No text, no typography, no labels, no watermarks, no logos, no UI, no arrows, no YouTube thumbnail styling.",
+    "Leave safe negative space on one side for a presenter. Keep the scene visually useful but not busy.",
+    `Scene ${prompt.sceneNumber}: ${prompt.title}.`,
+    `Image prompt: ${clampText(prompt.prompt, 1700)}`,
+    "Use credible Texas/Houston, home, auto, business, policy document, storm, renewal, family, or service-context visuals when relevant. Polished documentary/editorial lighting, realistic, trustworthy, compliance-safe, no sensationalism, no fabricated documents with readable text."
+  ].join(" ").slice(0, 3200);
 }
 
 function supportsNegativePrompt(model: string) {

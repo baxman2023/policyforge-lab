@@ -142,7 +142,7 @@ function timestampBlock(existing: string, targetLengthMinutes?: number | null) {
   const extracted = extractTimestamps(existing);
   const stamps = extracted.length >= 3 && timestampItemsFit(extracted, targetLengthMinutes)
     ? extracted
-    : defaultTimestamps(targetLengthMinutes ?? 45);
+    : defaultTimestamps(targetLengthMinutes ?? 7);
   return ["Timestamps:", ...stamps.map((item) => `${item.time} - ${item.label}`)].join("\n");
 }
 
@@ -208,7 +208,7 @@ function escapeRegExp(value: string) {
 }
 
 function defaultTimestamps(targetLengthMinutes: number) {
-  const minutes = Math.max(6, Math.min(120, targetLengthMinutes || 45));
+  const minutes = Math.max(6, Math.min(30, targetLengthMinutes || 7));
   const totalSeconds = minutes * 60;
   const marks = [0, 0.14, 0.28, 0.44, 0.6, 0.78, 0.92].map((ratio) => roundToNearestFifteen(totalSeconds * ratio));
   const labels = ["Opening question", "The setup", "The first major turn", "The evidence trail", "The competing explanations", "What remains unresolved", "Final takeaway"];
