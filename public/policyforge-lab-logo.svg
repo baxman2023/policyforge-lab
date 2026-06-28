@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="PolicyForge LAB logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#061f2a"/>
+      <stop offset="0.58" stop-color="#0c3d49"/>
+      <stop offset="1" stop-color="#08262f"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f5961"/>
+      <stop offset="1" stop-color="#07313a"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <path d="M256 54 389 111 361 320 256 438 151 320 123 111Z" fill="url(#shield)" stroke="#e8b24a" stroke-width="12" stroke-linejoin="round"/>
+  <text x="256" y="131" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="800" fill="#f7fbfa">PF</text>
+  <path d="M174 230 256 152 338 230" fill="none" stroke="#21a397" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="199" y="223" width="114" height="112" rx="12" fill="none" stroke="#f7fbfa" stroke-width="13"/>
+  <path d="M256 223v112M199 278h114" stroke="#f7fbfa" stroke-width="10" stroke-linecap="round"/>
+  <path d="M190 369 233 405 323 340" fill="none" stroke="#e8b24a" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

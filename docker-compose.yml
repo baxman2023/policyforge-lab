@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: policyforgelab
+      POSTGRES_PASSWORD: policyforgelab
+      POSTGRES_DB: policyforgelab
+    ports:
+      - "5432:5432"
+    volumes:
+      - policyforgelab-postgres:/var/lib/postgresql/data
+
+volumes:
+  policyforgelab-postgres:
