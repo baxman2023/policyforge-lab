@@ -1064,6 +1064,7 @@ const EPISODE_AUTO_SEQUENCE: ScriptPassType[] = [
 const navItems: Array<{ id: AppSection; label: string; icon: LucideIcon }> = [
   { id: "dashboard", label: "Growth Plan", icon: Home },
   { id: "campaign-builder", label: "Campaign Builder", icon: Zap },
+  { id: "idea-factory", label: "Video Ideas", icon: Lightbulb },
   { id: "projects", label: "Projects", icon: FolderKanban },
   { id: "media", label: "Assets", icon: ImageIcon },
   { id: "calendar", label: "Calendar", icon: CalendarDays },
