@@ -35,6 +35,7 @@ import {
   Search,
   Settings,
   ShieldCheck,
+  SlidersHorizontal,
   Star,
   Trash2,
   UserCog,
@@ -196,6 +197,7 @@ type WorkspacePayload = {
 
 type AppSection =
   | "dashboard"
+  | "campaign-builder"
   | "idea-factory"
   | "projects"
   | "script-lab"
@@ -1060,17 +1062,107 @@ const EPISODE_AUTO_SEQUENCE: ScriptPassType[] = [
 ];
 
 const navItems: Array<{ id: AppSection; label: string; icon: LucideIcon }> = [
-  { id: "dashboard", label: "Dashboard", icon: Home },
-  { id: "idea-factory", label: "Idea Factory", icon: Lightbulb },
-  { id: "projects", label: "Campaign Projects", icon: FolderKanban },
-  { id: "script-lab", label: "Content Lab", icon: FileText },
-  { id: "calendar", label: "Campaign Calendar", icon: CalendarDays },
-  { id: "published", label: "Published", icon: Globe2 },
-  { id: "media", label: "Media", icon: ImageIcon },
-  { id: "exports", label: "Exports", icon: LayoutList },
+  { id: "dashboard", label: "Growth Plan", icon: Home },
+  { id: "campaign-builder", label: "Campaign Builder", icon: Zap },
+  { id: "projects", label: "Projects", icon: FolderKanban },
+  { id: "media", label: "Assets", icon: ImageIcon },
+  { id: "calendar", label: "Calendar", icon: CalendarDays },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "guides", label: "Guides", icon: BookOpen },
   { id: "settings", label: "Settings", icon: Settings }
+];
+
+type CampaignGoalKey =
+  | "home-quotes"
+  | "auto-bundles"
+  | "germania-home"
+  | "storm-season"
+  | "renewal-rescue"
+  | "referrals-reviews"
+  | "local-seo";
+
+type CampaignAssetKey = "video" | "article" | "landing-page" | "gbp-social" | "email" | "podcast";
+
+const campaignGoalOptions: Array<{
+  key: CampaignGoalKey;
+  label: string;
+  detail: string;
+  goal: string;
+  cta: string;
+  offer: string;
+}> = [
+  {
+    key: "home-quotes",
+    label: "Get Home Insurance Quotes",
+    detail: "High-intent education for Texas homeowners, buyers, renewals, and coverage reviews.",
+    goal: "Generate qualified Texas home insurance quote requests and policy review conversations.",
+    cta: "Call 281-445-1381 or request a Texas home insurance review with Baxter Insurance Agency.",
+    offer: "Texas home insurance quotes, policy reviews, storm/flood questions, and coverage checkups."
+  },
+  {
+    key: "auto-bundles",
+    label: "Get Auto Bundle Reviews",
+    detail: "Auto, home bundle, teen driver, renewal, and household-change campaigns.",
+    goal: "Generate auto quote requests, bundle reviews, and household policy review conversations.",
+    cta: "Call 281-445-1381 to review auto coverage, bundle options, or a Texas household renewal.",
+    offer: "Texas auto quotes, home and auto bundle reviews, teen-driver reviews, and renewal checkups."
+  },
+  {
+    key: "germania-home",
+    label: "Promote Germania Home",
+    detail: "Germania-focused Texas homeowners education without carrier promises.",
+    goal: "Create Germania-focused Texas home insurance conversations while avoiding carrier eligibility, rate, or coverage promises.",
+    cta: "Ask Baxter Insurance Agency whether Germania may be worth reviewing for your Texas home situation.",
+    offer: "Germania-focused home and property quote preparation, policy review, and Texas homeowners education."
+  },
+  {
+    key: "storm-season",
+    label: "Storm Season Campaign",
+    detail: "Timely Texas wind, hail, flood, roof, claim documentation, and prep content.",
+    goal: "Generate storm-season policy review requests and practical coverage-prep conversations.",
+    cta: "Call 281-445-1381 before storm season to review home, auto, flood, and documentation questions.",
+    offer: "Storm season coverage review, flood discussion, documentation checklist, and Texas preparedness guidance."
+  },
+  {
+    key: "renewal-rescue",
+    label: "Renewal Rescue",
+    detail: "Rate increase, renewal confusion, deductible, coverage change, and quote-prep campaigns.",
+    goal: "Generate renewal review conversations from Texas prospects confused by rate changes, deductibles, or policy updates.",
+    cta: "Call 281-445-1381 to schedule a Texas renewal review before you make a coverage decision.",
+    offer: "Home, auto, landlord, and business renewal reviews with plain-English coverage questions."
+  },
+  {
+    key: "referrals-reviews",
+    label: "Referrals + Reviews",
+    detail: "Client goodwill campaigns that request reviews, referrals, and policy check-ins.",
+    goal: "Increase review requests, referral conversations, and client reactivation without sounding pushy.",
+    cta: "Refer a Texas friend, leave a Google review, or call 281-445-1381 with a coverage question.",
+    offer: "Review requests, referral prompts, client check-in campaigns, and helpful policy-review reminders."
+  },
+  {
+    key: "local-seo",
+    label: "Build Local SEO",
+    detail: "City/service pages, GBP posts, FAQs, and local quote-intent articles.",
+    goal: "Build Texas local SEO visibility for quote-ready insurance searches in Houston-area markets.",
+    cta: "Call 281-445-1381 or request a quote from Baxter Insurance Agency for Texas insurance questions.",
+    offer: "Houston-area home, auto, commercial, flood, and life insurance local SEO pages and quote-ready FAQs."
+  }
+];
+
+const campaignAssetOptions: Array<{
+  key: CampaignAssetKey;
+  label: string;
+  detail: string;
+  contentMode: ContentMode;
+  format: StoryProjectFormat;
+  length: string;
+  sourceType: string;
+}> = [
+  { key: "video", label: "Video Campaign", detail: "Script plus Business Campaign Kit, thumbnails, Shorts hooks, and Macaly prompt.", contentMode: "LOCAL_LEAD_GEN", format: "STANDALONE", length: "10 minutes", sourceType: "Agency knowledge, Texas market context, carrier guidelines" },
+  { key: "article", label: "SEO Article", detail: "Website-ready article, FAQ, topical map, GBP post, email, and landing page prompt.", contentMode: "EXPERT_AUTHORITY", format: "ARTICLE", length: "Feature article - about 2,000 words", sourceType: "Local SEO research and service-area pages" },
+  { key: "landing-page", label: "Macaly Landing Page", detail: "Generate ideas whose campaign kit produces a Macaly prompt optimized for forms and CTAs.", contentMode: "LOCAL_LEAD_GEN", format: "ARTICLE", length: "Feature article - about 2,000 words", sourceType: "Agency knowledge, Texas market context, carrier guidelines" },
+  { key: "gbp-social", label: "GBP + Social Push", detail: "Short campaign ideas for Google Business Profile, Facebook, email, and phone follow-up.", contentMode: "REPURPOSE_MULTIPLIER", format: "ARTICLE", length: "Brief article - about 900 words", sourceType: "Client FAQs and policy review notes" },
+  { key: "email", label: "Client Email Campaign", detail: "Email-first education or referral push with supporting article and call script.", contentMode: "SALES_OFFER", format: "ARTICLE", length: "Brief article - about 900 words", sourceType: "Client FAQs and policy review notes" },
+  { key: "podcast", label: "Podcast Episode", detail: "Podcast-ready topic with show notes, follow-up assets, and Macaly prompt.", contentMode: "EXPERT_AUTHORITY", format: "PODCAST_EPISODE", length: "20 minutes", sourceType: "Agency knowledge, Texas market context, carrier guidelines" }
 ];
 
 const categoryOptions = [
@@ -1308,7 +1400,7 @@ const projectFormatOptions: Array<{
   {
     value: "STANDALONE",
     label: "Video Script",
-    description: "Insurance video script, publishing pack, and thumbnails.",
+    description: "Insurance video script, Business Campaign Kit, and thumbnails.",
     icon: Play
   },
   {
@@ -1382,7 +1474,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Choose Anthropic and OpenAI fallback models from the live provider dropdowns after saving those keys.",
         "Add Runware only if you want video thumbnails, logos, or banners generated inside Baxter Growth Lab.",
         "Add DataForSEO if you want keyword metrics to improve local SEO pages, tags, and publishing descriptions.",
-        "Open Model Routing, choose the models for discovery, research, drafting, critique, rewrite, and publishing packs, then click Save Model Routing.",
+        "Open Model Routing, choose the models for discovery, research, drafting, critique, rewrite, and campaign kits, then click Save Model Routing.",
         "Save AI Providers saves keys and provider settings. Save Model Routing saves the routing dropdowns."
       ]
     },
@@ -1491,16 +1583,16 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Compliance Check summarizes confirmed facts, verification targets, risky claims, and do-not-say-as-fact notes.",
         "Teleprompter Polish creates the clean final video script. If the ending guard keeps blocking a result, Force Save Final reruns and saves the pass anyway.",
         "Copy copies the current output to your clipboard; Download saves the current output as a local text file.",
-        "Content Pack downloads the complete output, scorecard, compliance notes, publishing pack, and video thumbnails when available."
+        "Content Pack downloads the complete output, scorecard, compliance notes, campaign kit, and video thumbnails when available."
       ]
     },
     {
       title: "Metadata Packs and Thumbnails",
       items: [
-        "Video Publishing Pack creates three titles, YouTube metadata, tags, pinned comment, and three thumbnail prompts.",
+        "Business Campaign Kit creates title tests, descriptions, tags, CTAs, thumbnail prompts, and supporting campaign assets.",
         "Podcast Show Notes Pack creates three episode titles, show notes, tags, and a listener prompt.",
         "Article SEO Pack creates three headlines, SEO description, tags, and a reader prompt.",
-        "When DataForSEO is configured, Publishing Pack can favor stronger keyword phrases in titles, descriptions, tags, and hashtags.",
+        "When DataForSEO is configured, Business Campaign Kit can favor stronger keyword phrases in titles, descriptions, tags, and hashtags.",
         "Description follows this order: main keyword, CTA link, description part one, timestamps, description part two, CTA with link, and 3-5 hashtags.",
         "Video timestamps are rebuilt around the actual saved script duration when the generated timestamps do not fit.",
         "Use Regenerate Description in the video Description block when YouTube metadata needs a fresh pass.",
@@ -1571,7 +1663,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       title: "Publishing Protocol",
       items: [
         "Use Monthly Auto only when the channel has at least seven unused or saved ideas.",
-        "Schedule one-offs after the final or publishing pack is ready.",
+        "Schedule one-offs after the final output or campaign kit is ready.",
         "Download a Content Pack before sending content to production.",
         "Mark Published only after the content is live; Produced is for finished content waiting to publish."
       ]
@@ -1600,7 +1692,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       items: [
         "Use Content Pack for the clean current production bundle.",
         "Use Markdown or plain text export for a lightweight content-only handoff.",
-        "Use Export Vault History when you need to recover an older draft, earlier publishing pack, or previous workflow output.",
+        "Use Export Vault History when you need to recover an older draft, earlier campaign kit, or previous workflow output.",
         "Avoid copying raw Draft, Rewrite, or Final when an assembled final output exists, because it includes the opening, cleaned body, and closing."
       ]
     },
@@ -1610,7 +1702,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "If a model returns invalid output, rerun the same pass, click Test beside each configured API key, then choose a different OpenRouter or fallback model.",
         "If a pass stalls, refresh and check whether the previous output was saved before rerunning.",
         "If generated thumbnails fail, confirm the Runware key and model, then rerun Create Thumbnails.",
-        "If Teleprompter Polish keeps failing with an incomplete-output warning, use Force Save Final from the Final step, then inspect the saved script before creating the Publishing Pack.",
+        "If Teleprompter Polish keeps failing with an incomplete-output warning, use Force Save Final from the Final step, then inspect the saved script before creating the Business Campaign Kit.",
         "If model choices appear to revert, return to Settings > Model Routing, choose the models again, and click Save Model Routing."
       ]
     }
@@ -1619,8 +1711,12 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
 
 const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
   dashboard: {
-    title: "Dashboard",
-    subtitle: "A live view of your idea pipeline, active projects, and production pace."
+    title: "This Week's Money Plan",
+    subtitle: "The clearest next actions for turning content into quote, review, referral, and policy-review conversations."
+  },
+  "campaign-builder": {
+    title: "Campaign Builder",
+    subtitle: "Choose a business goal, growth lane, and asset type, then generate a complete lead-focused campaign direction."
   },
   "idea-factory": {
     title: "Growth Idea Factory",
@@ -1643,8 +1739,8 @@ const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
     subtitle: "Track what is finished, scheduled, live, archived, and protected from duplicate reuse."
   },
   media: {
-    title: "Media",
-    subtitle: "Prepare source, visual, and production asset needs for each campaign."
+    title: "Assets",
+    subtitle: "Prepare thumbnails, visual assets, Business Campaign Kits, and downloadable production material."
   },
   exports: {
     title: "Exports",
@@ -1660,7 +1756,7 @@ const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
   },
   settings: {
     title: "Settings",
-    subtitle: "Save AI provider keys, fallback models, routing, tone, and content defaults."
+    subtitle: "Save business setup, growth lanes, AI providers, integrations, and content defaults."
   }
 };
 
@@ -1737,6 +1833,9 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
   const [businessCta, setBusinessCta] = useState("Call Baxter Insurance Agency, Inc. at 281-445-1381 or request a Texas insurance review.");
   const [ideaCount, setIdeaCount] = useState(10);
   const [projectFormat, setProjectFormat] = useState<StoryProjectFormat>("STANDALONE");
+  const [campaignGoal, setCampaignGoal] = useState<CampaignGoalKey>("home-quotes");
+  const [campaignAsset, setCampaignAsset] = useState<CampaignAssetKey>("video");
+  const [campaignLaneName, setCampaignLaneName] = useState(FORGE_NICHES[0].name);
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [selectedOutputByProjectId, setSelectedOutputByProjectId] = useState<Record<string, string>>({});
   const [sourceMaterialByProjectId, setSourceMaterialByProjectId] = useState<Record<string, string>>({});
@@ -2799,36 +2898,54 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     );
   }
 
-  async function generateIdeas() {
+  type IdeaGenerationOverrides = Partial<{
+    forgeNiche: typeof FORGE_NICHES[number] | null;
+    niche: string;
+    tone: string;
+    category: string;
+    desiredLength: string;
+    sourceType: string;
+    contentMode: ContentMode;
+    businessAudience: string;
+    businessOffer: string;
+    businessLocation: string;
+    businessGoal: string;
+    businessCompliance: string;
+    businessCta: string;
+    projectFormat: StoryProjectFormat;
+    ideaCount: number;
+  }>;
+
+  async function generateIdeas(overrides: IdeaGenerationOverrides = {}) {
     if (!activeChannelId) {
       setMessage("Create or choose a channel before generating ideas.");
       return;
     }
 
     await runAction("generate", async () => {
-      const forgeNiche = currentForgeNiche;
+      const forgeNiche = overrides.forgeNiche === undefined ? currentForgeNiche : overrides.forgeNiche;
       const payload = await fetchJson<{ ideas: StoryIdea[]; modelUsed: string }>("/api/ideas/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          niche: forgeNiche ? forgeIdeaBrief(forgeNiche) : niche,
-          tone: forgeNiche?.tone || tone,
-          category: forgeNiche?.category || (generateCategory === "All Categories" ? "Mixed long-form true stories" : generateCategory),
-          desiredLength,
-          sourceType: forgeNiche?.sourceType || sourceType,
-          contentMode,
-          businessAudience,
-          businessOffer,
-          businessLocation,
-          businessGoal,
-          businessCompliance,
-          businessCta,
-          projectFormat,
+          niche: forgeNiche ? forgeIdeaBrief(forgeNiche) : overrides.niche ?? niche,
+          tone: forgeNiche?.tone || overrides.tone || tone,
+          category: forgeNiche?.category || (overrides.category ?? (generateCategory === "All Categories" ? "Mixed long-form true stories" : generateCategory)),
+          desiredLength: overrides.desiredLength ?? desiredLength,
+          sourceType: forgeNiche?.sourceType || overrides.sourceType || sourceType,
+          contentMode: overrides.contentMode ?? contentMode,
+          businessAudience: overrides.businessAudience ?? businessAudience,
+          businessOffer: overrides.businessOffer ?? businessOffer,
+          businessLocation: overrides.businessLocation ?? businessLocation,
+          businessGoal: overrides.businessGoal ?? businessGoal,
+          businessCompliance: overrides.businessCompliance ?? businessCompliance,
+          businessCta: overrides.businessCta ?? businessCta,
+          projectFormat: overrides.projectFormat ?? projectFormat,
           moneyGoal: channelBlueprintDraft.moneyGoal,
           affiliateOffer: [channelBlueprintDraft.offerDescription, channelBlueprintDraft.affiliateUrl].filter(Boolean).join(" | "),
           riskProfile: channelBlueprintDraft.riskTolerance,
           productionCapacity: `${channelBlueprintDraft.weeklyVideoTarget || 2} videos per week`,
-          count: ideaCount,
+          count: overrides.ideaCount ?? ideaCount,
           model: settings.discoveryModel,
           channelId: activeChannelId,
           save: true,
@@ -2839,6 +2956,55 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       setActiveTab("Generated Ideas");
       setMessage(`${payload.ideas.length} ideas generated, scored, duplicate-checked, and saved. Model: ${payload.modelUsed}.`);
     });
+  }
+
+  function campaignBuilderContext() {
+    const goal = campaignGoalOptions.find((item) => item.key === campaignGoal) ?? campaignGoalOptions[0];
+    const asset = campaignAssetOptions.find((item) => item.key === campaignAsset) ?? campaignAssetOptions[0];
+    const lane = FORGE_NICHES.find((item) => item.name === campaignLaneName) ?? currentForgeNiche ?? FORGE_NICHES[0];
+    return { goal, asset, lane };
+  }
+
+  function applyCampaignBuilderTemplate() {
+    const { goal, asset, lane } = campaignBuilderContext();
+    setContentMode(asset.contentMode);
+    setProjectFormat(asset.format);
+    setDesiredLength(asset.length);
+    setNiche(lane.nicheFocus);
+    setGenerateCategory(lane.category);
+    setTone(lane.tone);
+    setSourceType(asset.sourceType || lane.sourceType);
+    setBusinessGoal(goal.goal);
+    setBusinessCta(goal.cta);
+    setBusinessOffer(goal.offer);
+    setBusinessAudience("Texas insurance prospects, Baxter Insurance Agency clients, homeowners, drivers, families, landlords, and small-business owners, especially Houston and surrounding areas");
+    setBusinessLocation("Texas, primarily Houston and surrounding areas");
+    setBusinessCompliance("Texas-only. Do not promise savings, coverage, eligibility, underwriting acceptance, carrier appetite, rates, discounts, or claim outcomes. Explain that coverage depends on policy terms, limits, exclusions, deductibles, endorsements, underwriting, carrier appetite, and Texas regulations.");
+    setIdeaCount(10);
+    setMessage(`Campaign Builder applied: ${goal.label} · ${asset.label} · ${lane.name}. Review or generate in the Idea Factory.`);
+  }
+
+  async function generateCampaignIdeas() {
+    const { goal, asset, lane } = campaignBuilderContext();
+    applyCampaignBuilderTemplate();
+    await generateIdeas({
+      forgeNiche: lane,
+      niche: lane.nicheFocus,
+      tone: lane.tone,
+      category: lane.category,
+      desiredLength: asset.length,
+      sourceType: asset.sourceType || lane.sourceType,
+      contentMode: asset.contentMode,
+      businessAudience: "Texas insurance prospects, Baxter Insurance Agency clients, homeowners, drivers, families, landlords, and small-business owners, especially Houston and surrounding areas",
+      businessOffer: goal.offer,
+      businessLocation: "Texas, primarily Houston and surrounding areas",
+      businessGoal: goal.goal,
+      businessCompliance: "Texas-only. Do not promise savings, coverage, eligibility, underwriting acceptance, carrier appetite, rates, discounts, or claim outcomes. Explain that coverage depends on policy terms, limits, exclusions, deductibles, endorsements, underwriting, carrier appetite, and Texas regulations.",
+      businessCta: goal.cta,
+      projectFormat: asset.format,
+      ideaCount: 10
+    });
+    setActiveSection("idea-factory");
   }
 
   function changeContentMode(mode: ContentMode) {
@@ -3174,7 +3340,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     }
 
     if (!latestDraftForPass(selectedProject, "PUBLISHING_PACK")) {
-      setMessage("Create a Publishing Pack before regenerating the video description.");
+      setMessage("Create a Business Campaign Kit before regenerating the video description.");
       return;
     }
 
@@ -3379,12 +3545,12 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
 
     const needsWork = eligibleProjects.filter((project) => !latestDraftForPass(project, "PUBLISHING_PACK") || (project.thumbnails?.length ?? 0) < requiredThumbnailCountForProject(project));
     if (!needsWork.length) {
-      setMessage("Every video project already has a Publishing Pack and the required thumbnails.");
+      setMessage("Every video project already has a Business Campaign Kit and the required thumbnails.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Create missing Publishing Packs and thumbnails for ${needsWork.length} video project${needsWork.length === 1 ? "" : "s"}?\n\nBaxter Growth Lab will keep the shared thumbnail style across all images.`
+      `Create missing Business Campaign Kits and thumbnails for ${needsWork.length} video project${needsWork.length === 1 ? "" : "s"}?\n\nBaxter Growth Lab will keep the shared thumbnail style across all images.`
     );
     if (!confirmed) return;
 
@@ -3397,7 +3563,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           const material = sourceMaterialByProjectId[project.id] ?? project.sourceMaterial ?? "";
 
           if (!latestDraftForPass(currentProject, "PUBLISHING_PACK")) {
-            setAutoStep(`Publishing Pack: ${project.title}`);
+            setAutoStep(`Business Campaign Kit: ${project.title}`);
             currentProject = await executeProjectPass(currentProject, "PUBLISHING_PACK", material);
             packed += 1;
           }
@@ -3413,7 +3579,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         setAutoStep("");
       }
       setActiveSection("media");
-      setMessage(`Batch complete: ${packed} Publishing Packs created and ${generated} thumbnails generated.`);
+      setMessage(`Batch complete: ${packed} Business Campaign Kits created and ${generated} thumbnails generated.`);
     }, { errorKey: "thumbnail-batch" });
   }
 
@@ -3996,6 +4162,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         ) : null}
 
         {!loading && activeSection === "dashboard" ? renderDashboard() : null}
+        {!loading && activeSection === "campaign-builder" ? renderCampaignBuilder() : null}
         {!loading && activeSection === "idea-factory" ? renderIdeaFactory() : null}
         {!loading && activeSection === "projects" ? renderProjects() : null}
         {!loading && activeSection === "script-lab" ? renderScriptLab() : null}
@@ -4027,6 +4194,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const moneyAnalytics = moneyFocusedAnalytics({ analytics: youtubeAnalytics, projects, blueprint: channelBlueprintDraft });
     const moneyPathReady = isMoneyPathReady(channelBlueprintDraft);
     const cockpitItems = creatorCockpitItems({ ideas, projects, slots: publishingSlots, analytics: youtubeAnalytics, blueprint: channelBlueprintDraft });
+    const weeklyMoneyPlan = bestNextMoveItems({ ideas, projects, slots: publishingSlots, analytics: youtubeAnalytics, blueprint: channelBlueprintDraft });
 
     return (
       <SectionStack>
@@ -4039,9 +4207,9 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           <Metric label="Published content" value={counts.published} />
         </div>
         <div className="action-strip">
-          <button className="primary-button fit" type="button" onClick={() => goToSection("idea-factory", "Generated Ideas")}>
+          <button className="primary-button fit" type="button" onClick={() => goToSection("campaign-builder")}>
             <Zap size={16} />
-            Find New Growth Ideas
+            Build Lead Campaign
           </button>
           <button className="secondary-button" type="button" onClick={() => goToSection("projects")}>
             <FolderKanban size={16} />
@@ -4052,6 +4220,20 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             Campaign Calendar
           </button>
         </div>
+        <Panel title="This Week's Money Plan">
+          <div className="money-plan-list">
+            {weeklyMoneyPlan.map((item, index) => (
+              <button className={cn("money-plan-card", item.priority)} type="button" key={item.title} onClick={() => goToSection(item.section, item.tab)}>
+                <span>{index + 1}</span>
+                <div>
+                  <strong>{item.title}</strong>
+                  <small>{item.detail}</small>
+                  <em>{item.action}</em>
+                </div>
+              </button>
+            ))}
+          </div>
+        </Panel>
         <Panel title="Agency Growth Cockpit">
           <div className="creator-cockpit">
             {cockpitItems.map((item) => (
@@ -4075,9 +4257,9 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               <Settings size={16} />
               Set Revenue Path
             </button>
-            <button className="secondary-button compact" type="button" onClick={() => goToSection("idea-factory")}>
+            <button className="secondary-button compact" type="button" onClick={() => goToSection("campaign-builder")}>
               <Lightbulb size={15} />
-              Generate Revenue Ideas
+              Generate Revenue Campaign
             </button>
           </div>
         </div>
@@ -4099,7 +4281,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           </Panel>
           <Panel title="Best Next Move">
             <div className="producer-list">
-              {bestNextMoveItems({ ideas, projects, slots: publishingSlots, analytics: youtubeAnalytics, blueprint: channelBlueprintDraft }).map((item) => (
+              {weeklyMoneyPlan.map((item) => (
                 <button className={cn("producer-row", item.priority)} type="button" key={item.title} onClick={() => goToSection(item.section, item.tab)}>
                   <strong>{item.title}</strong>
                   <span>{item.detail}</span>
@@ -4230,7 +4412,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 ))}
               </div>
             ) : (
-              <EmptyState title="No packaging memory yet" body="Run Publishing Pack to collect reusable title and thumbnail tests." />
+            <EmptyState title="No campaign kit memory yet" body="Create a Business Campaign Kit to collect reusable title and thumbnail tests." />
             )}
           </Panel>
           <Panel title="Channel Voice Profile">
@@ -4254,11 +4436,11 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           <Panel title="Guided Create Flow">
             <div className="guided-create-flow">
               {[
-                { label: "Choose Mode", detail: "Pick video, podcast, article, quote campaign, client education, local SEO, renewal, review, or social/GBP content.", done: true, action: () => goToSection("idea-factory") },
+                { label: "Choose Campaign", detail: "Pick quote campaign, client education, local SEO, renewal, review, video, podcast, article, or social/GBP content.", done: true, action: () => goToSection("campaign-builder") },
                 { label: "Generate Ideas", detail: `${counts.unused} unused ideas available in this channel.`, done: counts.unused > 0, action: () => goToSection("idea-factory", "Generated Ideas") },
                 { label: "Build Project", detail: `${counts.projects} project${counts.projects === 1 ? "" : "s"} created.`, done: counts.projects > 0, action: () => goToSection("projects") },
                 { label: "Run Workflow", detail: `${counts.completedScripts} finished output${counts.completedScripts === 1 ? "" : "s"} ready.`, done: counts.completedScripts > 0, action: () => goToSection("script-lab") },
-                { label: "Package Assets", detail: "Create publishing packs, thumbnails, article images, exports, and calls to action.", done: projects.some((project) => latestDraftForPass(project, "PUBLISHING_PACK")), action: () => goToSection("media") },
+                { label: "Package Assets", detail: "Create campaign kits, thumbnails, article images, exports, and calls to action.", done: projects.some((project) => latestDraftForPass(project, "PUBLISHING_PACK")), action: () => goToSection("media") },
                 { label: "Schedule / Publish", detail: `${counts.scheduled} scheduled item${counts.scheduled === 1 ? "" : "s"} waiting.`, done: counts.scheduled > 0 || counts.published > 0, action: () => goToSection("calendar") }
               ].map((step, index) => (
                 <button className={cn("guided-step", step.done && "done")} type="button" key={step.label} onClick={step.action}>
@@ -4396,6 +4578,151 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             ) : (
               <EmptyState title="No projects yet" body="Start a project from a saved or generated idea." />
             )}
+          </Panel>
+        </div>
+      </SectionStack>
+    );
+  }
+
+  function renderCampaignBuilder() {
+    const { goal, asset, lane } = campaignBuilderContext();
+    const rankedLanes = [...FORGE_NICHES].sort((a, b) => {
+      if (b.monetizationScore !== a.monetizationScore) return b.monetizationScore - a.monetizationScore;
+      return a.name.localeCompare(b.name);
+    });
+    const outputItems = [
+      `${asset.label} generated around ${goal.label.toLowerCase()}`,
+      "Business Campaign Kit with titles, description, CTA, tags, and thumbnails",
+      "Macaly landing page prompt matched to the campaign angle",
+      "Google Business Profile, social, email, and referral follow-up assets",
+      "Texas-only compliance framing for Baxter Insurance Agency"
+    ];
+
+    return (
+      <SectionStack>
+        <div className="campaign-hero panel">
+          <div>
+            <span className="eyebrow">Guided Revenue Builder</span>
+            <h2>Start with the business outcome, then let Baxter Growth Lab build the campaign around it.</h2>
+            <p>
+              Choose the quote, retention, referral, or local SEO outcome first. The app will carry the selected growth lane,
+              asset type, CTA, audience, and Texas compliance guardrails into the Idea Factory.
+            </p>
+          </div>
+          <div className="campaign-hero-actions">
+            <button className="primary-button fit" type="button" onClick={() => void generateCampaignIdeas()} disabled={busy === "generate"}>
+              {busy === "generate" ? <Loader2 size={16} className="spin" /> : <Zap size={16} />}
+              {busy === "generate" ? "Generating..." : "Generate Campaign Ideas"}
+            </button>
+            <button className="secondary-button fit" type="button" onClick={() => {
+              applyCampaignBuilderTemplate();
+              goToSection("idea-factory");
+            }}>
+              <SlidersHorizontal size={16} />
+              Apply To Idea Factory
+            </button>
+          </div>
+        </div>
+
+        <div className="campaign-builder-grid">
+          <Panel title="1. Choose The Business Goal">
+            <div className="campaign-choice-list">
+              {campaignGoalOptions.map((item) => (
+                <button
+                  className={cn("campaign-choice-card", campaignGoal === item.key && "active")}
+                  key={item.key}
+                  type="button"
+                  onClick={() => setCampaignGoal(item.key)}
+                >
+                  <strong>{item.label}</strong>
+                  <span>{item.detail}</span>
+                  <small>{item.cta}</small>
+                </button>
+              ))}
+            </div>
+          </Panel>
+
+          <Panel title="2. Pick The Growth Lane">
+            <Field label="Texas Insurance Lane">
+              <select value={campaignLaneName} onChange={(event) => setCampaignLaneName(event.target.value)}>
+                {rankedLanes.map((item) => (
+                  <option key={item.name} value={item.name}>
+                    {item.name} - {item.title}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <div className="campaign-lane-card">
+              <div>
+                <strong>{lane.name}</strong>
+                <span>{lane.title}</span>
+              </div>
+              <div className="monetization-rank-strip forge-active-score">
+                <strong>{lane.monetizationScore}/10</strong>
+                <span>{agencyRevenueTierLabel(lane.monetizationTier)}</span>
+              </div>
+              <p>{lane.description}</p>
+              <div className="keyword-cloud compact-cloud">
+                {lane.keywords.slice(0, 6).map((keyword) => (
+                  <span className="keyword-pill" key={keyword}>
+                    <strong>{keyword}</strong>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Panel>
+
+          <Panel title="3. Select The Asset">
+            <div className="campaign-choice-list">
+              {campaignAssetOptions.map((item) => (
+                <button
+                  className={cn("campaign-choice-card", campaignAsset === item.key && "active")}
+                  key={item.key}
+                  type="button"
+                  onClick={() => setCampaignAsset(item.key)}
+                >
+                  <strong>{item.label}</strong>
+                  <span>{item.detail}</span>
+                  <small>{item.length}</small>
+                </button>
+              ))}
+            </div>
+          </Panel>
+        </div>
+
+        <div className="dashboard-grid two">
+          <Panel title="Business Campaign Kit Preview">
+            <div className="campaign-output-list">
+              {outputItems.map((item) => (
+                <div className="campaign-output-item" key={item}>
+                  <CheckCircle2 size={16} />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </Panel>
+          <Panel title="Conversion Guardrails">
+            <div className="business-fit-strip large">
+              <span className="business-fit-chip high">Quote intent: High</span>
+              <span className="business-fit-chip high">Texas only</span>
+              <span className="business-fit-chip medium">Carrier fit: {lane.name}</span>
+              <span className="business-fit-chip medium">CTA: Call or request quote</span>
+            </div>
+            <div className="campaign-summary-copy">
+              <strong>{goal.goal}</strong>
+              <span>{goal.offer}</span>
+              <small>{goal.cta}</small>
+            </div>
+            <div className="inline-actions">
+              <button className="primary-button fit" type="button" onClick={() => void generateCampaignIdeas()} disabled={busy === "generate"}>
+                {busy === "generate" ? <Loader2 size={16} className="spin" /> : <Lightbulb size={16} />}
+                Generate Ideas
+              </button>
+              <button className="secondary-button fit" type="button" onClick={() => goToSection("projects")}>
+                <FolderKanban size={16} />
+                Open Projects
+              </button>
+            </div>
           </Panel>
         </div>
       </SectionStack>
@@ -4610,7 +4937,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 <span />
               </button>
             </div>
-            <button className="primary-button" type="button" onClick={generateIdeas} disabled={busy === "generate"}>
+            <button className="primary-button" type="button" onClick={() => void generateIdeas()} disabled={busy === "generate"}>
               {busy === "generate" ? <Loader2 size={16} className="spin" /> : <Zap size={16} />}
               {busy === "generate" ? "Generating..." : "Generate Ideas"}
             </button>
@@ -4728,6 +5055,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                       <span className={cn("depth-chip", depthStrengthClass(idea.lengthPotentialScore))}>
                         Depth: {depthStrengthLabel(idea.lengthPotentialScore)}
                       </span>
+                    </div>
+                    <div className="business-fit-strip">
+                      {businessFitBadgesForIdea(idea).map((badge) => (
+                        <span className={cn("business-fit-chip", badge.level)} key={badge.label}>
+                          {badge.label}
+                        </span>
+                      ))}
                     </div>
                     {renderIdeaPowerPack(idea)}
                   </div>
@@ -4959,6 +5293,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 <div>
                   <strong>{project.title}</strong>
                   <span>{project.storyIdea?.hook || "Ready for the guided workflow."}</span>
+                  <div className="business-fit-strip compact">
+                    {businessFitBadgesForIdea(project.storyIdea).map((badge) => (
+                      <span className={cn("business-fit-chip", badge.level)} key={badge.label}>
+                        {badge.label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <div>
                   <span className={cn("format-chip", projectFormatClass(project.format))}>{formatProjectFormat(project.format)}</span>
@@ -5394,14 +5735,14 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         id: "publishing-pack",
         number: 15 + workflowNumberOffset,
         title: publishingPackLabel(selectedProject?.format),
-        description: isArticleProject ? "SEO metadata, image plan, and topical authority map." : isPodcastProject ? "Three episode titles, show notes, tags, and listener prompt." : isBookProject ? "Three book titles/subtitles, back-cover description, keywords, and reader prompt." : "Three YouTube-test titles, description, tags, pinned comment, and thumbnail prompts.",
+        description: isArticleProject ? "SEO metadata, image plan, Macaly prompt, and topical authority map." : isPodcastProject ? "Three episode titles, show notes, tags, and listener prompt." : isBookProject ? "Three book titles/subtitles, back-cover description, keywords, and reader prompt." : "Titles, description, CTA, tags, pinned comment, thumbnail prompts, and campaign assets.",
         complete: selectedProject && projectHasEpisodePlan(selectedProject) ? projectHasEpisodePublishingPack(selectedProject) : hasPass("PUBLISHING_PACK"),
         enabled: hasPass("SCENE_CARDS"),
         busyKey: "pass-PUBLISHING_PACK",
         errorKey: "pass-PUBLISHING_PACK",
         actionLabel: selectedProject && projectHasEpisodePlan(selectedProject) && !projectHasEpisodePublishingPack(selectedProject)
-          ? "Create Episode Packs"
-          : hasPass("PUBLISHING_PACK") ? "Rerun Pack" : `Create ${isArticleProject ? "SEO Pack" : isPodcastProject ? "Show Notes" : isBookProject ? "Launch Pack" : "Pack"}`,
+          ? "Create Episode Kits"
+          : hasPass("PUBLISHING_PACK") ? "Rerun Kit" : `Create ${isArticleProject ? "Article Kit" : isPodcastProject ? "Podcast Kit" : isBookProject ? "Launch Kit" : "Campaign Kit"}`,
         action: () => void generateProjectPass("PUBLISHING_PACK")
       },
       ...(canCreateThumbnails ? [{
@@ -5771,7 +6112,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                     <div className="episode-production-head">
                       <div>
                         <strong>Episode Production Board</strong>
-                        <span>Each part tracks its own script, publishing pack, thumbnail set, and export actions.</span>
+                        <span>Each part tracks its own script, campaign kit, thumbnail set, and export actions.</span>
                       </div>
                       <button className="secondary-button compact" type="button" onClick={() => void runEpisodeFullyAuto()} disabled={Boolean(busy)}>
                         {busy === "episode-auto" ? <Loader2 size={15} className="spin" /> : <Zap size={15} />}
@@ -5787,7 +6128,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                           </div>
                           <div className="episode-status-row">
                             <span className={cn("readiness-pill", episode.scriptReady ? "ready" : "blocked")}>Script</span>
-                            <span className={cn("readiness-pill", episode.packReady ? "ready" : "needs-review")}>Pack</span>
+                            <span className={cn("readiness-pill", episode.packReady ? "ready" : "needs-review")}>Kit</span>
                             <span className={cn("readiness-pill", episode.thumbnailReady ? "ready" : "needs-review")}>Thumbs</span>
                           </div>
                           <p>{episode.detail}</p>
@@ -6093,15 +6434,15 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                             <div className="episode-output-head">
                               <div>
                                 <span>{episode.partLabel}</span>
-                                <strong>Publishing Pack</strong>
+                                <strong>Business Campaign Kit</strong>
                               </div>
                               <button
                                 className="secondary-button compact"
                                 type="button"
-                                onClick={() => void copyText(JSON.stringify(episode, null, 2), `${episode.partLabel} publishing pack copied.`)}
+                                onClick={() => void copyText(JSON.stringify(episode, null, 2), `${episode.partLabel} campaign kit copied.`)}
                               >
                                 <Copy size={14} />
-                                Copy Pack
+                                Copy Kit
                               </button>
                             </div>
                             <div className="pack-section">
@@ -6187,7 +6528,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                           <button
                             className="secondary-button compact"
                             type="button"
-                            onClick={() => void copyText(latestPublishingPack.description, "Publishing description copied to clipboard.")}
+                            onClick={() => void copyText(latestPublishingPack.description, "Campaign description copied to clipboard.")}
                           >
                             <Copy size={14} />
                             Copy {isPodcastProject ? "Show Notes" : "Description"}
@@ -6789,7 +7130,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                         <>
                           <div className="check-line">
                             <CircleSlash size={15} />
-                            Run Publishing Pack first
+                            Create Business Campaign Kit first
                           </div>
                           <div className="check-line">
                             <ImageIcon size={15} />
@@ -6845,8 +7186,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         <div className="panel data-panel">
           <div className="data-row data-head export-row">
             <div>Project</div>
-            <div>One-Click Pack</div>
-            <div>Upload Pack</div>
+            <div>Campaign Kit</div>
+            <div>Upload Package</div>
             <div>Book PDF</div>
             <div>Kindle EPUB</div>
             <div>Markdown</div>
@@ -6865,7 +7206,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                     {body ? (
                       <a className="primary-button compact" href={apiPath(`/api/projects/${project.id}/content-pack`)}>
                         <Download size={15} />
-                        Pack
+                        Kit
                       </a>
                     ) : (
                       "No output yet"
@@ -7529,6 +7870,20 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const isAppAdmin = user.role === "ADMIN";
     return (
       <SectionStack>
+        <div className="settings-section-tabs">
+          {[
+            { label: "Business Setup", detail: "Workspace, team, phone, service area, and compliance defaults." },
+            { label: "Growth Lanes", detail: "Texas-only carrier and product packs for ideas and campaigns." },
+            { label: "AI Providers", detail: "OpenRouter, Anthropic, OpenAI, Runware, and routing fallbacks." },
+            { label: "Integrations", detail: "YouTube analytics, WordPress, DataForSEO, exports, and upload checks." },
+            { label: "Content Defaults", detail: "Tone, narration, CTA, sponsor language, and thumbnail style." }
+          ].map((item) => (
+            <div className="settings-section-card" key={item.label}>
+              <strong>{item.label}</strong>
+              <span>{item.detail}</span>
+            </div>
+          ))}
+        </div>
         <div className="settings-grid">
           <div className="panel pad">
             <div className="panel-title-row">
@@ -8148,7 +8503,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 onChange={(event) => setSettingsDraft((current) => ({ ...current, thumbnailStyleGuide: event.target.value }))}
                 placeholder={DEFAULT_THUMBNAIL_STYLE_GUIDE}
               />
-              <small className="field-hint">Applied to every Publishing Pack prompt and every Runware thumbnail request.</small>
+              <small className="field-hint">Applied to every Business Campaign Kit prompt and every Runware thumbnail request.</small>
             </Field>
             <button className="primary-button" type="button" onClick={saveSettings} disabled={busy === "settings"}>
               {busy === "settings" ? <Loader2 size={16} className="spin" /> : <Save size={16} />}
@@ -8395,7 +8750,7 @@ function UniversalAssetLibraryPanel({
     { label: "Source Pack", ready: sourceReady, detail: sourceReady ? "Research and source notes saved" : "Add notes or source URLs" },
     { label: "Draft History", ready: Boolean(project.drafts?.length), detail: `${project.drafts?.length ?? 0} saved output${project.drafts?.length === 1 ? "" : "s"}` },
     { label: "Final Output", ready: finalReady, detail: finalReady ? projectFinalOutputLabel(project.format) : "Run workflow to finish" },
-    { label: "Publishing Pack", ready: latestPublishingPackReady, detail: latestPublishingPackReady ? publishingPackLabel(project.format) : "Run final pack step" },
+    { label: "Campaign Kit", ready: latestPublishingPackReady, detail: latestPublishingPackReady ? publishingPackLabel(project.format) : "Create the final campaign kit" },
     { label: "Images", ready: imageCount > 0, detail: imageCount ? `${imageCount} generated image${imageCount === 1 ? "" : "s"}` : "No image assets yet" },
     { label: "Exports", ready: finalReady, detail: finalReady ? "Content pack and downloads ready" : "Finish output first" }
   ];
@@ -8435,11 +8790,11 @@ function UploadReadinessPanel({
 }) {
   const localReadyItems = [
     { label: "Script", ready: hasPublishableScript(project), detail: hasPublishableScript(project) ? "Final output is available." : "Run the workflow first." },
-    { label: "Pack", ready: Boolean(latestDraftForPass(project, "PUBLISHING_PACK")), detail: latestDraftForPass(project, "PUBLISHING_PACK") ? "Publishing metadata exists." : "Create Publishing Pack." },
+    { label: "Campaign Kit", ready: Boolean(latestDraftForPass(project, "PUBLISHING_PACK")), detail: latestDraftForPass(project, "PUBLISHING_PACK") ? "Campaign metadata exists." : "Create Business Campaign Kit." },
     { label: "Images", ready: !supportsThumbnails(project) || (project.thumbnails?.length ?? 0) >= requiredThumbnailCountForProject(project), detail: supportsThumbnails(project) ? `${project.thumbnails?.length ?? 0}/${requiredThumbnailCountForProject(project)} thumbnails.` : "No thumbnail requirement." }
   ];
   return (
-    <Panel title="Ready-To-Upload Command Pack">
+    <Panel title="Ready-To-Use Campaign Package">
       <div className="upload-readiness-panel">
         <div className="upload-readiness-summary">
           <div>
@@ -9245,6 +9600,42 @@ function ideaPowerVerdict(pack: IdeaPowerPack) {
   };
 }
 
+function businessFitBadgesForIdea(idea?: StoryIdea | null) {
+  if (!idea) {
+    return [
+      { label: "Quote intent: Unknown", level: "medium" as const },
+      { label: "Local fit: Needs review", level: "medium" as const }
+    ];
+  }
+
+  const pack = ideaPowerPackForIdea(idea);
+  const haystack = [idea.title, idea.hook, idea.summary, idea.category, idea.location, idea.sourceType, idea.suggestedAngle].filter(Boolean).join(" ");
+  const hasCarrier = /germania|travelers|swyfft|progressive|geico/i.test(haystack);
+  const hasLocalSignal = /texas|houston|spring|woodlands|katy|cypress|humble|conroe|pasadena|pearland|sugar land|near me|local/i.test(haystack);
+  const hasQuoteIntent = /quote|home|auto|bundle|renewal|policy|coverage|claim|deductible|liability|insurance/i.test(haystack);
+  const risk = pack?.monetizationRisk?.riskLevel ?? "Medium";
+  const quoteLevel = hasQuoteIntent || idea.totalScore >= 82 ? "High" : idea.totalScore >= 70 ? "Medium" : "Low";
+
+  return [
+    {
+      label: `Quote intent: ${quoteLevel}`,
+      level: quoteLevel === "High" ? "high" as const : quoteLevel === "Medium" ? "medium" as const : "low" as const
+    },
+    {
+      label: `Local fit: ${hasLocalSignal ? "Texas/Houston" : "General Texas"}`,
+      level: hasLocalSignal ? "high" as const : "medium" as const
+    },
+    {
+      label: hasCarrier ? "Carrier fit: Named" : "Carrier fit: Service",
+      level: hasCarrier ? "high" as const : "medium" as const
+    },
+    {
+      label: `Risk: ${risk}`,
+      level: risk === "Low" ? "high" as const : risk === "High" ? "low" as const : "medium" as const
+    }
+  ];
+}
+
 function asClientRecord(value: unknown) {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
 }
@@ -9685,10 +10076,10 @@ function projectTargetDisplay(project: StoryProject) {
 }
 
 function publishingPackLabel(format?: StoryProjectFormat) {
-  if (format === "ARTICLE") return "Article SEO Pack";
-  if (format === "PODCAST_EPISODE") return "Show Notes Pack";
+  if (format === "ARTICLE") return "Article Campaign Kit";
+  if (format === "PODCAST_EPISODE") return "Podcast Campaign Kit";
   if (format === "SHORT_BOOK" || format === "LONG_BOOK") return "Book Launch Pack";
-  return "Publishing Pack";
+  return "Business Campaign Kit";
 }
 
 function weekdayLabel(value?: string | null) {
@@ -9737,7 +10128,7 @@ function passLabel(passType: ScriptPassType) {
     FINAL: "Teleprompter Polish",
     OUTRO: "Outro",
     SCENE_CARDS: "Scene Cards",
-    PUBLISHING_PACK: "Publishing Pack"
+    PUBLISHING_PACK: "Business Campaign Kit"
   };
   return labels[passType];
 }
@@ -9953,10 +10344,10 @@ function projectWorkspaceTabs(input: {
       action: () => scrollToWorkspaceTarget("current-output")
     },
     {
-      label: "Publishing Pack",
+      label: "Campaign Kit",
       status: input.latestPublishingPackReady ? "Ready" : "Missing",
-      detail: input.latestPublishingPackReady ? "Titles, description, tags, and prompts are available." : "Create the pack after the final production passes.",
-      explain: "Publishing packs hold title tests, descriptions, tags, comments, and thumbnail prompts.",
+      detail: input.latestPublishingPackReady ? "Titles, description, tags, CTA, and prompts are available." : "Create the kit after the final production passes.",
+      explain: "Business Campaign Kits hold title tests, descriptions, tags, comments, CTAs, thumbnail prompts, and supporting assets.",
       state: input.latestPublishingPackReady ? "ready" : scriptReady ? "needs-review" : "blocked",
       action: () => scrollToWorkspaceTarget("current-output")
     },
@@ -9992,7 +10383,7 @@ function projectReadinessState(project: StoryProject, slots: PublishingSlot[]) {
     return { label: "Needs Review", className: "needs-review", detail: "Script exists but Quality Gate has not run.", nextAction: "Run Quality Gate" };
   }
   if (!pack) {
-    return { label: "Needs Pack", className: "needs-review", detail: "Quality pass exists but metadata is missing.", nextAction: "Create Publishing Pack" };
+    return { label: "Needs Kit", className: "needs-review", detail: "Quality pass exists but campaign metadata is missing.", nextAction: "Create Business Campaign Kit" };
   }
   if (supportsThumbnails(project) && thumbnailCount < requiredThumbnails) {
     return { label: "Needs Thumbnail", className: "needs-review", detail: `${thumbnailCount}/${requiredThumbnails} thumbnails are saved.`, nextAction: "Create Thumbnails" };
@@ -10032,9 +10423,9 @@ function episodeBoardItems(project: StoryProject, publishingPack: ClientPublishi
       scriptContent,
       packContent,
       detail: section?.content
-        ? `${countWords(section.content).toLocaleString()} script words${pack ? ", publishing pack ready" : ""}.`
+        ? `${countWords(section.content).toLocaleString()} script words${pack ? ", campaign kit ready" : ""}.`
         : pack
-          ? "Publishing pack is ready; final script output is not selected yet."
+          ? "Campaign kit is ready; final script output is not selected yet."
           : "Run Episode Fully Auto to build this part out."
     };
   });
@@ -10276,7 +10667,7 @@ function moneyFocusedAnalytics(input: {
     {
       label: "Output runway",
       value: `${publishable} scripts`,
-      detail: `${packed} have publishing packs. Aim for at least 10 packaged assets before judging the lane.`
+      detail: `${packed} have campaign kits. Aim for at least 10 packaged assets before judging the lane.`
     },
     {
       label: "Pace to 10 uploads",
@@ -10334,7 +10725,7 @@ function commandCenterItems(input: {
     },
     {
       label: "Packaging",
-      title: packsWithoutAssets ? "Create missing thumbnails/assets" : scriptsWithoutPacks ? "Create publishing packs" : "Packaging is moving",
+      title: packsWithoutAssets ? "Create missing thumbnails/assets" : scriptsWithoutPacks ? "Create campaign kits" : "Packaging is moving",
       detail: packsWithoutAssets ? `${packsWithoutAssets} packed project${packsWithoutAssets === 1 ? "" : "s"} need visuals.` : scriptsWithoutPacks ? `${scriptsWithoutPacks} script${scriptsWithoutPacks === 1 ? "" : "s"} need metadata and thumbnail prompts.` : "No major packaging gap detected.",
       priority: packsWithoutAssets || scriptsWithoutPacks ? "medium" : "low",
       section: packsWithoutAssets ? "media" : "script-lab",
@@ -10647,7 +11038,7 @@ function agencyReadinessItems(projects: StoryProject[], settings: UserSettings, 
   return [
     { label: "Campaign content started", ready: projects.length >= 3, detail: `${projects.length} project${projects.length === 1 ? "" : "s"} in this growth lane` },
     { label: "Final output available", ready: completedScript, detail: completedScript ? "A producer can copy or export finished content." : "Run Fully Auto on one project." },
-    { label: "One-click content pack", ready: publishingPack, detail: publishingPack ? "Publishing metadata is ready to package." : "Run the final pack after Outro or Closing CTA." },
+    { label: "One-click campaign package", ready: publishingPack, detail: publishingPack ? "Campaign metadata is ready to package." : "Create the final Business Campaign Kit after Outro or Closing CTA." },
     { label: "Video thumbnail set", ready: videoProjects.length ? thumbnailSet : true, detail: videoProjects.length ? (thumbnailSet ? "At least one video project has three thumbnails." : "Generate thumbnails for the strongest video project.") : "No video projects need thumbnails." },
     { label: "Quality scorecard", ready: qualityGate, detail: qualityGate ? "Quality gate data is visible." : "Run Quality Gate before Final." },
     { label: "Growth lane blueprint", ready: blueprintReady, detail: blueprintReady ? `${channel?.name} has a saved operating strategy.` : "Save audience, style, CTA, and rhythm rules." },
@@ -10880,7 +11271,7 @@ function channelBlueprintFromHotNiche(niche: ChannelHotNiche): ChannelBlueprint 
     toneRules: `Default tone: ${niche.tone}. Stay helpful, local, practical, and compliance-safe. Never promise savings, coverage, eligibility, underwriting acceptance, or claim outcomes.`,
     voiceProfile: "Trusted Texas insurance advisor with warm, direct, plain-English explanations and a clear next step.",
     introStyle: "Open on a real Texas risk, renewal question, household change, storm concern, vehicle situation, or business decision before explaining the practical insurance takeaway.",
-    formattingRules: "Generate ideas, scripts, SEO pages, emails, titles, thumbnails, and publishing packs only inside this insurance lane. Favor quote-ready education, client retention, cross-sells, and local search value.",
+    formattingRules: "Generate ideas, scripts, SEO pages, emails, titles, thumbnails, and campaign kits only inside this insurance lane. Favor quote-ready education, client retention, cross-sells, and local search value.",
     phrasesToUse: "coverage depends on policy terms, request a review, quote-ready checklist, Texas homeowners, Houston-area families, talk with a licensed Texas agent",
     recurringStoryTypes: sampleAngles.join("; "),
     bannedPhrases: "You won't believe, shocking truth, solved forever, 100% proof, scientists hate this, finally exposed.",
