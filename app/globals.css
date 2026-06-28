@@ -3854,6 +3854,137 @@ button.text-link {
   background: #fff1ef;
 }
 
+.script-intent-panel {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #cfe4e1;
+  border-radius: 8px;
+  background: #f7fcfb;
+}
+
+.script-intent-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.script-intent-head h3,
+.script-intent-head p {
+  margin: 0;
+}
+
+.script-intent-head p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.script-intent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.script-intent-grid .field:nth-child(5) {
+  grid-column: 1 / -1;
+}
+
+.script-guardrail-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 12px;
+}
+
+.script-compliance-reminder,
+.cta-strength-card,
+.landing-match-card {
+  min-height: 124px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.script-compliance-reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-color: #cfe4e1;
+  background: #f8fcfb;
+}
+
+.script-compliance-reminder svg {
+  flex: 0 0 auto;
+  color: var(--teal);
+}
+
+.script-compliance-reminder div,
+.landing-match-card div {
+  display: grid;
+  gap: 5px;
+}
+
+.script-compliance-reminder span,
+.cta-strength-card span,
+.landing-match-card span,
+.landing-match-card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cta-check-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.cta-check-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid #f1c6c6;
+  border-radius: 999px;
+  background: #fff7f7;
+  color: #b42318;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.cta-check-list span.ready {
+  border-color: #a9dbc5;
+  background: #effaf3;
+  color: var(--green);
+}
+
+.landing-match-card {
+  display: grid;
+  gap: 8px;
+}
+
+.landing-match-card.high {
+  border-color: #a9dbc5;
+  background: #f4fbf7;
+}
+
+.landing-match-card.medium {
+  border-color: #cfe4e1;
+  background: #f7fcfb;
+}
+
+.landing-match-card.low {
+  border-color: var(--line);
+  background: #fbfcfb;
+}
+
+.landing-match-card p {
+  margin: 0;
+}
+
 .field > span {
   font-size: 12px;
   font-weight: 800;
@@ -5601,7 +5732,9 @@ button.text-link {
   .dashboard-grid.three,
   .campaign-builder-grid,
   .money-plan-list,
-  .settings-section-tabs {
+  .settings-section-tabs,
+  .script-intent-grid,
+  .script-guardrail-grid {
     grid-template-columns: 1fr;
   }
 

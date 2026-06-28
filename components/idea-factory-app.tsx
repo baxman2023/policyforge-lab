@@ -1081,6 +1081,15 @@ type CampaignGoalKey =
   | "local-seo";
 
 type CampaignAssetKey = "video" | "article" | "landing-page" | "gbp-social" | "email" | "podcast";
+type ScriptOpeningKey = "costly-mistake" | "texas-scenario" | "renewal-shock" | "storm-risk" | "before-you-buy" | "coverage-myth";
+
+type ScriptIntentLock = {
+  primaryLeadGoal: string;
+  targetBuyer: string;
+  serviceCarrier: string;
+  cta: string;
+  complianceBoundary: string;
+};
 
 const campaignGoalOptions: Array<{
   key: CampaignGoalKey;
@@ -1163,6 +1172,45 @@ const campaignAssetOptions: Array<{
   { key: "gbp-social", label: "GBP + Social Push", detail: "Short campaign ideas for Google Business Profile, Facebook, email, and phone follow-up.", contentMode: "REPURPOSE_MULTIPLIER", format: "ARTICLE", length: "Brief article - about 900 words", sourceType: "Client FAQs and policy review notes" },
   { key: "email", label: "Client Email Campaign", detail: "Email-first education or referral push with supporting article and call script.", contentMode: "SALES_OFFER", format: "ARTICLE", length: "Brief article - about 900 words", sourceType: "Client FAQs and policy review notes" },
   { key: "podcast", label: "Podcast Episode", detail: "Podcast-ready topic with show notes, follow-up assets, and Macaly prompt.", contentMode: "EXPERT_AUTHORITY", format: "PODCAST_EPISODE", length: "20 minutes", sourceType: "Agency knowledge, Texas market context, carrier guidelines" }
+];
+
+const scriptOpeningOptions: Array<{ key: ScriptOpeningKey; label: string; detail: string; instruction: string }> = [
+  {
+    key: "costly-mistake",
+    label: "Costly mistake",
+    detail: "Open with a common insurance mistake that could create expensive confusion.",
+    instruction: "Open on a specific costly mistake a Texas prospect might make, then calmly explain the practical coverage question to review."
+  },
+  {
+    key: "texas-scenario",
+    label: "Texas scenario",
+    detail: "Start with a realistic Houston or Texas household/business situation.",
+    instruction: "Open with a realistic Texas scenario involving a homeowner, driver, landlord, family, or small-business owner."
+  },
+  {
+    key: "renewal-shock",
+    label: "Renewal shock",
+    detail: "Lead with a rate, deductible, coverage, or renewal surprise.",
+    instruction: "Open with renewal confusion or sticker shock, then pivot to what a licensed Texas agent can help review."
+  },
+  {
+    key: "storm-risk",
+    label: "Storm claim risk",
+    detail: "Frame the topic around wind, hail, flood, roof, claim documentation, or preparedness.",
+    instruction: "Open with a Texas storm, roof, flood, claim documentation, or preparedness risk without implying any claim outcome."
+  },
+  {
+    key: "before-you-buy",
+    label: "Before you buy",
+    detail: "Use a pre-purchase checklist angle for homes, cars, landlords, or businesses.",
+    instruction: "Open with a before-you-buy moment and name the coverage questions worth reviewing before the decision."
+  },
+  {
+    key: "coverage-myth",
+    label: "Coverage myth",
+    detail: "Challenge a common misunderstanding while staying compliance-safe.",
+    instruction: "Open by correcting a common coverage misconception without making blanket coverage promises."
+  }
 ];
 
 const categoryOptions = [
@@ -1840,6 +1888,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
   const [selectedOutputByProjectId, setSelectedOutputByProjectId] = useState<Record<string, string>>({});
   const [sourceMaterialByProjectId, setSourceMaterialByProjectId] = useState<Record<string, string>>({});
   const [sourceUrlsByProjectId, setSourceUrlsByProjectId] = useState<Record<string, string>>({});
+  const [scriptIntentLocksByProjectId, setScriptIntentLocksByProjectId] = useState<Record<string, Partial<ScriptIntentLock>>>({});
+  const [scriptOpeningByProjectId, setScriptOpeningByProjectId] = useState<Record<string, ScriptOpeningKey>>({});
   const [sponsorBlurbByProjectId, setSponsorBlurbByProjectId] = useState<Record<string, string>>({});
   const [sponsorLinkByProjectId, setSponsorLinkByProjectId] = useState<Record<string, string>>({});
   const [sponsorOfferUrlByProjectId, setSponsorOfferUrlByProjectId] = useState<Record<string, string>>({});
@@ -2693,6 +2743,28 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     setSourceUrlsByProjectId((current) => ({ ...current, [projectId]: value }));
   }
 
+  function updateScriptIntentLock<K extends keyof ScriptIntentLock>(key: K, value: ScriptIntentLock[K], projectId = selectedProject?.id) {
+    if (!projectId) return;
+    setScriptIntentLocksByProjectId((current) => ({
+      ...current,
+      [projectId]: {
+        ...current[projectId],
+        [key]: value
+      }
+    }));
+  }
+
+  function resetScriptIntentLock(project = selectedProject) {
+    if (!project) return;
+    setScriptIntentLocksByProjectId((current) => {
+      const next = { ...current };
+      delete next[project.id];
+      return next;
+    });
+    setScriptOpeningByProjectId((current) => ({ ...current, [project.id]: "texas-scenario" }));
+    setMessage(`Script intent lock reset for "${project.title}".`);
+  }
+
   function updateSponsorBlurb(value: string, projectId = selectedProject?.id) {
     if (!projectId) return;
     setSponsorBlurbByProjectId((current) => ({ ...current, [projectId]: value }));
@@ -3461,6 +3533,9 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const sponsorAllowed = supportsSponsorBlurb(project.format);
     const projectSponsorBlurb = sponsorAllowed ? normalizeSponsorBlurbForFormat(sponsorBlurbByProjectId[project.id] ?? project.sponsorBlurb ?? "", project.format) : "";
     const projectSponsorLink = sponsorAllowed ? sponsorLinkByProjectId[project.id] ?? project.sponsorLink ?? "" : "";
+    const intentLock = mergeScriptIntentLock(project, channelBlueprintDraft, scriptIntentLocksByProjectId[project.id]);
+    const openingKey = scriptOpeningByProjectId[project.id] ?? "texas-scenario";
+    const materialWithIntent = withScriptIntentMaterial(project, material, intentLock, openingKey);
     let currentProject = project;
     let continuePass = false;
     let progressMessage = "";
@@ -3479,7 +3554,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             passType,
-            sourceMaterial: material,
+            sourceMaterial: materialWithIntent,
             sponsorBlurb: projectSponsorBlurb,
             sponsorLink: projectSponsorLink,
             forceSave: options.forceSave
@@ -5453,6 +5528,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           format: selectedProject?.format
         })
       : null;
+    const scriptIntentLock = selectedProject
+      ? mergeScriptIntentLock(selectedProject, channelBlueprintDraft, scriptIntentLocksByProjectId[selectedProject.id])
+      : null;
+    const selectedOpeningKey = selectedProject ? scriptOpeningByProjectId[selectedProject.id] ?? "texas-scenario" : "texas-scenario";
+    const selectedOpening = scriptOpeningOptions.find((item) => item.key === selectedOpeningKey) ?? scriptOpeningOptions[1];
+    const ctaCheck = selectedProject && scriptIntentLock ? ctaStrengthCheck(selectedProject, scriptIntentLock, sponsorBlurb, sponsorLink, latestPublishingPack) : null;
+    const landingPageMatch = selectedProject && scriptIntentLock ? landingPageMatchForProject(selectedProject, scriptIntentLock) : null;
     const latestEpisodeSections = selectedProject && latestDraft && latestDraft.passType !== "PUBLISHING_PACK" && projectHasEpisodePlan(selectedProject)
       ? parseEpisodeOutputSections(latestDraft.content)
       : [];
@@ -5910,6 +5992,105 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                           Schedule In Calendar
                         </button>
                       ) : null}
+                    </div>
+                  ) : null}
+                </div>
+                {scriptIntentLock ? (
+                  <div className="script-intent-panel">
+                    <div className="script-intent-head">
+                      <div>
+                        <h3>Script Intent Lock</h3>
+                        <p>These fields are injected into every workflow pass so the script stays aimed at new business.</p>
+                      </div>
+                      <button className="secondary-button compact" type="button" onClick={() => resetScriptIntentLock(selectedProject)}>
+                        <RefreshCw size={15} />
+                        Reset
+                      </button>
+                    </div>
+                    <div className="script-intent-grid">
+                      <Field label="Primary Lead Goal">
+                        <textarea
+                          className="short-textarea"
+                          value={scriptIntentLock.primaryLeadGoal}
+                          onChange={(event) => updateScriptIntentLock("primaryLeadGoal", event.target.value)}
+                        />
+                      </Field>
+                      <Field label="Target Buyer">
+                        <textarea
+                          className="short-textarea"
+                          value={scriptIntentLock.targetBuyer}
+                          onChange={(event) => updateScriptIntentLock("targetBuyer", event.target.value)}
+                        />
+                      </Field>
+                      <Field label="Service / Carrier">
+                        <textarea
+                          className="short-textarea"
+                          value={scriptIntentLock.serviceCarrier}
+                          onChange={(event) => updateScriptIntentLock("serviceCarrier", event.target.value)}
+                        />
+                      </Field>
+                      <Field label="CTA">
+                        <textarea
+                          className="short-textarea"
+                          value={scriptIntentLock.cta}
+                          onChange={(event) => updateScriptIntentLock("cta", event.target.value)}
+                        />
+                      </Field>
+                      <Field label="Compliance Boundary">
+                        <textarea
+                          className="short-textarea"
+                          value={scriptIntentLock.complianceBoundary}
+                          onChange={(event) => updateScriptIntentLock("complianceBoundary", event.target.value)}
+                        />
+                      </Field>
+                      <Field label="Opening Template">
+                        <select
+                          value={selectedOpeningKey}
+                          onChange={(event) => setScriptOpeningByProjectId((current) => ({ ...current, [selectedProject.id]: event.target.value as ScriptOpeningKey }))}
+                        >
+                          {scriptOpeningOptions.map((option) => (
+                            <option key={option.key} value={option.key}>{option.label}</option>
+                          ))}
+                        </select>
+                        <small className="field-hint">{selectedOpening.detail}</small>
+                      </Field>
+                    </div>
+                  </div>
+                ) : null}
+                <div className="script-guardrail-grid">
+                  <div className="script-compliance-reminder">
+                    <ShieldCheck size={18} />
+                    <div>
+                      <strong>Texas Insurance Compliance Reminder</strong>
+                      <span>Do not promise savings, coverage, eligibility, claim outcomes, or carrier acceptance. Coverage depends on policy terms, underwriting, limits, exclusions, deductibles, endorsements, and Texas regulations.</span>
+                    </div>
+                  </div>
+                  {ctaCheck ? (
+                    <div className="cta-strength-card">
+                      <div className="scorecard-head">
+                        <div>
+                          <strong>CTA Strength Check</strong>
+                          <span>{ctaCheck.label}</span>
+                        </div>
+                        <b>{ctaCheck.score}/100</b>
+                      </div>
+                      <div className="cta-check-list">
+                        {ctaCheck.checks.map((item) => (
+                          <span className={cn(item.ready && "ready")} key={item.label} title={item.detail}>
+                            {item.ready ? <CheckCircle2 size={14} /> : <CircleSlash size={14} />}
+                            {item.label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  {landingPageMatch ? (
+                    <div className={cn("landing-match-card", landingPageMatch.priority)}>
+                      <div>
+                        <strong>Macaly Landing Page Match</strong>
+                        <span>{landingPageMatch.label}</span>
+                      </div>
+                      <p>{landingPageMatch.detail}</p>
                     </div>
                   ) : null}
                 </div>
@@ -10844,6 +11025,83 @@ function qualityGateQueue(projects: StoryProject[]) {
     })
     .filter((item): item is { project: StoryProject; status: string; nextAction: string; rank: number } => Boolean(item))
     .sort((a, b) => a.rank - b.rank || new Date(b.project.updatedAt).getTime() - new Date(a.project.updatedAt).getTime());
+}
+
+function defaultScriptIntentLock(project: StoryProject, blueprint: ChannelBlueprint): ScriptIntentLock {
+  const idea = project.storyIdea;
+  const carrierMatch = [project.title, idea?.title, idea?.summary, idea?.hook].filter(Boolean).join(" ").match(/Germania|Travelers|Swyfft|Progressive|Geico/i)?.[0];
+  return {
+    primaryLeadGoal: blueprint.moneyGoal?.trim() || "Generate qualified Texas insurance quote requests, policy reviews, renewal conversations, referrals, or Google review opportunities.",
+    targetBuyer: blueprint.targetAudience?.trim() || "Texas insurance prospects, especially Houston-area homeowners, drivers, families, landlords, and small-business owners.",
+    serviceCarrier: carrierMatch || blueprint.offerDescription?.trim() || idea?.category || "Texas home, auto, commercial, life, flood, or carrier-specific insurance education.",
+    cta: blueprint.primaryCta?.trim() || "Call Baxter Insurance Agency, Inc. at 281-445-1381 or request a Texas insurance review.",
+    complianceBoundary: blueprint.sponsorRules?.trim() || "Texas-only. Do not promise savings, coverage, eligibility, underwriting acceptance, carrier appetite, rates, discounts, or claim outcomes. Coverage depends on policy terms, limits, exclusions, deductibles, endorsements, underwriting, carrier appetite, and Texas regulations."
+  };
+}
+
+function mergeScriptIntentLock(project: StoryProject, blueprint: ChannelBlueprint, override?: Partial<ScriptIntentLock>): ScriptIntentLock {
+  const fallback = defaultScriptIntentLock(project, blueprint);
+  return {
+    primaryLeadGoal: override?.primaryLeadGoal?.trim() || fallback.primaryLeadGoal,
+    targetBuyer: override?.targetBuyer?.trim() || fallback.targetBuyer,
+    serviceCarrier: override?.serviceCarrier?.trim() || fallback.serviceCarrier,
+    cta: override?.cta?.trim() || fallback.cta,
+    complianceBoundary: override?.complianceBoundary?.trim() || fallback.complianceBoundary
+  };
+}
+
+function scriptIntentMaterialBlock(project: StoryProject, intent: ScriptIntentLock, openingKey: ScriptOpeningKey) {
+  const opening = scriptOpeningOptions.find((item) => item.key === openingKey) ?? scriptOpeningOptions[0];
+  return [
+    "SCRIPT INTENT LOCK",
+    `Primary lead goal: ${intent.primaryLeadGoal}`,
+    `Target buyer: ${intent.targetBuyer}`,
+    `Service/carrier: ${intent.serviceCarrier}`,
+    `CTA: ${intent.cta}`,
+    `Compliance boundary: ${intent.complianceBoundary}`,
+    `Opening style: ${opening.label} - ${opening.instruction}`,
+    `Project format: ${formatProjectFormat(project.format)}`
+  ].join("\n");
+}
+
+function withScriptIntentMaterial(project: StoryProject, material: string, intent: ScriptIntentLock, openingKey: ScriptOpeningKey) {
+  return [scriptIntentMaterialBlock(project, intent, openingKey), material.trim()].filter(Boolean).join("\n\n");
+}
+
+function ctaStrengthCheck(project: StoryProject, intent: ScriptIntentLock, sponsorBlurb: string, sponsorLink: string, latestPack: ClientPublishingPack | null) {
+  const text = [intent.cta, sponsorBlurb, sponsorLink, latestPack?.description, latestPack?.pinnedComment].filter(Boolean).join(" ");
+  const checks = [
+    { label: "Clear next step", ready: /call|request|quote|review|schedule|contact|refer|leave/i.test(text), detail: "Names the action a prospect should take." },
+    { label: "Phone number included", ready: /281[\s.-]?445[\s.-]?1381/.test(text), detail: "Uses Baxter's phone number for high-intent viewers." },
+    { label: "Baxter named", ready: /Baxter Insurance/i.test(text), detail: "Connects the content to the agency, not generic advice." },
+    { label: "Texas-only framed", ready: /Texas|Houston/i.test(text), detail: "Keeps the CTA inside the licensed market." },
+    { label: "Not too salesy", ready: !/guaranteed|save \$|lowest rate|best rate|approved|covered no matter what/i.test(text), detail: "Avoids promises and hype language." },
+    { label: "Matched to topic", ready: text.toLowerCase().includes(intent.serviceCarrier.split(/[,&/|]/)[0]?.trim().toLowerCase() || ""), detail: "CTA ties back to the selected service or carrier." }
+  ];
+  const score = Math.round((checks.filter((item) => item.ready).length / checks.length) * 100);
+  const label = score >= 84 ? "Strong CTA" : score >= 67 ? "Usable CTA" : "CTA needs work";
+  return { score, label, checks };
+}
+
+function landingPageMatchForProject(project: StoryProject, intent: ScriptIntentLock) {
+  const haystack = [project.title, project.storyIdea?.title, project.storyIdea?.summary, project.storyIdea?.hook, intent.primaryLeadGoal, intent.serviceCarrier].filter(Boolean).join(" ");
+  const lower = haystack.toLowerCase();
+  if (/review|referral|google review|refer/i.test(haystack)) {
+    return { label: "Review / Referral Page", priority: "medium" as const, detail: "Use Macaly for a simple page that requests reviews, referrals, and client check-ins." };
+  }
+  if (/germania|travelers|swyfft|progressive|geico/i.test(haystack)) {
+    return { label: "Carrier Page", priority: "high" as const, detail: "Create a carrier-focused page with Texas-only wording, eligibility caveats, quote CTA, FAQs, and Baxter contact info." };
+  }
+  if (/quote|renewal|bundle|home insurance|auto insurance|commercial|business|life insurance|flood/i.test(lower)) {
+    return { label: "Quote Landing Page", priority: "high" as const, detail: "Create a focused quote page with one lead form, call button, FAQs, trust signals, and compliance-safe copy." };
+  }
+  if (/faq|question|what|why|how|does|should/i.test(lower)) {
+    return { label: "FAQ Page", priority: "medium" as const, detail: "Create a helpful FAQ page that answers the topic and routes readers to a policy review." };
+  }
+  if (project.format === "ARTICLE") {
+    return { label: "Article / Service Page", priority: "medium" as const, detail: "Use a page that can rank locally and link to quote or service pages." };
+  }
+  return { label: "No dedicated page yet", priority: "low" as const, detail: "Use the campaign kit first. Build a landing page after the topic proves interest or has direct quote intent." };
 }
 
 function packagingTestBank(projects: StoryProject[]) {
