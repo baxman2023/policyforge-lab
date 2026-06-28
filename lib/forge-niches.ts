@@ -29,6 +29,7 @@ const AGENCY_PHONE = "281-445-1381";
 const AGENCY_ADDRESS = "450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060";
 const LICENSE_CONTEXT = "Licensed for General Lines and life in Texas only.";
 const COMPLIANCE_RULES = [
+  "Texas-only rule: all generated assets must target Texas prospects, Texas clients, Texas agency workflows, and Texas insurance conversations.",
   "Do not promise savings, claim outcomes, eligibility, coverage, or carrier acceptance.",
   "Use plain-English educational language and tell users coverage depends on underwriting, policy terms, conditions, limits, exclusions, endorsements, deductibles, carrier appetite, and Texas regulations.",
   "Invite prospects to request a review or quote from Baxter Insurance Agency, Inc. instead of giving legal, tax, claim, or coverage advice.",
@@ -292,8 +293,290 @@ const POLICY_NICHE_SEEDS: ForgeNicheSeed[] = [
     starterAngles: ["A review request email after a smooth policy setup", "Referral ask for home and auto clients", "Thank-you sequence after a client sends a referral"],
     monetizationScore: 9,
     monetizationRationale: "Low-cost growth channel with warm trust transfer and strong lifetime value."
-  }
+  },
+  ...carrierNichePacks()
 ];
+
+type CarrierPackInput = {
+  carrier: "Germania" | "Travelers" | "Swyfft";
+  code: string;
+  title: string;
+  product: string;
+  lineGroup: "Personal Lines" | "Business Insurance" | "Commercial Lines";
+  description: string;
+  nicheFocus: string;
+  category: string;
+  tone?: string;
+  sourceType?: string;
+  keywords: string[];
+  starterAngles: string[];
+  monetizationScore: number;
+  monetizationRationale: string;
+};
+
+function carrierNichePacks(): ForgeNicheSeed[] {
+  return [
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_AUTO",
+      title: "Germania Texas Auto Insurance Pack",
+      product: "Auto Insurance",
+      lineGroup: "Personal Lines",
+      description: "Germania-focused Texas auto insurance education, quote preparation, driver changes, deductibles, and household review campaigns.",
+      nicheFocus: "Auto insurance",
+      category: "Germania Personal Auto",
+      tone: "Helpful, local, consultative",
+      keywords: ["Germania auto insurance Texas", "Texas auto insurance", "Houston auto insurance", "Germania insurance agency"],
+      starterAngles: ["Texas auto quote checklist for Germania shoppers", "Household driver changes to review before renewal", "Deductible and liability questions for Texas drivers"],
+      monetizationScore: 9,
+      monetizationRationale: "Core Texas personal-lines quote lane with strong home-auto cross-sell value."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_HOME",
+      title: "Germania Texas Home & Property Pack",
+      product: "Home & Property Insurance",
+      lineGroup: "Personal Lines",
+      description: "Germania-focused Texas homeowners and property education around roof age, wind, hail, deductibles, inspections, and renewal reviews.",
+      nicheFocus: "Homeowners insurance",
+      category: "Germania Home Property",
+      keywords: ["Germania home insurance Texas", "Texas homeowners insurance", "Houston home insurance", "roof age insurance"],
+      starterAngles: ["Germania home review questions before storm season", "Roof age and Texas homeowners insurance conversations", "Wind and hail deductible checklist for Houston homeowners"],
+      monetizationScore: 10,
+      monetizationRationale: "High-intent Texas homeowners lane tied directly to the agency's priority business."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_LIFE",
+      title: "Germania Texas Life Insurance Pack",
+      product: "Life Insurance",
+      lineGroup: "Personal Lines",
+      description: "Germania-focused Texas term life and whole life education for families, homeowners, business owners, and annual policy reviews.",
+      nicheFocus: "Life insurance",
+      category: "Germania Life",
+      tone: "Warm and trust-building",
+      keywords: ["Germania life insurance Texas", "Texas life insurance", "term life Texas", "whole life Texas"],
+      starterAngles: ["Term life questions after buying a Texas home", "Whole life versus term life as a review conversation", "Family protection review for Germania clients"],
+      monetizationScore: 8,
+      monetizationRationale: "Relationship-deepening cross-sell lane with strong trust value."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_BUSINESS",
+      title: "Germania Texas Business Insurance Pack",
+      product: "Business Insurance",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency business insurance education for Texas small-business owners, contracts, certificates, property, liability, and renewal reviews.",
+      nicheFocus: "Small business insurance",
+      category: "Germania Business",
+      keywords: ["Germania business insurance Texas", "Texas business insurance", "Houston business insurance", "Germania General Agency"],
+      starterAngles: ["Texas business insurance checklist before signing a lease", "Certificate requests as a quote trigger", "Business renewal review questions for Germania markets"],
+      monetizationScore: 9,
+      monetizationRationale: "Commercial account lane with higher revenue potential and service-driven urgency."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_BUSINESS_AUTO",
+      title: "Germania Texas Business Auto Pack",
+      product: "Business Auto Insurance",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency business auto education for Texas contractors, service businesses, employee drivers, and work vehicles.",
+      nicheFocus: "Commercial auto",
+      category: "Germania Business Auto",
+      keywords: ["Germania business auto Texas", "commercial auto insurance Texas", "business vehicle insurance Houston", "work truck insurance"],
+      starterAngles: ["When a Texas business vehicle needs a commercial auto conversation", "Driver list hygiene before renewal", "Contractor truck questions for Germania business auto markets"],
+      monetizationScore: 9,
+      monetizationRationale: "High-value commercial line with obvious cross-sell to GL, BOP, and contractor coverage."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_GL",
+      title: "Germania Texas General Liability Pack",
+      product: "General Liability Insurance",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency general liability education for Texas businesses, contractors, premises exposure, contracts, and certificate requests.",
+      nicheFocus: "Small business insurance",
+      category: "Germania General Liability",
+      keywords: ["Germania general liability Texas", "Texas general liability", "Houston contractor liability", "certificate of insurance"],
+      starterAngles: ["General liability questions before a Texas contract", "Certificate request checklist for small businesses", "Premises exposure questions for Houston businesses"],
+      monetizationScore: 10,
+      monetizationRationale: "Core commercial coverage lane with strong local search and urgent certificate-driven buying behavior."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_BOP",
+      title: "Germania Texas BOP Pack",
+      product: "Business Owner Insurance (BOP)",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency BOP education for Texas small businesses comparing business owner policies, liability, property, and income exposures.",
+      nicheFocus: "Small business insurance",
+      category: "Germania BOP",
+      keywords: ["Germania BOP Texas", "business owners policy Texas", "Houston small business insurance", "BOP insurance"],
+      starterAngles: ["BOP versus general liability for Texas businesses", "What business property values to gather before a quote", "Lease insurance requirements and BOP conversations"],
+      monetizationScore: 9,
+      monetizationRationale: "Efficient commercial package lane with strong small-business quote value."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_BUSINESS_FLOOD",
+      title: "Germania Texas Business Flood Pack",
+      product: "Flood Insurance for Businesses",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency business flood education for Texas property owners, tenants, inventory, equipment, and lender or lease requirements.",
+      nicheFocus: "Flood insurance",
+      category: "Germania Business Flood",
+      keywords: ["business flood insurance Texas", "Houston commercial flood insurance", "Germania business flood", "commercial flood coverage"],
+      starterAngles: ["Why Texas business flood risk deserves its own quote conversation", "Inventory and equipment questions before flood season", "Lease and lender flood requirements for Houston businesses"],
+      monetizationScore: 8,
+      monetizationRationale: "Important Houston-area gap-coverage lane with strong seasonal urgency."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_HOME_BUSINESS",
+      title: "Germania Texas Home-Based Business Pack",
+      product: "Home-Based Business Insurance",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency home-based business education for Texas entrepreneurs who may be mixing homeowners, business property, and liability exposures.",
+      nicheFocus: "Small business insurance",
+      category: "Germania Home-Based Business",
+      keywords: ["home based business insurance Texas", "Germania business insurance", "Texas home business insurance", "Houston small business insurance"],
+      starterAngles: ["When a Texas side business outgrows a home policy conversation", "Home office property and liability questions", "Quote-ready checklist for home-based business owners"],
+      monetizationScore: 8,
+      monetizationRationale: "Practical cross-over lane between personal lines and small commercial."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_MANAGEMENT_PROFESSIONAL",
+      title: "Germania Texas Management & Professional Pack",
+      product: "Management & Professional Insurance",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency management and professional liability education for Texas businesses needing D&O, EPLI, ERISA fidelity, E&O, or fidelity conversations.",
+      nicheFocus: "Small business insurance",
+      category: "Germania Management Professional",
+      keywords: ["management liability Texas", "professional liability Texas", "D&O insurance Texas", "E&O insurance Texas"],
+      starterAngles: ["D&O and EPLI questions for Texas business owners", "When errors and omissions belongs in the insurance review", "Fidelity and ERISA questions for management teams"],
+      monetizationScore: 8,
+      monetizationRationale: "Higher-complexity commercial lane with strong advisory value and premium potential."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_COMMERCIAL_PROPERTY",
+      title: "Germania Texas Commercial Property Pack",
+      product: "Business / Commercial Property Insurance",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency commercial property education for Texas buildings, tenant improvements, inventory, equipment, valuations, and storm exposure.",
+      nicheFocus: "Small business insurance",
+      category: "Germania Commercial Property",
+      keywords: ["Germania commercial property Texas", "commercial property insurance Houston", "business property insurance Texas", "Texas building insurance"],
+      starterAngles: ["Commercial property values Texas businesses should review", "Tenant improvements and inventory questions before renewal", "Storm-readiness checklist for commercial property owners"],
+      monetizationScore: 9,
+      monetizationRationale: "High-value property lane with local storm and renewal urgency."
+    }),
+    carrierPack({
+      carrier: "Germania",
+      code: "GERMANIA_CYBER",
+      title: "Germania Texas Data Breach & Cyber Pack",
+      product: "Data Breach / Cyber Insurance",
+      lineGroup: "Business Insurance",
+      description: "Germania General Agency data breach and cyber education for Texas small businesses, customer data, payment systems, ransomware, and incident-response planning.",
+      nicheFocus: "Small business insurance",
+      category: "Germania Cyber",
+      keywords: ["cyber insurance Texas", "data breach insurance Texas", "Germania cyber insurance", "small business cyber insurance"],
+      starterAngles: ["Cyber questions every Texas small business should ask", "Customer data and payment-system exposure checklist", "Data breach coverage as a renewal review topic"],
+      monetizationScore: 9,
+      monetizationRationale: "Fast-growing commercial lane with strong advertiser and business-owner urgency."
+    }),
+    ...travelersPersonalPacks(),
+    ...travelersBusinessPacks(),
+    ...swyfftPacks()
+  ];
+}
+
+function travelersPersonalPacks(): ForgeNicheSeed[] {
+  return [
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_HOME", title: "Travelers Texas Home & Property Pack", product: "Home / Property Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas home and property education for homeowners, roof questions, deductibles, water, wind, hail, and renewal reviews.", nicheFocus: "Homeowners insurance", category: "Travelers Home Property", keywords: ["Travelers home insurance Texas", "Texas homeowners insurance", "Houston home insurance", "home insurance review"], starterAngles: ["Travelers home quote checklist for Texas homeowners", "Roof and deductible questions before renewal", "Houston home review before storm season"], monetizationScore: 10, monetizationRationale: "High-intent Texas homeowners lane with major quote and retention value." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_AUTO", title: "Travelers Texas Auto Pack", product: "Auto Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas auto education for drivers, households, teen drivers, deductibles, limits, and renewal reviews.", nicheFocus: "Auto insurance", category: "Travelers Auto", keywords: ["Travelers auto insurance Texas", "Texas auto insurance", "Houston car insurance", "auto insurance review"], starterAngles: ["Travelers auto quote checklist for Texas drivers", "Teen driver questions before renewal", "Liability and deductible review for Houston households"], monetizationScore: 9, monetizationRationale: "Large-volume personal line with strong home-auto cross-sell." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_RENTERS", title: "Travelers Texas Renters Pack", product: "Renters Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas renters education for apartments, personal property, liability, lease requirements, and first-policy conversations.", nicheFocus: "Renters insurance", category: "Travelers Renters", keywords: ["Travelers renters insurance Texas", "Houston renters insurance", "Texas renters insurance", "apartment insurance"], starterAngles: ["Renters checklist for Houston apartments", "What renters should know about personal property", "Lease-required insurance versus real protection questions"], monetizationScore: 7, monetizationRationale: "Entry-level relationship lane with long-term household growth potential." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_CONDO", title: "Travelers Texas Condo Pack", product: "Condo Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas condo education around unit-owner coverage, association master policies, personal property, loss assessment, and liability.", nicheFocus: "Homeowners insurance", category: "Travelers Condo", keywords: ["Travelers condo insurance Texas", "Texas condo insurance", "Houston condo insurance", "loss assessment insurance"], starterAngles: ["Condo insurance questions before closing in Texas", "Master policy versus unit-owner policy explained", "Loss assessment questions for condo owners"], monetizationScore: 8, monetizationRationale: "Useful property sub-lane with purchase and association-triggered quote intent." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_BOAT", title: "Travelers Texas Boat & Yacht Pack", product: "Boat & Yacht Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas boat and yacht education for coastal, lake, storage, liability, trailer, and seasonal review conversations.", nicheFocus: "Liability protection", category: "Travelers Boat Yacht", keywords: ["Travelers boat insurance Texas", "Texas boat insurance", "boat insurance Houston", "yacht insurance Texas"], starterAngles: ["Boat insurance questions before Texas lake season", "Storage and trailer questions for boat owners", "Liability conversations for Texas boaters"], monetizationScore: 7, monetizationRationale: "Niche personal-lines cross-sell with affluent household potential." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_LANDLORD", title: "Travelers Texas Landlord Pack", product: "Landlord / Rental Property Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas landlord and rental property education for rental homes, tenant exposure, vacancy, short-term rentals, and property investor reviews.", nicheFocus: "Rental property insurance", category: "Travelers Landlord", keywords: ["Travelers landlord insurance Texas", "Texas rental property insurance", "Houston landlord insurance", "vacant home insurance"], starterAngles: ["Rental property checklist for Texas landlords", "Vacancy and tenant questions before renewal", "Landlord coverage conversation before leasing a home"], monetizationScore: 8, monetizationRationale: "Higher account value and good cross-sell into umbrella and property schedules." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_UMBRELLA", title: "Travelers Texas Personal Umbrella Pack", product: "Personal Umbrella (Excess Liability)", lineGroup: "Personal Lines", description: "Travelers-focused Texas personal umbrella education for homeowners, drivers, landlords, boat owners, and higher-asset households.", nicheFocus: "Liability protection", category: "Travelers Umbrella", keywords: ["Travelers umbrella insurance Texas", "personal umbrella Texas", "excess liability insurance Texas", "Houston umbrella insurance"], starterAngles: ["Umbrella questions for Texas families with teen drivers", "Landlords and umbrella liability conversations", "Why auto limits matter before umbrella quotes"], monetizationScore: 8, monetizationRationale: "Strong retention and account-rounding lane with advisory value." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_VALUABLE_ITEMS", title: "Travelers Texas Valuable Items Pack", product: "Valuable Items / Jewelry Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas valuable items and jewelry education for appraisals, scheduling, gifts, engagement rings, collections, and household reviews.", nicheFocus: "Homeowners insurance", category: "Travelers Valuable Items", keywords: ["Travelers jewelry insurance Texas", "valuable items insurance Texas", "scheduled personal property", "Houston jewelry insurance"], starterAngles: ["Jewelry questions after an engagement or anniversary", "When valuable items may need a separate review", "Appraisal checklist for Texas households"], monetizationScore: 7, monetizationRationale: "Useful cross-sell tied to life events and higher-value households." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_WEDDING_EVENT", title: "Travelers Texas Wedding & Event Pack", product: "Wedding & Special Event Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas wedding and special event insurance education for venues, deposits, liability, vendors, weather, and event-day surprises.", nicheFocus: "Liability protection", category: "Travelers Wedding Event", keywords: ["wedding insurance Texas", "special event insurance Texas", "Travelers wedding insurance", "event liability Texas"], starterAngles: ["Wedding insurance checklist for Texas venues", "Event liability questions before signing contracts", "Weather and vendor questions for Texas events"], monetizationScore: 6, monetizationRationale: "Lower-frequency but timely life-event lane with clear search intent." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_TRAVEL", title: "Travelers Texas Travel Insurance Pack", product: "Travel Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas travel insurance education for trip costs, medical questions, cancellations, family travel, and timing conversations.", nicheFocus: "Liability protection", category: "Travelers Travel", keywords: ["Travelers travel insurance Texas", "travel insurance Texas", "trip insurance", "travel protection"],
+      starterAngles: ["Travel insurance questions before a major trip", "Trip cost and cancellation checklist", "Family travel protection questions for Texas clients"], monetizationScore: 6, monetizationRationale: "Useful cross-sell and seasonal content lane, though less central to P&C agency revenue." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_PET", title: "Travelers Texas Pet Insurance Pack", product: "Pet Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas pet insurance education for households comparing pet medical costs, timing, exclusions, and quote questions.", nicheFocus: "Relationship marketing", category: "Travelers Pet", keywords: ["Travelers pet insurance Texas", "pet insurance Texas", "Houston pet insurance", "pet medical insurance"], starterAngles: ["Pet insurance questions for Texas families", "When to compare pet insurance before a health issue", "Pet coverage as a household review conversation"], monetizationScore: 6, monetizationRationale: "Lightweight relationship and cross-sell lane with broad household appeal." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_MOTORCYCLE", title: "Travelers Texas Motorcycle Pack", product: "Motorcycle Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas motorcycle insurance education for riders, seasonal use, liability, physical damage, gear, and multi-policy reviews.", nicheFocus: "Auto insurance", category: "Travelers Motorcycle", keywords: ["Travelers motorcycle insurance Texas", "Texas motorcycle insurance", "Houston motorcycle insurance", "motorcycle coverage review"], starterAngles: ["Motorcycle insurance checklist for Texas riders", "Seasonal rider questions before renewal", "Liability and physical damage conversations for motorcycles"], monetizationScore: 7, monetizationRationale: "Niche auto-adjacent cross-sell with clear seasonal engagement." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_FLOOD", title: "Travelers Texas Flood Pack", product: "Flood Insurance", lineGroup: "Personal Lines", description: "Travelers-focused Texas flood insurance education for homeowners, landlords, condo owners, Houston flooding, lender requirements, and quote timing.", nicheFocus: "Flood insurance", category: "Travelers Flood", keywords: ["Travelers flood insurance Texas", "Houston flood insurance", "Texas flood insurance", "flood policy review"], starterAngles: ["Flood questions for Houston homeowners outside high-risk zones", "Waiting period reminders before storm season", "Flood quote checklist before buying a Texas home"], monetizationScore: 9, monetizationRationale: "Critical Houston-area protection gap with strong educational lead value." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_CLASSIC_CAR", title: "Travelers Texas Classic Car Pack", product: "Classic / Antique Car Insurance", lineGroup: "Personal Lines", description: "Travelers/InsuraMatch-focused Texas classic and antique car education for agreed value, storage, usage, collections, and household reviews.", nicheFocus: "Auto insurance", category: "Travelers Classic Car", keywords: ["classic car insurance Texas", "antique car insurance Texas", "Travelers classic car", "agreed value auto insurance"], starterAngles: ["Classic car insurance questions before a show or sale", "Agreed value versus regular auto conversations", "Storage and usage questions for Texas collectors"], monetizationScore: 7, monetizationRationale: "Niche but valuable affluent-household cross-sell lane." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_RV", title: "Travelers Texas RV Pack", product: "RV Insurance", lineGroup: "Personal Lines", description: "Travelers/InsuraMatch-focused Texas RV insurance education for motorhomes, trailers, seasonal travel, storage, liability, and household reviews.", nicheFocus: "Auto insurance", category: "Travelers RV", keywords: ["RV insurance Texas", "Travelers RV insurance", "motorhome insurance Texas", "camper insurance Texas"], starterAngles: ["RV insurance questions before Texas road trips", "Storage and seasonal use checklist", "Motorhome liability and physical damage conversations"], monetizationScore: 7, monetizationRationale: "Seasonal personal-lines cross-sell with strong household and travel timing." })
+  ];
+}
+
+function travelersBusinessPacks(): ForgeNicheSeed[] {
+  return [
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_EQUIPMENT_BREAKDOWN", title: "Travelers Texas Equipment Breakdown Pack", product: "Boiler & Machinery / Equipment Breakdown", lineGroup: "Business Insurance", description: "Travelers-focused Texas equipment breakdown education for building systems, machinery, restaurants, retailers, offices, and property owners.", nicheFocus: "Small business insurance", category: "Travelers Equipment Breakdown", keywords: ["Travelers equipment breakdown Texas", "boiler machinery insurance Texas", "business equipment breakdown", "commercial property Texas"], starterAngles: ["Equipment breakdown questions for Texas businesses", "Restaurants and retailers: systems that can stop revenue", "Commercial property review checklist for equipment exposure"], monetizationScore: 8, monetizationRationale: "Good commercial property add-on lane with useful loss-prevention education." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_COMMERCIAL_AUTO_TRUCKING", title: "Travelers Texas Commercial Auto & Trucking Pack", product: "Commercial Auto & Trucking", lineGroup: "Business Insurance", description: "Travelers-focused Texas commercial auto and trucking education for fleets, hired/non-owned auto, contractors, delivery, driver lists, and trucking exposures.", nicheFocus: "Commercial auto", category: "Travelers Commercial Auto Trucking", keywords: ["Travelers commercial auto Texas", "Texas trucking insurance", "commercial auto insurance Houston", "fleet insurance Texas"], starterAngles: ["Fleet review checklist for Texas businesses", "Hired and non-owned auto questions", "Driver list hygiene for commercial auto renewals"], monetizationScore: 10, monetizationRationale: "High-value commercial line with urgent quote and renewal triggers." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_GROUP_CAPTIVE", title: "Travelers Texas Commercial Group Captive Pack", product: "Commercial Group Captive", lineGroup: "Business Insurance", description: "Travelers-focused Texas commercial group captive education for qualifying businesses exploring risk-sharing, safety, loss control, and long-term cost-control conversations.", nicheFocus: "Small business insurance", category: "Travelers Group Captive", keywords: ["Travelers group captive Texas", "commercial group captive", "Texas captive insurance", "business risk financing"], starterAngles: ["What a group captive conversation means for Texas businesses", "Loss control questions before considering captive options", "Who should ask about group captive programs"], monetizationScore: 7, monetizationRationale: "Specialized commercial lane for larger, more sophisticated accounts." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_CYBER", title: "Travelers Texas Cyber Liability Pack", product: "Cyber Liability", lineGroup: "Business Insurance", description: "Travelers-focused Texas cyber liability education for ransomware, data breach, payment systems, customer data, vendor access, and incident response.", nicheFocus: "Small business insurance", category: "Travelers Cyber", keywords: ["Travelers cyber liability Texas", "cyber insurance Texas", "data breach insurance Houston", "ransomware insurance"], starterAngles: ["Cyber questions every Texas business should ask", "Customer data and payment-system checklist", "Why cyber belongs in the annual commercial review"], monetizationScore: 10, monetizationRationale: "Premium commercial lane with strong urgency and high-value advertiser/search intent." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_ENVIRONMENTAL", title: "Travelers Texas Environmental Liability Pack", product: "Environmental / Pollution Liability", lineGroup: "Business Insurance", description: "Travelers-focused Texas environmental and pollution liability education for contractors, property owners, fuel, storage, cleanup, and contractual exposures.", nicheFocus: "Small business insurance", category: "Travelers Environmental", keywords: ["Travelers pollution liability Texas", "environmental insurance Texas", "pollution liability Houston", "contractor pollution insurance"], starterAngles: ["Pollution liability questions for Texas contractors", "Environmental exposure checklist before a contract", "Property-owner cleanup conversations before renewal"], monetizationScore: 8, monetizationRationale: "Specialized commercial lane with strong account value and advisory differentiation." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_COMMERCIAL_UMBRELLA", title: "Travelers Texas Commercial Umbrella Pack", product: "Commercial Umbrella & Excess Liability", lineGroup: "Business Insurance", description: "Travelers-focused Texas commercial umbrella and excess liability education for contracts, auto fleets, premises, products, and larger liability stacks.", nicheFocus: "Liability protection", category: "Travelers Commercial Umbrella", keywords: ["Travelers commercial umbrella Texas", "commercial excess liability Texas", "business umbrella insurance Houston", "Texas liability limits"], starterAngles: ["Commercial umbrella questions before signing larger contracts", "Fleet and premises exposures that raise limit conversations", "Why excess liability belongs in the business review"], monetizationScore: 9, monetizationRationale: "Strong commercial account-rounding lane with high retention value." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_GL", title: "Travelers Texas General Liability Pack", product: "General Liability", lineGroup: "Business Insurance", description: "Travelers-focused Texas general liability education for small businesses, contractors, premises liability, products, completed operations, and certificates.", nicheFocus: "Small business insurance", category: "Travelers General Liability", keywords: ["Travelers general liability Texas", "Texas general liability insurance", "Houston business liability", "certificate of insurance"], starterAngles: ["General liability questions before a Texas contract", "Certificate requests and quote readiness", "Products and completed operations conversations"], monetizationScore: 10, monetizationRationale: "Core commercial line with strong search intent and urgent certificate-driven demand." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_INTERNATIONAL", title: "Travelers Texas Global / International Pack", product: "Global / International Insurance", lineGroup: "Business Insurance", description: "Travelers-focused Texas international insurance education for businesses with global operations, foreign travel, imported goods, overseas contracts, and cross-border exposures.", nicheFocus: "Small business insurance", category: "Travelers International", keywords: ["Travelers international insurance Texas", "global business insurance", "foreign liability insurance", "Texas international business insurance"], starterAngles: ["When a Texas business should ask about international exposure", "Foreign travel and overseas contract insurance questions", "Imported goods and global operations review checklist"], monetizationScore: 7, monetizationRationale: "Specialized but valuable lane for more complex commercial accounts." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_INLAND_MARINE", title: "Travelers Texas Inland Marine Pack", product: "Inland Marine", lineGroup: "Business Insurance", description: "Travelers-focused Texas inland marine education for equipment, tools, materials in transit, installation floaters, contractors, and mobile property.", nicheFocus: "Contractor insurance", category: "Travelers Inland Marine", keywords: ["Travelers inland marine Texas", "tools equipment insurance Texas", "contractor equipment insurance", "installation floater Texas"], starterAngles: ["Tools and equipment checklist for Texas contractors", "Property in transit questions for businesses", "Installation floater conversations before larger jobs"], monetizationScore: 9, monetizationRationale: "Strong contractor and commercial property cross-sell with tangible pain points." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_MANAGEMENT_PROFESSIONAL", title: "Travelers Texas Management & Professional Pack", product: "Management & Professional Liability", lineGroup: "Business Insurance", description: "Travelers-focused Texas management and professional liability education for D&O, EPLI, fiduciary, E&O, nonprofit, private, public, and financial institution exposures.", nicheFocus: "Small business insurance", category: "Travelers Management Professional", keywords: ["Travelers management liability Texas", "D&O insurance Texas", "EPLI insurance Texas", "professional liability Texas"], starterAngles: ["D&O and EPLI questions for Texas leadership teams", "Professional liability review before contract growth", "Fiduciary liability questions for benefit plans"], monetizationScore: 9, monetizationRationale: "High-value commercial advisory lane with strong account sophistication." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_OCEAN_MARINE", title: "Travelers Texas Ocean Marine Pack", product: "Ocean Marine", lineGroup: "Business Insurance", description: "Travelers-focused Texas ocean marine education for cargo, ports, logistics, maritime businesses, import/export, and coastal commercial exposures.", nicheFocus: "Small business insurance", category: "Travelers Ocean Marine", keywords: ["Travelers ocean marine Texas", "ocean marine insurance Houston", "cargo insurance Texas", "marine insurance Texas"], starterAngles: ["Ocean marine questions for Houston logistics businesses", "Cargo and import/export coverage review", "Port-related business exposure checklist"], monetizationScore: 8, monetizationRationale: "Specialized Houston-relevant commercial lane with larger account potential." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_COMMERCIAL_PROPERTY", title: "Travelers Texas Commercial Property Pack", product: "Commercial Property", lineGroup: "Business Insurance", description: "Travelers-focused Texas commercial property education for buildings, business personal property, valuations, equipment, storm risk, leases, and renewal reviews.", nicheFocus: "Small business insurance", category: "Travelers Commercial Property", keywords: ["Travelers commercial property Texas", "commercial property insurance Houston", "business property insurance Texas", "building insurance Texas"], starterAngles: ["Commercial property values to gather before renewal", "Business personal property questions for Texas companies", "Storm-readiness review for commercial buildings"], monetizationScore: 10, monetizationRationale: "High-value commercial property lane with major Texas storm and renewal urgency." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_BOP", title: "Travelers Texas BOP / Small Business Pack", product: "Business Owner's Policy (BOP) / Small Business", lineGroup: "Business Insurance", description: "Travelers-focused Texas BOP and small-business education for package policies, liability, property, income exposures, leases, and local business reviews.", nicheFocus: "Small business insurance", category: "Travelers BOP Small Business", keywords: ["Travelers BOP Texas", "business owners policy Texas", "small business insurance Houston", "Texas BOP insurance"], starterAngles: ["BOP checklist for Texas small businesses", "BOP versus general liability explained plainly", "Lease insurance requirements and quote readiness"], monetizationScore: 10, monetizationRationale: "Core small-commercial lane with high quote value and repeatable local SEO demand." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_SURETY", title: "Travelers Texas Surety Bonds Pack", product: "Surety Bonds", lineGroup: "Business Insurance", description: "Travelers-focused Texas surety bond education for contractors, licensing, performance bonds, payment bonds, bid bonds, and business obligations.", nicheFocus: "Contractor insurance", category: "Travelers Surety Bonds", keywords: ["Travelers surety bonds Texas", "Texas surety bonds", "contractor bonds Texas", "performance bond Texas"], starterAngles: ["Surety bond questions before bidding Texas work", "Performance and payment bonds explained for contractors", "License bond checklist for Texas businesses"], monetizationScore: 8, monetizationRationale: "Specialized but high-intent commercial/service lane tied to contractor growth." }),
+    carrierPack({ carrier: "Travelers", code: "TRAVELERS_WORKERS_COMP", title: "Travelers Texas Workers Compensation Pack", product: "Workers Compensation", lineGroup: "Business Insurance", description: "Travelers-focused Texas workers compensation education for employers, payroll, classifications, claims, safety, audits, and renewal reviews.", nicheFocus: "Small business insurance", category: "Travelers Workers Compensation", keywords: ["Travelers workers compensation Texas", "Texas workers comp insurance", "Houston workers compensation", "workers comp audit"], starterAngles: ["Workers comp questions before hiring in Texas", "Payroll and classification checklist before renewal", "Safety and claims conversations for business owners"], monetizationScore: 9, monetizationRationale: "High-retention commercial line with recurring audits and service conversations."
+    })
+  ];
+}
+
+function swyfftPacks(): ForgeNicheSeed[] {
+  return [
+    carrierPack({ carrier: "Swyfft", code: "SWYFFT_HO3_HOMEOWNERS", title: "Swyfft Texas Homeowners HO3 Pack", product: "Homeowners Insurance (HO3)", lineGroup: "Personal Lines", description: "Swyfft-focused Texas HO3 homeowners education covering dwelling, other structures, personal property, loss of use, personal liability, deductibles, and quote-readiness.", nicheFocus: "Homeowners insurance", category: "Swyfft HO3 Homeowners", keywords: ["Swyfft homeowners insurance Texas", "HO3 insurance Texas", "Texas homeowners insurance", "Houston home insurance"], starterAngles: ["HO3 checklist for Texas homeowners comparing Swyfft", "Coverage A through E explained for home reviews", "Quote-ready home details before a Swyfft conversation"], monetizationScore: 10, monetizationRationale: "Priority homeowners lane with strong Texas property lead value." }),
+    carrierPack({ carrier: "Swyfft", code: "SWYFFT_EQUIPMENT_BREAKDOWN", title: "Swyfft Texas Equipment Breakdown Pack", product: "Equipment Breakdown Coverage", lineGroup: "Personal Lines", description: "Swyfft-focused Texas equipment breakdown endorsement education for homeowners reviewing systems, appliances, mechanical breakdown, and household risk questions.", nicheFocus: "Homeowners insurance", category: "Swyfft Equipment Breakdown", keywords: ["Swyfft equipment breakdown Texas", "equipment breakdown coverage", "home equipment breakdown insurance", "Texas homeowners endorsement"], starterAngles: ["Equipment breakdown questions for Texas homeowners", "Systems and appliances to discuss during a home review", "Endorsement conversations before renewal"], monetizationScore: 8, monetizationRationale: "Useful endorsement lane that strengthens homeowners reviews and account rounding." }),
+    carrierPack({ carrier: "Swyfft", code: "SWYFFT_FLOOD", title: "Swyfft Texas Flood Education Pack", product: "Flood Insurance", lineGroup: "Personal Lines", description: "Swyfft-adjacent flood education for Texas homeowners, clearly framed as availability-dependent and focused on separate flood conversations, waiting periods, and Houston-area risk.",
+      nicheFocus: "Flood insurance", category: "Swyfft Flood Education", keywords: ["Swyfft flood insurance Texas", "Houston flood insurance", "Texas flood insurance", "flood insurance review"], starterAngles: ["Flood questions Texas homeowners should ask separately from HO3", "Houston flood risk review before storm season", "Availability-dependent flood quote conversation checklist"], monetizationScore: 8, monetizationRationale: "Houston-relevant protection-gap lane, with careful availability-dependent framing." }),
+    carrierPack({ carrier: "Swyfft", code: "SWYFFT_APARTMENT_BUILDINGS", title: "Swyfft Texas Apartment Buildings Pack", product: "Commercial Package — Apartment Buildings", lineGroup: "Commercial Lines", description: "Swyfft-focused Texas commercial package education for apartment building owners, property values, liability, habitational risk, loss control, and renewal reviews.", nicheFocus: "Small business insurance", category: "Swyfft Apartment Buildings", keywords: ["Swyfft apartment building insurance Texas", "apartment building insurance Houston", "habitational insurance Texas", "commercial package Texas"], starterAngles: ["Apartment building insurance checklist for Texas owners", "Habitational risk questions before renewal", "Property values and liability conversations for apartment buildings"], monetizationScore: 9, monetizationRationale: "High-value property/commercial lane with strong Houston real estate relevance." }),
+    carrierPack({ carrier: "Swyfft", code: "SWYFFT_CONDO_ASSOCIATIONS", title: "Swyfft Texas Condo Associations Pack", product: "Commercial Package — Condominium Associations", lineGroup: "Commercial Lines", description: "Swyfft-focused Texas commercial package education for condominium associations, buildings, shared property, liability, board questions, and renewal planning.", nicheFocus: "Small business insurance", category: "Swyfft Condo Associations", keywords: ["Swyfft condo association insurance Texas", "condominium association insurance", "HOA insurance Texas", "commercial package insurance"], starterAngles: ["Condo association insurance checklist for Texas boards", "Shared property and liability questions before renewal", "Board-level review prompts for condominium associations"], monetizationScore: 8, monetizationRationale: "Specialized commercial property lane with strong advisory value." }),
+    carrierPack({ carrier: "Swyfft", code: "SWYFFT_SHOPPING_CENTERS", title: "Swyfft Texas Shopping Centers Pack", product: "Commercial Package — Shopping Center Owners & Operators", lineGroup: "Commercial Lines", description: "Swyfft-focused Texas commercial package education for shopping center owners and operators, tenant exposures, property values, liability, leases, and storm risk.", nicheFocus: "Small business insurance", category: "Swyfft Shopping Centers", keywords: ["shopping center insurance Texas", "Swyfft commercial package Texas", "retail property insurance Houston", "commercial property liability"], starterAngles: ["Shopping center insurance checklist for Texas owners", "Tenant and lease insurance questions before renewal", "Storm and liability review for retail property operators"], monetizationScore: 9, monetizationRationale: "High-account-value commercial property lane with strong local relevance." }),
+    carrierPack({ carrier: "Swyfft", code: "SWYFFT_OFFICE_BUILDINGS", title: "Swyfft Texas Office Buildings Pack", product: "Commercial Package — Office Buildings", lineGroup: "Commercial Lines", description: "Swyfft-focused Texas commercial package education for office building owners, property values, tenants, liability, building systems, and renewal reviews.", nicheFocus: "Small business insurance", category: "Swyfft Office Buildings", keywords: ["office building insurance Texas", "Swyfft commercial package", "commercial property Houston", "office building liability"], starterAngles: ["Office building insurance checklist for Texas owners", "Tenant and building-system questions before renewal", "Commercial property review prompts for office buildings"], monetizationScore: 8, monetizationRationale: "Commercial property lane with clear property-owner and lease-driven conversations." })
+  ];
+}
+
+function carrierPack(input: CarrierPackInput): ForgeNicheSeed {
+  const texasTitle = input.title.includes("Texas") ? input.title : `${input.title} Texas Pack`;
+  const linePrefix = `${input.carrier} ${input.lineGroup}`;
+  return {
+    code: input.code,
+    name: input.code,
+    title: texasTitle,
+    slug: slugify(input.code),
+    description: `${input.description} Texas-only pack for Baxter Insurance Agency content, local SEO, client education, quote preparation, renewal reviews, and compliant carrier-specific conversations.`,
+    viewerPromise: `Every asset helps Texas prospects and clients understand ${input.carrier} ${input.product} conversations before requesting a licensed Texas agency review.`,
+    nicheFocus: input.nicheFocus,
+    tone: input.tone || "Helpful, local, consultative",
+    category: input.category,
+    sourceType: input.sourceType || `${linePrefix} product information, Texas market context, agency quoting workflow, client FAQs`,
+    keywords: uniqueList([...input.keywords, `${input.carrier} insurance Texas`, "Baxter Insurance Agency", "Texas insurance review"]),
+    starterAngles: input.starterAngles,
+    monetizationScore: input.monetizationScore,
+    monetizationRationale: `${input.monetizationRationale} Keep all assets Texas-based and frame ${input.carrier} as a possible market or carrier relationship, not a promise of availability, placement, price, or coverage.`
+  };
+}
+
+function uniqueList(values: string[]) {
+  const seen = new Set<string>();
+  return values.filter((value) => {
+    const key = value.trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 
 export const FORGE_NICHES: ForgeNiche[] = POLICY_NICHE_SEEDS.map((niche) => ({
   ...niche,
