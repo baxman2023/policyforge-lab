@@ -398,7 +398,7 @@ function projectModeRules(mode: IdeaContentMode) {
   return `- Treat this as story or documentary content with natural escalation, human stakes, and factual restraint.`;
 }
 
-const POLICYFORGE_AGENCY_PROFILE = `PolicyForge agency profile:
+const POLICYFORGE_AGENCY_PROFILE = `Baxter Growth Lab agency profile:
 - Agency: Baxter Insurance Agency, Inc.
 - Phone: 281-445-1381
 - Mailing address: 450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060
@@ -429,7 +429,7 @@ function policyForgeScriptEngineBrief(input: {
 }) {
   const scriptType = inferInsuranceScriptType(input);
   const cta = recommendedInsuranceCta(scriptType);
-  return `PolicyForge Scripting Engine:
+  return `Baxter Growth Lab Scripting Engine:
 ${POLICYFORGE_AGENCY_PROFILE}
 
 Required pre-script brief:
@@ -1015,7 +1015,7 @@ Supporting Asset Plan
 End-Screen Bridge
 
 Rules:
-- Respect the Agency Script Brief from the dossier. If the brief is missing, infer one using the PolicyForge Scripting Engine.
+- Respect the Agency Script Brief from the dossier. If the brief is missing, infer one using the Baxter Growth Lab Scripting Engine.
 - Pick one quote-intent structure and make the whole outline serve that structure.
 - Add one or two natural prospect objections and where they should be answered.
 - The local trust layer must be useful Texas/Houston context, not a tacked-on city mention.
@@ -1240,7 +1240,7 @@ Rules:
     case "CRITIQUE":
       return `${shared}
 
-Critique the existing ${outputName} as a PolicyForge agency-growth script.
+Critique the existing ${outputName} as a Baxter Growth Lab agency-growth script.
 
 Output plain text with these exact sections:
 Overall Score
@@ -2312,7 +2312,7 @@ export function projectResearchPrompt(input: {
         ? `${input.targetWordCount?.toLocaleString() || "60,000"}-word long form book`
     : `${input.targetLengthMinutes}-minute ${projectOutputName(input.format)}`;
 
-  return `Create a PolicyForge research brief and agency script brief for a ${formatLabel} project.
+  return `Create a Baxter Growth Lab research brief and agency script brief for a ${formatLabel} project.
 
 Story title: ${input.title}
 Project type: ${formatLabel}

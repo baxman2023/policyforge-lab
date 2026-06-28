@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         keywords: niche.keywords,
         starterAngles: niche.starterAngles
       })),
-      monthLabel: "PolicyForge Insurance Catalog",
+      monthLabel: "Baxter Insurance Catalog",
       modelUsed: "fixed private catalog"
     });
   } catch (error) {

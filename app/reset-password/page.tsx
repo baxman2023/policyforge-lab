@@ -13,7 +13,7 @@ export default async function ResetPasswordPage({
   return (
     <main className="login-page">
       <section className="login-panel reset-panel">
-        <div className="brand-mark" aria-label="PolicyForge LAB" />
+        <div className="brand-mark" aria-label="Baxter Growth Lab" />
         <h1>Reset Password</h1>
         {email && token ? (
           <ResetPasswordForm email={email} token={token} />

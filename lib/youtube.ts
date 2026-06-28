@@ -529,7 +529,7 @@ function buildYoutubeRecommendations(metrics: Array<{
       priority: "High",
       title: "Publish and sync the first videos",
       insight: "No YouTube performance data is synced yet.",
-      recommendation: "Publish at least three long-form videos, then run YouTube sync so PolicyForge LAB can identify retention, CTR, and subscriber patterns.",
+      recommendation: "Publish at least three long-form videos, then run YouTube sync so Baxter Growth Lab can identify retention, CTR, and subscriber patterns.",
       evidence: {}
     }];
   }

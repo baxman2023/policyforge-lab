@@ -962,7 +962,7 @@ const defaultSettings: UserSettings = {
   openAiModel: "gpt-5.4",
   runwareModel: "ideogram:4@0",
   thumbnailStyleGuide: DEFAULT_THUMBNAIL_STYLE_GUIDE,
-  workspaceName: "PolicyForge LAB",
+  workspaceName: "Baxter Growth Lab",
   workspaceTagline: "Insurance Growth Engine",
   workspaceLogoUrl: "",
   defaultSponsorCta: "",
@@ -1379,7 +1379,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Add or confirm at least one text provider key: OpenRouter primary, with Anthropic and OpenAI available as direct fallbacks.",
         "Click Test beside each API key to confirm it works before running production jobs.",
         "Choose Anthropic and OpenAI fallback models from the live provider dropdowns after saving those keys.",
-        "Add Runware only if you want video thumbnails, logos, or banners generated inside PolicyForge LAB.",
+        "Add Runware only if you want video thumbnails, logos, or banners generated inside Baxter Growth Lab.",
         "Add DataForSEO if you want keyword metrics to improve local SEO pages, tags, and publishing descriptions.",
         "Open Model Routing, choose the models for discovery, research, drafting, critique, rewrite, and publishing packs, then click Save Model Routing.",
         "Save AI Providers saves keys and provider settings. Save Model Routing saves the routing dropdowns."
@@ -1406,7 +1406,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Use manual step buttons when you want to inspect or rerun one pass before moving forward.",
         "Video and podcast projects create spoken scripts; article projects create publication-ready prose.",
         "Use the saved agency CTA and compliance rules to keep every output pointed toward quote requests, calls, reviews, referrals, or renewal conversations.",
-        "Video and podcast body passes now enforce a minimum useful length. If the model comes back too short, PolicyForge LAB attempts one automatic expansion before saving.",
+        "Video and podcast body passes now enforce a minimum useful length. If the model comes back too short, Baxter Growth Lab attempts one automatic expansion before saving.",
         "If Teleprompter Polish repeatedly says the final output appears incomplete, use Force Save Final only after you are willing to review the saved result manually.",
         "Use the Quality Scorecard and Compliance Check before considering content production-ready."
       ]
@@ -1830,7 +1830,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       setDesiredLength(defaultDesiredLengthLabel(mergedSettings.defaultLengthMinutes));
       setSelectedProjectId((current) => projectsPayload.projects.some((project) => project.id === current) ? current : projectsPayload.projects[0]?.id || "");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not load PolicyForge LAB data.");
+      setMessage(error instanceof Error ? error.message : "Could not load Baxter Growth Lab data.");
     } finally {
       setLoading(false);
     }
@@ -3071,7 +3071,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
 
   async function runMonthlyAuto() {
     const confirmed = window.confirm(
-      "Create a monthly publishing batch?\n\nPolicyForge LAB will create 6 standalone video projects with randomized 30, 45, or 60 minute targets, plus one 5-episode series, then schedule them after any existing future calendar items."
+      "Create a monthly publishing batch?\n\nBaxter Growth Lab will create 6 standalone video projects with randomized 30, 45, or 60 minute targets, plus one 5-episode series, then schedule them after any existing future calendar items."
     );
     if (!confirmed) return;
     if (!activeChannelId) {
@@ -3205,7 +3205,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       ? "\n\nLong form books are drafted in chapter batches to protect the requested word count, so this can take significantly longer than a script or article."
       : "";
     const confirmed = window.confirm(
-      `Run fully auto for "${selectedProject.title}"?\n\nPolicyForge LAB will run the ${projectOutputNoun(selectedProject.format)} workflow in order: ${passLabelForProject("INTRO", selectedProject.format)}, Research, ${sequence.filter((passType) => passType !== "INTRO").map((passType) => passLabelForProject(passType, selectedProject.format)).join(", ")}. This can take several minutes and will use your configured models.${longBookNote}`
+      `Run fully auto for "${selectedProject.title}"?\n\nBaxter Growth Lab will run the ${projectOutputNoun(selectedProject.format)} workflow in order: ${passLabelForProject("INTRO", selectedProject.format)}, Research, ${sequence.filter((passType) => passType !== "INTRO").map((passType) => passLabelForProject(passType, selectedProject.format)).join(", ")}. This can take several minutes and will use your configured models.${longBookNote}`
     );
     if (!confirmed) return;
 
@@ -3259,7 +3259,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
     const confirmed = window.confirm(
-      `Run Episode Fully Auto for "${selectedProject.title}"?\n\nPolicyForge LAB will keep the completed five-episode plan and run: ${sequence.length ? sequence.map((passType) => passLabelForProject(passType, "EPISODIC_SERIES")).join(", ") : "Thumbnails"}. This can take several minutes and will use your configured models.`
+      `Run Episode Fully Auto for "${selectedProject.title}"?\n\nBaxter Growth Lab will keep the completed five-episode plan and run: ${sequence.length ? sequence.map((passType) => passLabelForProject(passType, "EPISODIC_SERIES")).join(", ") : "Thumbnails"}. This can take several minutes and will use your configured models.`
     );
     if (!confirmed) return;
 
@@ -3383,7 +3383,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     }
 
     const confirmed = window.confirm(
-      `Create missing Publishing Packs and thumbnails for ${needsWork.length} video project${needsWork.length === 1 ? "" : "s"}?\n\nPolicyForge LAB will keep the shared thumbnail style across all images.`
+      `Create missing Publishing Packs and thumbnails for ${needsWork.length} video project${needsWork.length === 1 ? "" : "s"}?\n\nBaxter Growth Lab will keep the shared thumbnail style across all images.`
     );
     if (!confirmed) return;
 
@@ -3458,7 +3458,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
     if (!supportsBookIllustrations(project)) {
-      setMessage("Illustration generation is not available for this PolicyForge project type.");
+      setMessage("Illustration generation is not available for this Baxter Growth Lab project type.");
       return;
     }
 
@@ -3479,7 +3479,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
     if (!supportsBookIllustrations(project)) {
-      setMessage("Illustration generation is not available for this PolicyForge project type.");
+      setMessage("Illustration generation is not available for this Baxter Growth Lab project type.");
       return;
     }
     if (!settings.hasRunwareApiKey) {
@@ -3908,7 +3908,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         <div className="profile-card">
           <div className="avatar">{initials}</div>
           <div className="profile-meta">
-            <strong>{user.name || "PolicyForge LAB User"}</strong>
+            <strong>{user.name || "Baxter Growth Lab User"}</strong>
             <span>{user.email || "Signed in"}</span>
           </div>
           <ChevronDown size={16} />
@@ -3990,7 +3990,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         {loading ? (
           <div className="panel pad loading-panel">
             <Loader2 size={18} className="spin" />
-            Loading your PolicyForge LAB workspace...
+            Loading your Baxter Growth Lab workspace...
           </div>
         ) : null}
 
@@ -7246,7 +7246,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             <div>
               <h2 className="panel-title">
                 <BookOpen size={18} />
-                PolicyForge LAB Guides
+                Baxter Growth Lab Guides
               </h2>
               <p className="settings-note">Current channel: {currentChannel?.name || "Main Channel"}</p>
             </div>
@@ -7986,7 +7986,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   Test
                 </button>
               </div>
-              <small className="field-hint">Primary text provider. If it fails or returns empty output, PolicyForge LAB tries the fallback providers below.</small>
+              <small className="field-hint">Primary text provider. If it fails or returns empty output, Baxter Growth Lab tries the fallback providers below.</small>
               <CredentialStatus configured={Boolean(settings.hasOpenRouterApiKey)} label="OpenRouter key" />
               <ApiTestLine result={apiTestResults.openrouter} />
             </Field>
@@ -8096,7 +8096,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 onChange={(event) => setSettingsDraft((current) => ({ ...current, wordpressSiteUrl: event.target.value }))}
                 placeholder="https://your-site.com"
               />
-              <small className="field-hint">Used for Article projects only. PolicyForge LAB creates draft posts through the WordPress REST API.</small>
+              <small className="field-hint">Used for Article projects only. Baxter Growth Lab creates draft posts through the WordPress REST API.</small>
             </Field>
             <Field label="WordPress Username">
               <input
@@ -8665,7 +8665,7 @@ async function fetchJson<T>(url: string, init?: RequestInit, options: FetchJsonO
     return payload as T;
   }
 
-  throw new TransientApiError("PolicyForge LAB could not complete the request. Please try again.");
+  throw new TransientApiError("Baxter Growth Lab could not complete the request. Please try again.");
 }
 
 function channelUrl(path: string, channelId?: string) {
@@ -8771,7 +8771,7 @@ function clientJobCopy(label: string) {
     const passType = label.replace(/^pass-/, "") as ScriptPassType;
     return { label: passLabel(passType), detail: "Running one workflow pass and saving the result." };
   }
-  return { label: "PolicyForge LAB Job", detail: "Running and saving changes." };
+  return { label: "Baxter Growth Lab Job", detail: "Running and saving changes." };
 }
 
 function jobStatusLabel(status: ClientJobStatus) {
@@ -10562,7 +10562,7 @@ function learningLoopInsights(input: {
     } : null,
     {
       title: "Score calibration",
-      detail: `${input.projects.filter((project) => project.status === "PUBLISHED").length} projects are marked published in PolicyForge.`,
+      detail: `${input.projects.filter((project) => project.status === "PUBLISHED").length} projects are marked published in Baxter Growth Lab.`,
       action: "After each weekly sync, compare published project topics against actual CTR, retention, likes, watch hours, and subscriber gain."
     }
   ];
@@ -10924,8 +10924,8 @@ function channelBlueprintFromHotNiche(niche: ChannelHotNiche): ChannelBlueprint 
         sampleAngles: sampleAngles.map((angle, index) => `${angle} message ${index + 1}`)
       }
     ],
-    logoPrompt: `Square premium logo for PolicyForge LAB ${niche.title}, ${niche.category}, clean Texas insurance advisor brand, shield or document mark, modern navy teal gold palette, no tiny text.`,
-    bannerPrompt: `YouTube or web banner for PolicyForge LAB ${niche.title}, exact 2560 x 1440 canvas, keep readable text inside the centered safe area, professional Texas insurance background.`
+    logoPrompt: `Square premium logo for Baxter Growth Lab ${niche.title}, ${niche.category}, clean Texas insurance advisor brand, shield or document mark, modern navy teal gold palette, no tiny text.`,
+    bannerPrompt: `YouTube or web banner for Baxter Growth Lab ${niche.title}, exact 2560 x 1440 canvas, keep readable text inside the centered safe area, professional Texas insurance background.`
   };
 }
 

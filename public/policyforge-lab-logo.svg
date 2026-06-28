@@ -1,20 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="PolicyForge LAB logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Baxter Growth Lab logo">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#061f2a"/>
-      <stop offset="0.58" stop-color="#0c3d49"/>
-      <stop offset="1" stop-color="#08262f"/>
+    <linearGradient id="bg" x1="72" y1="40" x2="438" y2="464" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#06252c"/>
+      <stop offset="0.56" stop-color="#0b4b53"/>
+      <stop offset="1" stop-color="#07161b"/>
     </linearGradient>
-    <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f5961"/>
-      <stop offset="1" stop-color="#07313a"/>
+    <linearGradient id="gold" x1="154" y1="110" x2="372" y2="422" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f3cf7b"/>
+      <stop offset="1" stop-color="#c58a27"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="150" y1="166" x2="370" y2="358" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34d7c8"/>
+      <stop offset="1" stop-color="#007e82"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <path d="M256 54 389 111 361 320 256 438 151 320 123 111Z" fill="url(#shield)" stroke="#e8b24a" stroke-width="12" stroke-linejoin="round"/>
-  <text x="256" y="131" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="800" fill="#f7fbfa">PF</text>
-  <path d="M174 230 256 152 338 230" fill="none" stroke="#21a397" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="199" y="223" width="114" height="112" rx="12" fill="none" stroke="#f7fbfa" stroke-width="13"/>
-  <path d="M256 223v112M199 278h114" stroke="#f7fbfa" stroke-width="10" stroke-linecap="round"/>
-  <path d="M190 369 233 405 323 340" fill="none" stroke="#e8b24a" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect width="512" height="512" rx="104" fill="url(#bg)"/>
+  <path d="M256 64 390 118 363 318 256 438 149 318 122 118Z" fill="#082930" stroke="url(#gold)" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M183 247 256 178 329 247" fill="none" stroke="#f8fbf8" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M204 245v93h104v-93" fill="none" stroke="#f8fbf8" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M256 338v-86" stroke="#f8fbf8" stroke-width="12" stroke-linecap="round"/>
+  <path d="M211 292h90" stroke="#f8fbf8" stroke-width="12" stroke-linecap="round"/>
+  <path d="M175 382c46-4 90-23 128-54 18-15 34-32 48-51" fill="none" stroke="url(#teal)" stroke-width="22" stroke-linecap="round"/>
+  <path d="M338 273h52v52" fill="none" stroke="url(#teal)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="256" cy="126" r="33" fill="#f8fbf8"/>
+  <text x="256" y="139" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="900" fill="#07313a">B</text>
 </svg>

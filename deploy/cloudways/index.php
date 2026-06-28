@@ -42,7 +42,7 @@ $response = curl_exec($ch);
 if ($response === false) {
     http_response_code(503);
     header('Content-Type: text/plain; charset=utf-8');
-    echo 'PolicyForge LAB is starting. Please refresh in a moment.';
+    echo 'Baxter Growth Lab is starting. Please refresh in a moment.';
     exit;
 }
 

@@ -90,7 +90,7 @@ async function collectSourceUrlNotes(urls: string[]) {
     try {
       const response = await fetch(url, {
         headers: {
-          "User-Agent": "PolicyForgeLabResearchBot/1.0",
+          "User-Agent": "BaxterGrowthLabResearchBot/1.0",
           "Accept": "text/html,text/plain,application/xhtml+xml"
         },
         signal: AbortSignal.timeout(8_000)

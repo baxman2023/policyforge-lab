@@ -74,7 +74,7 @@ button {
   height: 34px;
   flex: 0 0 34px;
   border-radius: 10px;
-  background: url("/policyforge-lab-logo.png") center / cover no-repeat;
+  background: url("/policyforge-lab-logo.svg") center / cover no-repeat;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
 }
 
@@ -1763,7 +1763,7 @@ button.text-link {
   display: grid;
   place-items: center;
   color: transparent;
-  background: url("/policyforge-lab-logo.png") center / cover no-repeat;
+  background: url("/policyforge-lab-logo.svg") center / cover no-repeat;
   box-shadow: 0 14px 34px rgba(0, 126, 130, 0.22);
 }
 

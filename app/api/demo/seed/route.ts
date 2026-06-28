@@ -247,7 +247,7 @@ const DEMO_IDEAS = [
   {
     title: "The Vanishing Lifeboat: A Maritime Mystery No One Reopened",
     hook: "A lifeboat drifted home without the people who launched it, leaving a trail of official silence and one impossible timing problem.",
-    summary: "A premium demo story showing how PolicyForge LAB turns a thin maritime mystery into a research-led documentary with a safe central question.",
+    summary: "A premium demo story showing how Baxter Growth Lab turns a thin maritime mystery into a research-led documentary with a safe central question.",
     category: "Maritime Stories",
     people: ["Unknown crew", "Harbor officials"],
     location: "North Atlantic",

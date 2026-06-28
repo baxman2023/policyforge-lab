@@ -14,8 +14,8 @@ export default async function LoginPage({ searchParams }: { searchParams?: Promi
   return (
     <main className="login-page">
       <section className="login-panel">
-        <div className="brand-mark" aria-label="PolicyForge LAB" />
-        <h1>Sign in to PolicyForge LAB</h1>
+        <div className="brand-mark" aria-label="Baxter Growth Lab" />
+        <h1>Sign in to Baxter Growth Lab</h1>
         <p>Create an account or sign in with email and password. The first account becomes the admin.</p>
         <LoginForm googleConfigured={googleConfigured} inviteToken={params?.invite || ""} />
       </section>

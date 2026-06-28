@@ -76,7 +76,7 @@ export function AdminUsers({ users, currentUserId }: { users: AdminUser[]; curre
       <header className="admin-header">
         <div>
           <Link href="/" className="text-link">
-            Back to PolicyForge LAB
+            Back to Baxter Growth Lab
           </Link>
           <h1>Members</h1>
           <p>Keep this small group tidy. Disable people immediately, or delete accounts that do not belong.</p>

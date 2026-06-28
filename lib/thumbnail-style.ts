@@ -1,4 +1,4 @@
-export const DEFAULT_THUMBNAIL_STYLE_GUIDE = `PolicyForge LAB thumbnail system:
+export const DEFAULT_THUMBNAIL_STYLE_GUIDE = `Baxter Growth Lab thumbnail system:
 - Ownable channel look: premium Texas insurance advisor content with high-trust, high-readability packaging for mobile feeds.
 - Palette: deep navy, teal, white, warm gold, and restrained red only for urgent callouts. Keep it professional, not alarmist.
 - Composition: one dominant home, vehicle, business storefront, policy document, roof, storm prep object, family, or Texas/Houston cue; 2-3 visual elements max; no busy backgrounds.

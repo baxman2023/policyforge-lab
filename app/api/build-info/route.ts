@@ -7,7 +7,7 @@ export async function GET() {
   const marker = fs.existsSync(markerPath) ? fs.readFileSync(markerPath, "utf8").trim() : "local-dev";
   return Response.json(
     {
-      app: "PolicyForge LAB",
+      app: "Baxter Growth Lab",
       marker,
       descriptionFormatter: "publishing-pack-description-blocks-v3",
       apiProxy: "cloudways-index-php-v1"

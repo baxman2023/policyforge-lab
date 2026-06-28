@@ -651,8 +651,8 @@ export function forgeChannelDescription(niche: ForgeNiche) {
         sampleAngles: niche.starterAngles
       }
     ],
-    logoPrompt: `Square premium logo for PolicyForge LAB ${niche.name}, Texas insurance growth, clean shield or document mark, modern navy teal gold palette, no tiny text.`,
-    bannerPrompt: `YouTube or web banner for PolicyForge LAB ${niche.name}, tagline "${niche.title}", professional Texas insurance advisor style, readable text in centered safe area.`
+    logoPrompt: `Square premium logo for Baxter Growth Lab ${niche.name}, Texas insurance growth, clean shield or document mark, modern navy teal gold palette, no tiny text.`,
+    bannerPrompt: `YouTube or web banner for Baxter Growth Lab ${niche.name}, tagline "${niche.title}", professional Texas insurance advisor style, readable text in centered safe area.`
   });
 }
 

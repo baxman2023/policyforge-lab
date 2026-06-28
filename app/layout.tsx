@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://phpstack-1305612-6519184.cloudwaysapps.com"),
-  title: "PolicyForge LAB",
+  title: "Baxter Growth Lab",
   description: "AI insurance growth, local SEO, scripting, and sales enablement engine"
 };
 

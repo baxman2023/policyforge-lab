@@ -64,7 +64,7 @@ fi
 DEPLOY_MARKER="$(date -u +"%Y-%m-%dT%H:%M:%SZ") description-format-v3 api-proxy-v1 static-assets-v1 article-images-wordpress-v1 content-modes-v1 systems-upgrade-v1 idea-used-action-v1 idea-reactivate-action-v1 production-status-flow-v1 script-output-copy-v1 suno-music-prompt-v1"
 printf '%s\n' "$DEPLOY_MARKER" > "$ROOT_DIR/.deploy-marker"
 
-echo "Building PolicyForge LAB locally..."
+echo "Building Baxter Growth Lab locally..."
 npm run lint
 npm run build
 npm run typecheck
@@ -119,7 +119,7 @@ sshpass -e rsync -rlz --delete \
   "$ROOT_DIR/.next/static/" \
   "${REMOTE}:${TSL_REMOTE_DIR}/_next/static/"
 
-echo "Installing PolicyForge LAB environment and database schema..."
+echo "Installing Baxter Growth Lab environment and database schema..."
 POLICYFORGE_SECRET="${TSL_NEXTAUTH_SECRET:-$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")}"
 POLICYFORGE_ENCRYPTION_KEY="${TSL_ENCRYPTION_KEY:-$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")}"
 sshpass -e ssh "${SSH_OPTS[@]}" "$REMOTE" \

@@ -353,7 +353,7 @@ async function generateIdeaTopUp(input: {
     throw new Error("The selected model did not return usable growth ideas. Try a different discovery model or reduce the idea count.");
   }
   if (generated.length < input.input.count) {
-    throw new Error(`PolicyForge LAB only generated ${generated.length} usable ideas out of ${input.input.count}. The discovery model under-returned or failed during top-up. Try again or choose a different Discovery Model in Settings.`);
+    throw new Error(`Baxter Growth Lab only generated ${generated.length} usable ideas out of ${input.input.count}. The discovery model under-returned or failed during top-up. Try again or choose a different Discovery Model in Settings.`);
   }
 
   return generated;

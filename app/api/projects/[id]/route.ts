@@ -82,7 +82,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
           data: { status: PublishingSlotStatus.PUBLISHED }
         });
         const publishedData = {
-          platform: input.platform || "PolicyForge LAB",
+          platform: input.platform || "Baxter Growth Lab",
           publishedUrl: input.publishedUrl || null,
           notes: input.notes || null,
           publishedAt: new Date()

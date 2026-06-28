@@ -71,7 +71,7 @@ Mode:
 ${input.surpriseMe ? "SURPRISE ME. Invent a fresh, differentiated, commercially strong channel concept from scratch." : "Guided new-channel planning. Use the creator direction as the absolute source of truth."}
 
 Agency direction or seed:
-${input.seed || "No seed provided. Develop a strong, sellable insurance growth lane from the existing PolicyForge LAB strengths."}
+${input.seed || "No seed provided. Develop a strong, sellable insurance growth lane from the existing Baxter Growth Lab strengths."}
 
 Agency facts to preserve:
 - Baxter Insurance Agency, Inc.
@@ -293,7 +293,7 @@ export function repairChannelKitForNewTopic(kit: ChannelIdeaMachineKit, input: {
     ...replacement,
     dataForSeoWarning: [
       kit.dataForSeoWarning,
-      "Generated kit reused the active channel context, so PolicyForge LAB replaced it with a clean topic-matched kit."
+      "Generated kit reused the active channel context, so Baxter Growth Lab replaced it with a clean topic-matched kit."
     ].filter(Boolean).join(" ")
   };
 }
@@ -659,9 +659,9 @@ function lifeLane(): FallbackLane {
 
 function localSeoLane(): FallbackLane {
   return insuranceLane({
-    channelName: "PolicyForge Local SEO",
+    channelName: "Baxter Local SEO",
     tagline: "Texas insurance pages that earn calls.",
-    description: "PolicyForge Local SEO creates city pages, Google Business Profile posts, FAQs, service pages, comparison explainers, schema-ready sections, and quote-focused local content for Baxter Insurance Agency, Inc. The lane focuses on Houston and surrounding Texas communities while keeping copy useful, specific, and compliant. It prioritizes home and auto searches first, then flood, storm, commercial, landlord, umbrella, life, and referral campaigns that can turn search intent into real agency conversations.",
+    description: "Baxter Local SEO creates city pages, Google Business Profile posts, FAQs, service pages, comparison explainers, schema-ready sections, and quote-focused local content for Baxter Insurance Agency, Inc. The lane focuses on Houston and surrounding Texas communities while keeping copy useful, specific, and compliant. It prioritizes home and auto searches first, then flood, storm, commercial, landlord, umbrella, life, and referral campaigns that can turn search intent into real agency conversations.",
     targetAudience: "Texas insurance prospects searching locally for home, auto, flood, storm, commercial, life, or agency review help.",
     recurringStoryTypes: "City pages, neighborhood pages, Google Business Profile posts, FAQ blocks, quote pages, service explainers, and weekly local campaigns.",
     keywords: ["insurance agency Houston TX", "home insurance Houston", "auto insurance Houston", "Texas insurance agency", "Houston homeowners insurance", "local insurance agent Houston", "business insurance Houston", "Baxter Insurance Agency"],

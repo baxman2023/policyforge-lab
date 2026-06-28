@@ -148,7 +148,7 @@ async function fetchWithTimeout(url: string) {
         signal: controller.signal,
         redirect: "manual",
         headers: {
-          "User-Agent": "PolicyForgeLabSponsorBlurbBot/1.0",
+          "User-Agent": "BaxterGrowthLabSponsorBlurbBot/1.0",
           Accept: "text/html,text/plain;q=0.9,*/*;q=0.5"
         }
       });
@@ -163,7 +163,7 @@ async function fetchWithTimeout(url: string) {
       signal: controller.signal,
       redirect: "manual",
       headers: {
-        "User-Agent": "PolicyForgeLabSponsorBlurbBot/1.0",
+        "User-Agent": "BaxterGrowthLabSponsorBlurbBot/1.0",
         Accept: "text/html,text/plain;q=0.9,*/*;q=0.5"
       }
     });

@@ -355,7 +355,7 @@ function openRouterHeaders(apiKey: string) {
     Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",
     "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://phpstack-1305612-6519184.cloudwaysapps.com",
-    "X-Title": "PolicyForge LAB"
+    "X-Title": "Baxter Growth Lab"
   };
 }
 
@@ -363,7 +363,7 @@ function publicOpenRouterHeaders() {
   return {
     Accept: "application/json",
     "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://phpstack-1305612-6519184.cloudwaysapps.com",
-    "X-Title": "PolicyForge LAB"
+    "X-Title": "Baxter Growth Lab"
   };
 }
 

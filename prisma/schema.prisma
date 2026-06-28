@@ -137,7 +137,7 @@ model Workspace {
   id                 String                      @id @default(cuid())
   name               String
   slug               String                      @unique
-  tagline            String                      @default("AI Script Engine")
+  tagline            String                      @default("Texas Insurance Growth Engine")
   logoUrl            String?                     @db.Text
   customDomain       String?                     @unique
   subscriptionStatus WorkspaceSubscriptionStatus @default(ACTIVE)
@@ -277,8 +277,8 @@ model UserSettings {
   youtubeClientId             String?  @db.Text
   youtubeClientSecretEncrypted String? @db.Text
   thumbnailStyleGuide         String?  @db.Text
-  workspaceName               String   @default("PolicyForge LAB")
-  workspaceTagline            String   @default("AI Script Engine")
+  workspaceName               String   @default("Baxter Growth Lab")
+  workspaceTagline            String   @default("Texas Insurance Growth Engine")
   workspaceLogoUrl            String?  @db.Text
   defaultSponsorCta           String?  @db.Text
   publishingScheduleNote      String   @default("Mondays and Thursdays; one monthly Monday-Friday episode week.")

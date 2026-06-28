@@ -2,7 +2,7 @@
   "name": "policyforge-lab",
   "version": "0.1.0",
   "private": true,
-  "description": "PolicyForge LAB - AI insurance growth, local SEO, scripting, and sales enablement engine",
+  "description": "Baxter Growth Lab - AI insurance growth, local SEO, scripting, and sales enablement engine",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack && node scripts/copy-pdfkit-data.cjs",
