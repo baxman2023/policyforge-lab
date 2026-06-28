@@ -7836,10 +7836,10 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 className="short-textarea"
                 value={channelBlueprintDraft.description ?? ""}
                 onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, description: event.target.value }))}
-                placeholder="Public-facing lane or campaign description"
+                placeholder="Saved internal lane strategy, positioning, and campaign description"
               />
-              <small className={cn("field-hint", (channelBlueprintDraft.description?.length ?? 0) > 1000 && "warning-text")}>
-                {(channelBlueprintDraft.description?.length ?? 0)}/1000 characters. Growth Pack generation now targets 900-980 useful characters.
+              <small className="field-hint">
+                {(channelBlueprintDraft.description?.length ?? 0).toLocaleString()} characters. This saved strategy can be longer than a public channel About description; generated public descriptions are compacted separately.
               </small>
             </Field>
             <Field label="Target Audience">
