@@ -144,7 +144,7 @@ fi
 export DATABASE_URL="$TSL_DATABASE_URL"
 export PATH="$HOME/.local/opt/node-v22/bin:$HOME/.local/bin:$HOME/bin:$HOME/.npm-global/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 if [ ! -x node_modules/.bin/prisma ]; then
-  npm ci
+  npm ci || npm install
 fi
 npx prisma db push --accept-data-loss
 REMOTE_ENV
