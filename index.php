@@ -1,5 +1,8 @@
 <?php
 set_time_limit(900);
+header('Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $requestUri = preg_replace('#^/index\.php(?=/|\?|$)#', '', $requestUri);
