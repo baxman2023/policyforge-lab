@@ -76,6 +76,7 @@ export type ConversionAssets = {
   shortClipHooks: string[];
   callScript?: string;
   websiteArticleAngle?: string;
+  macalyLandingPagePrompt?: string;
   reviewReferralPrompt?: string;
 };
 
@@ -194,6 +195,13 @@ function readConversionAssets(value: unknown): ConversionAssets | undefined {
   if (callScript) assets.callScript = callScript;
   const websiteArticleAngle = readString(record.websiteArticleAngle ?? record.articleAngle ?? record.websiteFollowUp);
   if (websiteArticleAngle) assets.websiteArticleAngle = websiteArticleAngle;
+  const macalyLandingPagePrompt = readString(
+    record.macalyLandingPagePrompt
+      ?? record.macalyPrompt
+      ?? record.landingPagePrompt
+      ?? record.macalyLandingPage
+  );
+  if (macalyLandingPagePrompt) assets.macalyLandingPagePrompt = macalyLandingPagePrompt;
   const reviewReferralPrompt = readString(record.reviewReferralPrompt ?? record.referralPrompt ?? record.reviewPrompt);
   if (reviewReferralPrompt) assets.reviewReferralPrompt = reviewReferralPrompt;
   return Object.keys(assets).some((key) => key !== "shortClipHooks" || assets.shortClipHooks.length) ? assets : undefined;

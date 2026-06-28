@@ -1816,6 +1816,7 @@ Schema:
     "shortClipHooks": ["short-form clip hook 1", "short-form clip hook 2", "short-form clip hook 3"],
     "callScript": "short call script for staff or producer",
     "websiteArticleAngle": "website page/article follow-up angle",
+    "macalyLandingPagePrompt": "comprehensive prompt to paste into Macaly.com for a standalone landing page matched to this article and its conversion goal",
     "reviewReferralPrompt": "review or referral prompt if relevant"
   },
   "seoPack": {
@@ -1880,6 +1881,7 @@ Rules:
 - seoPack is required and must be directly useful for publishing the current article.
 - topicalAuthorityMap is required and must help the user know what articles to create next.
 - conversionAssets is required and must adapt the article into agency growth assets without adding unsupported claims.
+- macalyLandingPagePrompt is required inside conversionAssets. Write it as a complete prompt the user can paste into Macaly.com to build a standalone landing page for this article's goal. It must specify: page goal, target Texas audience, Baxter Insurance Agency context, hero headline/subheadline, trust section, problem section, education/value section, quote or review/referral CTA section, lead form fields to include, form-disclaimer copy, FAQ section, local SEO cues, mobile-first design direction, tone, color/visual guidance, analytics/tracking placeholders, and compliance boundaries. Do not ask Macaly to edit baxterinsuranceagency.com directly.
 - Topical Authority Map should include 3-5 clusters and 12-25 supporting article ideas total.
 - recommendedNextArticles should list the best 5-8 articles to create after this one.
 - For local lead-gen or expert/authority articles, include local service, cost, comparison, objection, FAQ, trust, and decision-intent articles.
@@ -1920,6 +1922,7 @@ Schema:
     "shortClipHooks": ["short-form clip hook 1", "short-form clip hook 2", "short-form clip hook 3"],
     "callScript": "short call script for staff or producer",
     "websiteArticleAngle": "website page/article follow-up angle",
+    "macalyLandingPagePrompt": "comprehensive prompt to paste into Macaly.com for a standalone landing page matched to this content and its conversion goal",
     "reviewReferralPrompt": "review or referral prompt if relevant"
   }
 }
@@ -1929,6 +1932,7 @@ Rules:
 - Titles should be curiosity-driven, factual, human, and clickable without false claims.
 - The description should be ready to paste into ${nonVideoPasteTarget}.
 - conversionAssets is required and must adapt this ${outputName} into agency growth assets without adding unsupported claims.
+- macalyLandingPagePrompt is required inside conversionAssets. Write it as a complete prompt the user can paste into Macaly.com to build a standalone landing page for this ${outputName}'s goal. It must specify: page goal, target Texas audience, Baxter Insurance Agency context, hero headline/subheadline, trust section, problem section, education/value section, quote or review/referral CTA section, lead form fields to include, form-disclaimer copy, FAQ section, local SEO cues, mobile-first design direction, tone, color/visual guidance, analytics/tracking placeholders, and compliance boundaries. Do not ask Macaly to edit baxterinsuranceagency.com directly.
 ${nonVideoSponsorRules}
 - Tags should include useful names, places, categories, spellings, and broad topic terms without stuffing.
 - If SEO keyword hints are available, use the most relevant phrases naturally.
@@ -2056,6 +2060,7 @@ Schema:
     "shortClipHooks": ["short-form clip hook 1", "short-form clip hook 2", "short-form clip hook 3"],
     "callScript": "short call script for staff or producer",
     "websiteArticleAngle": "website page/article follow-up angle",
+    "macalyLandingPagePrompt": "comprehensive prompt to paste into Macaly.com for a standalone landing page matched to this video and its conversion goal",
     "reviewReferralPrompt": "review or referral prompt if relevant"
   }
 }
@@ -2093,7 +2098,8 @@ Rules:
 - Pinned comments should ask for a genuine viewer interpretation, theory, memory, or next-question response. Do not use intentional typos, fake mistakes, or manipulative engagement bait.
 - Do not copy any competitor thumbnail, face, layout, logo, or exact framing.
 - Provide one sunoPrompt for background music specific to this video.
-- conversionAssets is required. Adapt the finished script into a GBP post, short email, Facebook/social post, three short-form clip hooks, staff call script, website article angle, and review/referral prompt when relevant.
+- conversionAssets is required. Adapt the finished script into a GBP post, short email, Facebook/social post, three short-form clip hooks, staff call script, website article angle, Macaly landing page prompt, and review/referral prompt when relevant.
+- macalyLandingPagePrompt is required inside conversionAssets. Write it as a complete prompt the user can paste into Macaly.com to build a standalone landing page for this video's goal. It must specify: page goal, target Texas audience, Baxter Insurance Agency context, hero headline/subheadline, embedded video or article-summary section, trust section, problem section, education/value section, quote or review/referral CTA section, lead form fields to include, form-disclaimer copy, FAQ section, local SEO cues, mobile-first design direction, tone, color/visual guidance, analytics/tracking placeholders, and compliance boundaries. Do not ask Macaly to edit baxterinsuranceagency.com directly.
 - Every conversion asset must keep the same compliance boundaries: Texas-only, no savings guarantees, no coverage promises, no carrier promises, no claim outcome promises.
 - The Suno prompt must be designed for background music under spoken narration: instrumental only, no vocals, no lyrics, loopable, emotionally aligned to the story, and not so busy that it competes with voiceover.
 - Include genre/style, mood, instrumentation, pacing or BPM feel, emotional arc, and a clear "no vocals, no lyrics" instruction.

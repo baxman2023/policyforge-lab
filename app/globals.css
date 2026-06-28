@@ -4889,6 +4889,10 @@ button.text-link {
   margin: 0;
 }
 
+.seo-card .prewrap-text {
+  white-space: pre-wrap;
+}
+
 .seo-card ol,
 .seo-card ul {
   margin: 0;

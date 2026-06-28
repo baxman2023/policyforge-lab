@@ -485,6 +485,7 @@ function ConversionAssetsView({ assets }: { assets: ConversionAssets }) {
     ["Facebook / Social Post", assets.facebookPost],
     ["Call Script", assets.callScript],
     ["Website Article Angle", assets.websiteArticleAngle],
+    ["Macaly Landing Page Prompt", assets.macalyLandingPagePrompt],
     ["Review / Referral Prompt", assets.reviewReferralPrompt]
   ] as const;
   return (
@@ -492,7 +493,7 @@ function ConversionAssetsView({ assets }: { assets: ConversionAssets }) {
       {cards.map(([label, value]) => value ? (
         <div className="seo-card wide" key={label}>
           <strong>{label}</strong>
-          <p>{value}</p>
+          <p className={label === "Macaly Landing Page Prompt" ? "prewrap-text" : undefined}>{value}</p>
         </div>
       ) : null)}
       {assets.shortClipHooks.length ? (
