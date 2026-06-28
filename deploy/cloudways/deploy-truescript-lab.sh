@@ -119,6 +119,16 @@ sshpass -e rsync -rlz --delete \
   "$ROOT_DIR/.next/static/" \
   "${REMOTE}:${TSL_REMOTE_DIR}/_next/static/"
 
+echo "Publishing public app assets to ${REMOTE}:${TSL_REMOTE_DIR}/..."
+sshpass -e rsync -rlz \
+  -e "ssh ${SSH_OPTS[*]}" \
+  --omit-dir-times \
+  --no-perms \
+  --no-owner \
+  --no-group \
+  "$ROOT_DIR/public/" \
+  "${REMOTE}:${TSL_REMOTE_DIR}/"
+
 echo "Installing Baxter Growth Lab environment and database schema..."
 POLICYFORGE_SECRET="${TSL_NEXTAUTH_SECRET:-$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")}"
 POLICYFORGE_ENCRYPTION_KEY="${TSL_ENCRYPTION_KEY:-$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")}"
