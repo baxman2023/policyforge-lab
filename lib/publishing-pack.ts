@@ -69,6 +69,16 @@ export type TopicalAuthorityMap = {
   recommendedNextArticles: TopicalAuthorityArticle[];
 };
 
+export type ConversionAssets = {
+  gbpPost?: string;
+  clientEmail?: string;
+  facebookPost?: string;
+  shortClipHooks: string[];
+  callScript?: string;
+  websiteArticleAngle?: string;
+  reviewReferralPrompt?: string;
+};
+
 export type PublishingPack = {
   titles: PublishingTitle[];
   description: string;
@@ -78,6 +88,7 @@ export type PublishingPack = {
   pinnedComment?: string;
   seoPack?: ArticleSeoPack;
   topicalAuthorityMap?: TopicalAuthorityMap;
+  conversionAssets?: ConversionAssets;
   episodePacks?: EpisodePublishingPack[];
 };
 
@@ -162,8 +173,30 @@ export function parsePublishingPack(content: string): PublishingPack {
     pinnedComment: readString(raw.pinnedComment),
     seoPack: readArticleSeoPack(raw.seoPack ?? raw.articleSeoPack ?? raw.seo),
     topicalAuthorityMap: readTopicalAuthorityMap(raw.topicalAuthorityMap ?? raw.authorityMap ?? raw.contentMap),
+    conversionAssets: readConversionAssets(raw.conversionAssets ?? raw.supportingAssets ?? raw.repurposeAssets ?? raw.growthAssets),
     episodePacks: readEpisodePublishingPacks(raw.episodePacks ?? raw.episodes ?? raw.parts)
   };
+}
+
+function readConversionAssets(value: unknown): ConversionAssets | undefined {
+  const record = asRecord(value);
+  if (!record) return undefined;
+  const assets: ConversionAssets = {
+    shortClipHooks: readStringArray(record.shortClipHooks ?? record.shorts ?? record.shortHooks).slice(0, 8)
+  };
+  const gbpPost = readString(record.gbpPost ?? record.googleBusinessProfilePost ?? record.googlePost);
+  if (gbpPost) assets.gbpPost = gbpPost;
+  const clientEmail = readString(record.clientEmail ?? record.email ?? record.prospectEmail);
+  if (clientEmail) assets.clientEmail = clientEmail;
+  const facebookPost = readString(record.facebookPost ?? record.socialPost ?? record.socialCaption);
+  if (facebookPost) assets.facebookPost = facebookPost;
+  const callScript = readString(record.callScript ?? record.phoneScript ?? record.staffCallScript);
+  if (callScript) assets.callScript = callScript;
+  const websiteArticleAngle = readString(record.websiteArticleAngle ?? record.articleAngle ?? record.websiteFollowUp);
+  if (websiteArticleAngle) assets.websiteArticleAngle = websiteArticleAngle;
+  const reviewReferralPrompt = readString(record.reviewReferralPrompt ?? record.referralPrompt ?? record.reviewPrompt);
+  if (reviewReferralPrompt) assets.reviewReferralPrompt = reviewReferralPrompt;
+  return Object.keys(assets).some((key) => key !== "shortClipHooks" || assets.shortClipHooks.length) ? assets : undefined;
 }
 
 function readEpisodePublishingPacks(value: unknown): EpisodePublishingPack[] | undefined {

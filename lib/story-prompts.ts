@@ -103,11 +103,11 @@ function inferProjectContentMode(input: {
   if (/authority|expert|buyer question|service explainer|case stud|compliance|faq|objection|myth bust|comparison content|industry expertise|qualified leads/.test(text)) {
     return "EXPERT_AUTHORITY";
   }
-  return "STORY_DOCUMENTARY";
+  return "LOCAL_LEAD_GEN";
 }
 
 export function ideaGenerationPrompt(input: IdeaFactoryInput, existingTitles: string[]) {
-  const contentMode = input.contentMode ?? "STORY_DOCUMENTARY";
+  const contentMode = input.contentMode ?? "LOCAL_LEAD_GEN";
   const isBusinessMode = contentMode !== "STORY_DOCUMENTARY";
   const isShortBook = input.projectFormat === "SHORT_BOOK";
   const isLongBook = input.projectFormat === "LONG_BOOK";
@@ -169,13 +169,13 @@ ${input.analyticsGuide || "No connected YouTube analytics guidance yet. Use gene
 Existing idea-library / white-space guidance:
 ${input.whiteSpaceGuide || "No existing idea-library pattern available yet. Build variety across titles, formats, subjects, and viewer promises."}
 
-Money path guidance:
-- Primary money goal: ${input.moneyGoal || "Not provided. Favor YouTube monetization, watch time, subscriber growth, and advertiser-safe trust building."}
-- Affiliate or offer: ${input.affiliateOffer || "Not provided. Do not invent a sponsor or affiliate product."}
+Agency revenue guidance:
+- Primary business goal: ${input.moneyGoal || "Generate qualified Texas insurance conversations for Baxter Insurance Agency while preserving trust and compliance."}
+- Offer or CTA path: ${input.affiliateOffer || "Use a helpful quote, policy review, referral, review, bundling, or coverage-question CTA. Do not invent products, savings, rates, or eligibility promises."}
 - Risk lane: ${input.riskProfile || "Balanced, advertiser-safe documentary framing."}
 - Production capacity: ${input.productionCapacity || "Not provided. Prefer ideas that can be produced consistently without padding."}`;
 
-  return `Generate ${input.count} ${isBusinessMode ? "content" : "long-form story"} ideas for a creator.
+  return `Generate ${input.count} ${isBusinessMode ? "content" : "local insurance education"} ideas for Baxter Insurance Agency.
 
 ${contextLines}
 
@@ -290,22 +290,22 @@ ${modeRules}
 - Pick recommendedNarrationStyle exactly from: ${narrationChoices}.
 - Treat lengthPotentialScore as Depth Strength: ${isBusinessMode ? "how much useful buyer education, search demand, proof, examples, objection handling, and practical substance exists to sustain the chosen output without padding." : "how much verifiable source/story material exists to sustain the chosen length without padding, repetition, or invented facts."}
 - Score lengthPotentialScore low when the idea is likely ${isBusinessMode ? "a short post" : "a short segment"}, medium when it can support one complete standard output, and high only when there are enough ${isBusinessMode ? "angles, examples, questions, proof points, sections, and stakes" : "records, turns, source layers, locations, people, and unanswered questions"} for deep coverage.
-- Score ideaMarketScore for subscriber/watch-time upside, packaging strength, repeatability, and advertiser-safe monetization potential.
+- Score ideaMarketScore for qualified-prospect intent, packaging strength, repeatability, usefulness, and compliance-safe agency revenue potential.
 - In titleThumbnailPretest, create three packaging options that test different curiosity promises without clickbait or false claims.
 - In thumbnailFirstFit, apply the thumbnail-first rule: if the idea cannot be sold with one clear visual subject plus one mystery/evidence detail, score it lower and explain what stronger visual anchor is needed before scripting.
 - The firstFrameExpectation must say how the opening line or visual immediately pays off the title/thumbnail promise. Good ideas should let the first 5 seconds say or show what the viewer clicked for.
 - In sourceDepthPreflight, flag whether the idea can honestly support 10, 20, 30, 45, or 60 minutes and list the source types needed before writing.
 - In analyticsFit, use only the YouTube performance guidance above. If no connected analytics exists, say the fit is based on general channel best practices.
 - In ideaCluster, show how the idea fits into a repeatable channel lane with follow-up videos and Shorts cutdowns.
-- In monetizationRisk, rate ad-safety and platform risk. Use educational/documentary framing for crime, weapons, drugs, disasters, medical, supernatural, conspiracy, and extremist topics.
-- In monetizationStrategy, explain exactly how the idea supports the saved money path without forcing the offer into the script. Include sponsor fit, affiliate angle, CTA, email capture idea, product idea, and warnings about revenue moves that would hurt trust or retention.
+- In monetizationRisk, rate compliance, trust, and platform risk. Use educational framing and avoid promises about savings, coverage, eligibility, underwriting, carrier appetite, or claim outcomes.
+- In monetizationStrategy, explain exactly how the idea supports qualified agency conversations without forcing the CTA into the script. Include service fit, CTA, email capture idea, follow-up asset, and warnings about revenue moves that would hurt trust or compliance.
 - In whiteSpace, identify the under-covered angle and the common overdone angle to avoid.
 - Make the length/time and narration choice fit the idea's substance, audience urgency, complexity, and payoff.`;
 }
 
 function ideaModeRules(mode: IdeaContentMode) {
   if (mode === "EXPERT_AUTHORITY") {
-    return `- Generate authority-building content ideas for a real professional, consultant, creator, or business.
+    return `- Generate authority-building content ideas for Baxter Insurance Agency or another real professional service business.
 - Ideas must be educational, credible, and useful to the specified audience, not generic motivational content.
 - Use buyer questions, objections, misconceptions, comparison angles, diagnostic frameworks, risks, checklists, case-study-style angles, and strong points of view.
 - Do not promise outcomes, legal results, medical results, financial returns, or guaranteed rankings.
@@ -398,6 +398,166 @@ function projectModeRules(mode: IdeaContentMode) {
   return `- Treat this as story or documentary content with natural escalation, human stakes, and factual restraint.`;
 }
 
+const POLICYFORGE_AGENCY_PROFILE = `PolicyForge agency profile:
+- Agency: Baxter Insurance Agency, Inc.
+- Phone: 281-445-1381
+- Mailing address: 450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060
+- Licensed for General Lines and life in Texas only.
+- Service area: Texas only, with strongest focus on Houston and surrounding areas.
+- Primary lines: home and auto first; commercial, life, retention, referrals, and reviews as supporting lanes.
+- Preferred carrier lanes: Germania, Travelers, SWYFFT, Progressive, GEICO, and other available markets when appropriate.
+- Voice: local, practical, plain-English, consultative, no hype, no scare tactics, no guaranteed outcomes.`;
+
+const POLICYFORGE_SOURCE_MEMORY = `Reusable insurance source memory:
+- Texas Department of Insurance is the preferred public authority for Texas insurance education, complaints, consumer guidance, licensing, and state-specific rules.
+- FEMA, NFIP, FloodSmart, local floodplain resources, and lender requirements are useful source lanes for flood education.
+- Carrier pages and underwriting appetite should be treated as current only when the user supplies or verifies them. Do not invent carrier-specific eligibility or appetite.
+- Policy terms, endorsements, limits, exclusions, deductibles, underwriting, carrier appetite, inspection results, and Texas regulations control actual coverage.
+- Claims guidance must stay educational: document damage, protect property when safe, contact the carrier/claims number, keep receipts, and ask the agency for policy-review help. Do not promise payment or claim outcomes.
+- Agency-specific facts: Baxter Insurance Agency, Inc. serves Texas, especially Houston and surrounding areas, and can invite prospects to call 281-445-1381 or request a quote/review.`;
+
+function policyForgeScriptEngineBrief(input: {
+  title: string;
+  format?: StoryProjectFormat | string | null;
+  targetLengthMinutes: number;
+  category?: string | null;
+  sourceType?: string | null;
+  suggestedAngle?: string | null;
+  location?: string | null;
+  eventName?: string | null;
+  channelVoiceGuide?: string;
+}) {
+  const scriptType = inferInsuranceScriptType(input);
+  const cta = recommendedInsuranceCta(scriptType);
+  return `PolicyForge Scripting Engine:
+${POLICYFORGE_AGENCY_PROFILE}
+
+Required pre-script brief:
+- Target prospect: infer from title, growth lane, category, source material, and saved growth strategy.
+- Policy/product focus: ${scriptType.policyFocus}
+- Texas location: ${input.location || "Texas, with Houston-area context when relevant"}
+- Pain point or decision moment: ${input.eventName || input.suggestedAngle || input.title}
+- Script structure: ${scriptType.structure}
+- Primary CTA: ${cta}
+- Compliance boundaries: Texas-only; do not promise savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcomes.
+- Proof/source notes: use source material, saved growth strategy, Texas DOI/TDI, FEMA/NFIP where relevant, carrier pages only when supplied, and agency knowledge as general education.
+
+Coverage promise guardrails:
+- Flag or remove: "guaranteed savings", "fully covered", "cheapest", "best rate guaranteed", "claim will be paid", "everyone qualifies", "no exclusions", "we can get anyone approved", "this carrier will cover it", or any equivalent promise.
+- Use careful language: "may", "can depend on", "ask about", "review", "quote", "policy terms", "underwriting", "limits", "exclusions", "deductibles", "endorsements", "carrier appetite", and "Texas regulations".
+- Never give legal, tax, claim, engineering, roofing, medical, financial-planning, or binding coverage advice.
+- Treat Germania, Travelers, SWYFFT, Progressive, and GEICO as carrier lanes or available relationships only. Do not imply endorsement, availability, eligibility, or the lowest rate.
+
+Quote-intent structures available:
+- Home Quote: roof age, location, deductibles, replacement cost, wind/hail, water/flood distinction, updates, prior claims, review CTA.
+- Auto Quote: drivers, vehicles, garaging ZIP, liability limits, UM/UIM, deductibles, teen drivers, household changes, quote CTA.
+- Bundle Review: household changes, home/auto alignment, deductibles, liability limits, umbrella conversation, review CTA.
+- Renewal Review: premium change, roof/vehicle/driver/business changes, coverage gaps, discounts only when supplied, review CTA.
+- Storm Prep: wind/hail deductible, photos, home inventory, roof age, emergency documentation, carrier claims path, review CTA.
+- Claims Prep: document, mitigate when safe, contact carrier, keep receipts, avoid outcome promises, policy-review CTA.
+- Commercial Prospect: operations, lease/contract requirements, certificates, GL/BOP/property/auto/workers comp/cyber where relevant, quote CTA.
+- Referral/Review Ask: gratitude, specific client moment, simple ask, no pressure, Google review/referral CTA.
+
+CTA intelligence:
+- Choose one primary CTA per output, not a pile of asks.
+- Best CTAs: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, prepare for renewal, refer a friend, or leave a Google review.
+- Put CTAs after useful value. For spoken scripts, the primary CTA usually belongs in the outro or after the first real value beat; never interrupt the opening promise.
+
+Local trust layer:
+- When relevant, include Houston/Texas realities such as storm season, wind and hail, roof age, hurricane prep, flooding, traffic, teen drivers, landlord/rental exposure, certificates, contractors, lease requirements, renewal shock, and small-business growth.
+- Do not fabricate local statistics, testimonials, reviews, neighborhood facts, laws, rates, or carrier appetite.
+
+Objection handling bank:
+- "I already have insurance."
+- "I only care about price."
+- "My mortgage company handles it."
+- "I do not understand deductibles."
+- "I will wait until renewal."
+- "I thought flood was included."
+- "My personal auto covers my business driving."
+- "A certificate is just paperwork."
+- Use one or two natural objections when they fit the script, then answer in plain English without lecturing.
+
+Agency revenue scorecard criteria:
+- Quote intent
+- Trust and clarity
+- Compliance safety
+- Texas/local relevance
+- CTA strength
+- Objection handling
+- Coverage-promise safety
+- Usefulness to a real prospect
+
+Supporting-asset expectation:
+- Publishing packs should include reusable downstream assets: GBP post, client email, Facebook/social post, short-form clip hooks, call script, website article angle, and review/referral prompt when relevant.
+
+${POLICYFORGE_SOURCE_MEMORY}`;
+}
+
+function inferInsuranceScriptType(input: {
+  title: string;
+  category?: string | null;
+  sourceType?: string | null;
+  suggestedAngle?: string | null;
+  eventName?: string | null;
+}) {
+  const text = [input.title, input.category, input.sourceType, input.suggestedAngle, input.eventName].filter(Boolean).join(" ").toLowerCase();
+  if (/storm|hail|wind|hurricane|roof|claim|damage|inventory/.test(text)) {
+    return {
+      policyFocus: "storm readiness, home insurance review, roof/wind/hail questions, and claim-documentation education",
+      structure: "Storm Prep or Claims Prep"
+    };
+  }
+  if (/flood|nfip|water/.test(text)) {
+    return {
+      policyFocus: "flood insurance education and the difference between flood coverage and standard homeowners coverage",
+      structure: "Flood Coverage Review"
+    };
+  }
+  if (/auto|driver|vehicle|car|teen|uninsured|um\/uim|commercial auto/.test(text)) {
+    return {
+      policyFocus: "Texas auto insurance, household drivers, liability limits, deductibles, and quote readiness",
+      structure: "Auto Quote"
+    };
+  }
+  if (/commercial|business|contractor|certificate|bop|liability|property|lease|workers|cyber|fleet/.test(text)) {
+    return {
+      policyFocus: "Texas business insurance, liability, commercial property, certificates, and quote readiness",
+      structure: "Commercial Prospect"
+    };
+  }
+  if (/renewal|retention|review|cross-sell|umbrella|bundle/.test(text)) {
+    return {
+      policyFocus: "renewal review, household review, bundling, umbrella, and account-rounding opportunities",
+      structure: "Renewal Review or Bundle Review"
+    };
+  }
+  if (/review|referral|google|relationship|thank/.test(text)) {
+    return {
+      policyFocus: "relationship marketing, referrals, Google reviews, and client retention",
+      structure: "Referral/Review Ask"
+    };
+  }
+  if (/life/.test(text)) {
+    return {
+      policyFocus: "Texas life insurance education and needs-review conversations",
+      structure: "Client Education"
+    };
+  }
+  return {
+    policyFocus: "Texas home and auto insurance, coverage review, and quote readiness",
+    structure: "Home Quote or Bundle Review"
+  };
+}
+
+function recommendedInsuranceCta(scriptType: { structure: string }) {
+  if (/Claims Prep|Storm Prep|Flood/i.test(scriptType.structure)) return "review your Texas policy before storm/flood urgency, document questions, and call Baxter Insurance Agency, Inc. at 281-445-1381 for a policy review or quote conversation.";
+  if (/Commercial/i.test(scriptType.structure)) return "call 281-445-1381 or request a Texas business insurance review before signing a lease, accepting a contract, or needing a certificate.";
+  if (/Referral|Review/i.test(scriptType.structure)) return "ask for a Google review, referral, or introduction in a grateful, low-pressure way.";
+  if (/Renewal|Bundle/i.test(scriptType.structure)) return "schedule a renewal, bundle, or coverage review and call 281-445-1381.";
+  return "request a Texas quote or policy review from Baxter Insurance Agency, Inc. and call 281-445-1381.";
+}
+
 export function projectGenerationPrompt(passType: ScriptPassType, input: {
   title: string;
   hook?: string | null;
@@ -436,6 +596,7 @@ export function projectGenerationPrompt(passType: ScriptPassType, input: {
   const formatLabel = projectFormatLabel(format);
   const outputName = isSeriesWorkflow ? "five-episode video series" : projectOutputName(format);
   const seriesTargetWordCount = input.targetWordCount;
+  const policyForgeEngineBrief = policyForgeScriptEngineBrief(input);
   const targetLine = isArticle
     ? `Target output: ${input.targetWordCount.toLocaleString()}-word article`
     : isBook
@@ -459,17 +620,19 @@ Narration style: ${input.narrationStyle}
 Channel voice and brand rules:
 ${input.channelVoiceGuide || "No saved channel voice profile."}
 
+${policyForgeEngineBrief}
+
 YouTube performance guidance:
 ${input.analyticsGuide || "No connected YouTube analytics guidance yet. Use general retention, clarity, and packaging best practices without inventing channel stats."}
 
-Revenue and CTA guidance:
-- If the saved channel guide includes a money goal, affiliate offer, lead magnet, sponsor URL, risk lane, or primary CTA, honor it in the intro, outro, publishing pack, and final QA.
-- Keep the main script viewer-first. Do not force sales language into the body unless the project format explicitly calls for a sales or offer asset.
-- A monetized output should preserve trust, retention, and factual safety before it asks for a click.
+Agency revenue and CTA guidance:
+- If the saved growth strategy includes a revenue goal, lead magnet, quote URL, compliance lane, service focus, or primary CTA, honor it in the intro, outro, publishing pack, and final QA.
+- Keep the main script prospect-first. Do not force quote language into the body unless the project format explicitly calls for quote, renewal, referral, or sales outreach.
+- A revenue-focused output should preserve trust, retention, usefulness, and factual safety before it asks for a call, quote, review, referral, or policy review.
 - For YouTube video projects, use the retention-script framework without becoming formulaic: match the title/thumbnail promise immediately, prove effort or credibility, create a clear curiosity gap, show the viewer they will get what they clicked for, and tease one extra payoff.
 - Thumbnail-first rule: the first 5 seconds should say or show the same subject, object, map, document, person, event, or mystery promised by the title and thumbnail.
 - Input-bias rule: make the viewer feel the work behind the video through verified effort, such as timeline reconstruction, source comparison, document review, map tracing, expert context, or evidence sorting. Never invent effort.
-- Timing targets for video scripts: intro ideally under 30 seconds; first real story/value beat by 30-40 seconds; first strong payoff, reveal, laugh, shock of context, or useful epiphany by 75 seconds; a soft lead-magnet/sponsor/affiliate CTA may appear after the first real value beat, roughly around 90 seconds, only if it feels earned.
+- Timing targets for video scripts: intro ideally under 30 seconds; first real story/value beat by 30-40 seconds; first strong payoff, reveal, practical warning, or useful epiphany by 75 seconds; a soft quote/review/referral/policy-review CTA may appear after the first real value beat, roughly around 90 seconds, only if it feels earned.
 - Transition rule: every section should make the next section feel necessary. Avoid mechanical "Point two" transitions when a curiosity bridge can do the work.
 - End-screen rule: the outro should quickly point to the next video by making it feel like the natural next question in the viewer's watch session.
 - Do not use fake engagement bait, intentional mistakes, misleading claims, or deliberate factual errors to farm comments.
@@ -500,18 +663,18 @@ ${projectModeRules(contentMode)}
 - Do not add editor-only pronunciation notes, brackets, footnotes, or stage directions.`;
   const ttsOutputRules = ttsScriptRules.split("\n").map((line) => `- ${line.replace(/^- /, "")}`).join("\n");
   const sponsorBlurb = isBook ? undefined : input.sponsorBlurb?.trim();
-  const sponsorText = sponsorBlurb || "No sponsor blurb provided.";
+  const sponsorText = sponsorBlurb || "No agency CTA instructions provided.";
   const sponsorLink = isBook ? undefined : input.sponsorLink?.trim();
-  const sponsorLinkText = sponsorLink || "No sponsor link provided.";
-  const sponsorLinkLanguage = isBook ? "sponsor CTA or offer-link" : isArticle ? "sponsor CTA or offer-link" : isPodcast ? "link in the show notes" : "link in the description";
+  const sponsorLinkText = sponsorLink || "No agency CTA link provided.";
+  const sponsorLinkLanguage = isBook ? "agency CTA or offer-link" : isArticle ? "agency CTA or offer-link" : isPodcast ? "link in the show notes" : "link in the description";
   const bodySponsorRules = sponsorBlurb
-    ? `Sponsor placement rules:
-- Do not include sponsor, ad, promo, discount, offer, product, or "${sponsorLinkLanguage}" language anywhere in this body pass.
-- Sponsor copy is allowed only in the separate opening and closing passes. The final assembled output will combine those pieces later.
-- If previous material contains sponsor copy, default sponsor text, or ad language, remove it from the body instead of rewriting it.`
-    : `Sponsor placement rules:
-- No sponsor blurb was provided.
-- Do not invent sponsor, ad, promo, discount, offer, product, or "${sponsorLinkLanguage}" language.`;
+    ? `Agency CTA placement rules:
+- Do not include CTA, ad, promo, discount, offer, product, or "${sponsorLinkLanguage}" language anywhere in this body pass.
+- Agency CTA copy belongs only in the separate opening and closing passes. The final assembled output will combine those pieces later.
+- If previous material contains CTA copy, default sponsor text, or ad language, remove it from the body instead of rewriting it.`
+    : `Agency CTA placement rules:
+- No agency CTA instructions were provided.
+- Do not invent CTA, ad, promo, discount, offer, product, or "${sponsorLinkLanguage}" language.`;
   const nonVideoPackLabel = isArticle ? "Article SEO Pack" : isPodcast ? "Podcast Show Notes Pack" : "Book Launch Pack";
   const nonVideoTitleKind = isArticle ? "article headline" : isPodcast ? "podcast episode title" : "book title and subtitle";
   const nonVideoDescriptionLabel = isArticle
@@ -522,17 +685,17 @@ ${projectModeRules(contentMode)}
   const nonVideoPromptLabel = isArticle ? "Social post or reader discussion prompt" : isPodcast ? "Listener question or social caption" : "Reader discussion prompt or launch social caption";
   const nonVideoPasteTarget = isArticle ? "a CMS SEO/description field or article notes" : isPodcast ? "podcast show notes" : "a book sales page, Gumroad listing, or Amazon-style book description";
   const nonVideoSponsorContext = isBook
-    ? `Book sponsor rules:
+    ? `Book CTA rules:
 Book projects do not use sponsor blurbs, sponsor links, ad reads, or product mentions.`
-    : `Sponsor blurb provided by the user:
+    : `Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link to include when useful:
+Agency CTA link to include when useful:
 ${sponsorLinkText}`;
   const nonVideoSponsorRules = isBook
     ? `- Do not include sponsor blurbs, sponsor links, ad reads, product mentions, affiliate CTAs, or invented offers.`
-    : `- If a sponsor link is provided, include the exact sponsor link once in the CTA area: ${sponsorLink || "no sponsor link"}.
-- If no sponsor link is provided, do not add a fake link.`;
+    : `- If an agency CTA link is provided, include the exact link once in the CTA area: ${sponsorLink || "no agency CTA link"}.
+- If no agency CTA link is provided, do not add a fake link.`;
 
   switch (passType) {
     case "INTRO":
@@ -541,10 +704,10 @@ ${sponsorLinkText}`;
 
 Create opening narration for all five episodes in the series.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link saved for the YouTube description:
+Agency CTA link saved for the YouTube description:
 ${sponsorLinkText}
 
 Output plain text with these exact sections:
@@ -558,10 +721,10 @@ Rules:
 - Each intro should be a distinct cold open for that specific episode, not a generic series trailer.
 - Each intro should be roughly one strong opening paragraph.
 - Use the episode plan if available.
-- If a sponsor blurb is provided, include it exactly once inside each episode intro, briefly and naturally after the cold open.
-- Use only the sponsor blurb provided by the user. Never invent generic sponsor wording or default sponsor text.
-- If a sponsor link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the sponsor blurb.
-- If no sponsor blurb is provided, do not mention sponsors, products, or the description.
+- If agency CTA instructions are provided, include them exactly once inside each episode intro, briefly and naturally after the cold open.
+- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
+- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the CTA instructions.
+- If no agency CTA instructions are provided, do not mention sponsors, products, or the description.
 - Do not draft the full episodes yet.
 - Do not use Markdown bullets, stage directions, or production notes.
 - End each intro with a natural bridge into that episode's story.
@@ -572,19 +735,19 @@ ${ttsOutputRules}`;
 
 Create Step 1: The Article Lead.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link saved for the article CTA:
+Agency CTA link saved for the article CTA:
 ${sponsorLinkText}
 
 Output rules:
 - Output one strong opening paragraph only.
 - Open with the central question, human stakes, and reason the reader should continue.
 - Do not welcome viewers or say "video."
-- If a sponsor blurb is provided, include it exactly once after the opening context and before the article moves into the story.
-- Use only the sponsor blurb provided by the user. Never invent generic sponsor wording.
-- If no sponsor blurb is provided, do not mention sponsors or products.
+- If agency CTA instructions are provided, include them exactly once after the opening context and before the article moves into the body.
+- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or carrier promises.
+- If no agency CTA instructions are provided, do not mention sponsors or products.
 - Do not use Markdown headings, bullets, bracketed notes, or production notes.`;
       }
       if (isPodcast) {
@@ -592,21 +755,21 @@ Output rules:
 
 Create Step 1: The Podcast Intro.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link saved for the show notes:
+Agency CTA link saved for the show notes:
 ${sponsorLinkText}
 
 Output rules:
 - Output one paragraph only.
 - Welcome the listener to the show, set up the story, and give one clear reason to keep listening.
 - Vary the language from episode to episode. Do not use a stock template.
-- If a sponsor blurb is provided, include it exactly once inside this intro. Work it in briefly and naturally before "Now, let's get into today's story."
-- Use only the sponsor blurb provided by the user. Never invent generic sponsor wording or default sponsor text.
-- If a sponsor link is provided, do not read the raw URL aloud. Say the link is in the show notes only if that fits the sponsor blurb.
-- If no sponsor blurb is provided, do not mention sponsors, products, or show notes.
-- End with this exact sentence: Now, let's get into today's story.
+- If agency CTA instructions are provided, include them exactly once inside this intro. Work them in briefly and naturally before "Now, let's get into today's topic."
+- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
+- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the show notes only if that fits the CTA instructions.
+- If no agency CTA instructions are provided, do not mention sponsors, products, or show notes.
+- End with this exact sentence: Now, let's get into today's topic.
 ${ttsOutputRules}
 - Do not use Markdown, headings, bullets, bracketed stage directions, or pause markers.`;
       }
@@ -627,10 +790,10 @@ Output rules:
 
 Create Step 1: The Intro.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link saved for the YouTube description:
+Agency CTA link saved for the YouTube description:
 ${sponsorLinkText}
 
 Output rules:
@@ -638,20 +801,29 @@ Output rules:
 - Write a warm, human opening modeled on strong long-form YouTube and narrative podcast intros: welcome them to the channel, establish the high-level story, and create a clean reason to keep listening.
 - Vary the language from video to video. Do not use a stock template.
 - Do not spoil the ending or over-explain the case.
-- If a sponsor blurb is provided, you must include the sponsor message exactly once inside this intro. Work it in briefly and naturally after the opening welcome/context and before "Now, let's get into today's story."
-- Use only the sponsor blurb provided by the user. Never invent generic sponsor wording or default sponsor text.
-- Preserve the sponsor's offer, product name, discount code, and description-link instruction when provided. Condense lightly only if needed for flow.
-- If a sponsor link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the sponsor blurb.
-- If no sponsor blurb is provided, do not mention sponsors, products, or the description.
-- End with this exact sentence: Now, let's get into today's story.
+- If agency CTA instructions are provided, include the CTA message exactly once inside this intro. Work it in briefly and naturally after the opening context and before "Now, let's get into today's topic."
+- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
+- Preserve the CTA's phone number, link, and description-link instruction when provided. Condense lightly only if needed for flow.
+- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the CTA instructions.
+- If no agency CTA instructions are provided, do not mention sponsors, products, or the description.
+- End with this exact sentence: Now, let's get into today's topic.
 ${ttsOutputRules}
 - Do not use Markdown, headings, bullets, bracketed stage directions, or pause markers.`;
     case "DOSSIER":
       return `${shared}
 
-Create a research dossier and fact ledger for this story.
+Create an insurance-ready research dossier, agency script brief, and fact ledger for this project.
 
 Output plain text with these exact sections:
+Agency Script Brief
+Target Prospect
+Policy Product Focus
+Texas Location And Local Trust Layer
+Pain Point Or Decision Moment
+Recommended Script Structure
+Primary CTA
+Compliance Boundaries
+Useful Objections To Answer
 Research Dossier
 Confirmed Facts
 Likely But Needs Verification
@@ -660,6 +832,7 @@ Timeline
 People And Organizations
 Locations
 Source Leads
+Reusable Source Memory
 Fact Ledger
 Do Not Say As Fact
 Writer Notes
@@ -668,6 +841,8 @@ Rules:
 - Treat this as the foundation for the whole script.
 - Be strict about uncertainty. If a claim is not supported by source material, put it under Unverified Or Risky Claims or Do Not Say As Fact.
 - Include a compact fact ledger with claim, confidence level, and how it should be handled in narration.
+- The Agency Script Brief must identify the best quote-intent structure and primary CTA before any draft is written.
+- Reusable Source Memory should list useful trusted source lanes such as Texas DOI/TDI, FEMA/NFIP, supplied carrier pages, agency notes, policy forms, renewal notes, claims documentation checklists, and local SEO questions. Do not invent exact source claims.
 - Do not write the script yet.`;
     case "ANALYTICS_BRIEF":
       return `${shared}
@@ -823,19 +998,33 @@ Create a long-form narrative strategy and outline that obeys the research dossie
 Include opening hook, main question, secondary mystery, reveal order, emotional promise, pacing plan, curiosity gaps, cliffhanger placements, retention checkpoints, and section-by-section outline.
 
 Add these exact sections to the outline:
+Agency Script Brief Check
+Prospect Decision Moment
+Quote Intent Structure
+Coverage Promise Guardrails
+Local Trust Layer
+Objection Handling Plan
 Title/Thumbnail Promise
 First 5 Seconds Expectation Match
 First 30 Seconds
 First Value Beat
 Effort Proof / Input Bias
 Soft CTA Window
+Primary Agency CTA
+Supporting Asset Plan
 End-Screen Bridge
 
 Rules:
+- Respect the Agency Script Brief from the dossier. If the brief is missing, infer one using the PolicyForge Scripting Engine.
+- Pick one quote-intent structure and make the whole outline serve that structure.
+- Add one or two natural prospect objections and where they should be answered.
+- The local trust layer must be useful Texas/Houston context, not a tacked-on city mention.
+- Coverage Promise Guardrails must list the exact claims the writer must avoid or hedge.
 - The title/thumbnail promise must be deliverable in the first spoken lines or first visual beat.
 - First 30 Seconds should include the cold open, effort/credibility proof, curiosity gap, and assurance that the viewer will get the promised payoff.
 - First Value Beat should happen by 30-40 seconds when possible.
-- Soft CTA Window should happen only after value, roughly around 90 seconds, and should be skipped if no saved offer, lead magnet, sponsor, or affiliate path fits.
+- Soft CTA Window should happen only after value, roughly around 90 seconds, and should be skipped if no quote, lead magnet, review, referral, renewal, or service path fits.
+- Supporting Asset Plan should name the downstream GBP post, email, social post, short clip, call script, and website article angle the final pack should create.
 - End-Screen Bridge should make the next video feel like the natural unanswered question.`;
     case "RETENTION_MAP":
       if (isBook) {
@@ -883,7 +1072,7 @@ Rules:
 - The First 90 Seconds Plan must include: expectation match in the first 5 seconds, intro under 30 seconds when possible, first real value/story beat by 30-40 seconds, first payoff or epiphany by 75 seconds, and optional CTA only after value.
 - Add a meaningful question, reveal, contradiction, or emotional turn every 3-5 minutes.
 - Each major transition should make the viewer need the next section, not merely announce the next section.
-- CTA Timing should identify whether a lead magnet, sponsor, affiliate, or subscribe CTA belongs around 90 seconds, in the outro, in the description only, or nowhere.
+- CTA Timing should identify whether a quote request, policy review, referral request, review request, lead magnet, or subscribe CTA belongs around 90 seconds, in the outro, in the description only, or nowhere.
 - End-Screen Bridge should name the next natural video/question that keeps the watch session alive.
 - Do not use fake engagement bait, deliberate errors, or misleading curiosity gaps.
 - Do not invent facts to create excitement.
@@ -956,7 +1145,7 @@ Episode rules:
 - Preserve series continuity, but make every episode satisfying on its own.
 - Use short sentences during tension, longer sentences during setup, natural listener questions, mini payoffs every 3-5 minutes, and emotional resolution.
 - In every episode, meet the title/thumbnail promise immediately, prove effort or credibility early, deliver a first payoff quickly, and use transitions that make the next section feel necessary.
-- If a sponsor, affiliate, or lead magnet is used, place it only after the viewer has received real value or in the outro. Never interrupt the opening promise.
+- If an agency CTA, quote request, referral request, review request, or lead magnet is used, place it only after the viewer has received real value or in the outro. Never interrupt the opening promise.
 - Do not invent facts. If source material is thin, deepen through verified context, timeline reconstruction, competing explanations, aftermath, source uncertainty, and why the story endured.
 
 ${bodySponsorRules}
@@ -973,8 +1162,14 @@ Article rules:
 - Use concise paragraphs and helpful section headings.
 - Keep the headline out of the body unless it improves readability.
 - Make the article easy to scan without making it shallow.
+- Follow the Agency Script Brief: target prospect, policy/product focus, Texas location, pain point, CTA, and compliance boundaries.
+- Use the best quote-intent structure for the topic, such as Home Quote, Auto Quote, Bundle Review, Renewal Review, Storm Prep, Claims Prep, Commercial Prospect, Referral/Review Ask, or Client Education.
+- Add Texas/Houston context where it helps the reader make a better insurance decision.
+- Answer one or two natural objections in plain English when they fit.
+- End with one clear agency CTA, such as call 281-445-1381, request a quote, schedule a review, review flood coverage, ask about bundling, refer a friend, or leave a review.
 - Do not write teleprompter copy, host narration, stage directions, or video language.
 - Do not use fake certainty, sensational claims, or unsupported facts.
+- Do not promise savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcomes.
 - Target roughly ${input.targetWordCount.toLocaleString()} words, but prioritize completeness and factual safety.
 
 ${bodySponsorRules}`;
@@ -1000,10 +1195,16 @@ ${bodySponsorRules}`;
 Write the full spoken narration script. If an episode plan exists, write the selected episode. Otherwise, write a ${outputName}. Start with the selected Hook Lab hook. Obey the story spine, structure, and retention beat map. Use short sentences during tension, longer sentences during setup, natural listener questions, mini payoffs every 3-5 minutes, and emotional resolution.
 
 Length rules:
+- Follow the Agency Script Brief: target prospect, policy/product focus, Texas location, pain point, CTA, and compliance boundaries.
+- Use the best quote-intent structure for the topic, such as Home Quote, Auto Quote, Bundle Review, Renewal Review, Storm Prep, Claims Prep, Commercial Prospect, Referral/Review Ask, or Client Education.
+- Include a useful Texas/Houston local trust layer when relevant: storm season, wind/hail, roof age, flooding, traffic, teen drivers, contractors, lease/certificate needs, renewal changes, or business growth.
+- Answer one or two natural prospect objections in the body without sounding defensive or salesy.
+- Use one clear CTA path. Do not stack calls, quotes, reviews, referrals, and subscriptions all at once.
+- Do not promise savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcomes.
 - Meet the title/thumbnail promise in the first spoken lines. The viewer should immediately feel, "this is the video I clicked."
 - Keep the intro tight. Aim for under 30 seconds, start the first real story/value beat by 30-40 seconds, and deliver the first payoff, reveal, shock of context, or useful epiphany by roughly 75 seconds when the facts allow it.
 - Show input bias early: the viewer should feel the verified work behind the script through records, maps, timelines, witness accounts, source comparison, expert context, or reconstruction. Do not fake sources or effort.
-- If a CTA, sponsor, affiliate, or lead magnet belongs in the script, place it only after real value has been delivered or in the outro. Do not interrupt the cold open.
+- If a quote, review, referral, renewal, or lead magnet CTA belongs in the script, place it only after real value has been delivered or in the outro. Do not interrupt the cold open.
 - Write transitions that create need for the next section. Avoid mechanical "next" phrasing when a curiosity bridge can make the viewer continue.
 - Do not use fake engagement bait, deliberate mistakes, misleading claims, or manufactured controversy to farm comments.
 - Target roughly ${input.targetWordCount.toLocaleString()} words for about ${input.targetLengthMinutes} minutes.
@@ -1039,7 +1240,31 @@ Rules:
     case "CRITIQUE":
       return `${shared}
 
-Critique the existing ${outputName}. Grade hook strength, clarity, tension, emotional pacing, boring sections, confusing sections, weak transitions, audience engagement, retention risk, and ending strength. Return a score out of 100 plus specific rewrite instructions.`;
+Critique the existing ${outputName} as a PolicyForge agency-growth script.
+
+Output plain text with these exact sections:
+Overall Score
+Quote Intent Score
+Trust Score
+Clarity Score
+Compliance Safety Score
+Texas Local Relevance Score
+CTA Strength Score
+Objection Handling Score
+Usefulness Score
+Hook And Retention Notes
+Coverage Promise Risks
+Weak Or Generic Sections
+Rewrite Instructions
+
+Rules:
+- Score each category from 0-100.
+- Grade whether the script would make a real Texas prospect more likely to call, request a quote, schedule a policy review, leave a review, refer someone, or start a renewal conversation.
+- Check whether the script follows the Agency Script Brief and the best quote-intent structure.
+- Flag missing or weak Texas/Houston context, generic filler, unclear service focus, overlong setup, weak CTA, and unanswered objections.
+- Flag language that sounds like legal, tax, claim, engineering, roofing, medical, financial-planning, or binding coverage advice.
+- Flag any promise of savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcome.
+- Return specific rewrite instructions that can be applied directly.`;
     case "FACT_CHECK":
       return `${shared}
 
@@ -1047,12 +1272,18 @@ Run a fact and continuity check on the latest ${outputName}.
 
 Output plain text with these exact sections:
 Fact Risk Summary
+Texas-Only Check
+Coverage Promise Warnings
+Carrier Statement Warnings
+Claim Outcome Warnings
+Legal Tax Or Professional Advice Warnings
 Unsupported Claims
 Continuity Issues
 Name Date Place Checks
 Cause And Motive Warnings
 Timeline Problems
 Overstatement Risks
+CTA Compliance Check
 Required Fixes
 Safe Rewrite Guidance
 
@@ -1060,6 +1291,11 @@ Rules:
 - Compare the ${outputName} against the dossier, source material, and prior notes.
 - Flag claims that need hedging or removal.
 - Flag contradictions in names, dates, places, chronology, causes, motives, and numbers.
+- Flag any out-of-state language or advice that conflicts with Texas-only agency positioning.
+- Flag any implied promise of savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcome.
+- Flag any carrier-specific claim about Germania, Travelers, SWYFFT, Progressive, GEICO, or another carrier unless the source material directly supports it.
+- Flag language that tells the prospect what is covered instead of inviting them to review policy terms, limits, exclusions, deductibles, endorsements, underwriting, carrier appetite, and Texas regulations.
+- Safe Rewrite Guidance must provide replacement wording for risky insurance claims.
 - Do not rewrite the script here.`;
     case "REWRITE":
       if (isSeriesWorkflow) {
@@ -1089,6 +1325,9 @@ Article rules:
 - Remove video, teleprompter, host, stage, and production language.
 - Preserve factual caution and attribution.
 - Keep the ending complete and not abrupt.
+- Strengthen quote intent, Texas/local relevance, objection handling, and CTA clarity.
+- Remove or hedge any risky coverage, savings, carrier, underwriting, or claim outcome language.
+- Keep one primary CTA and make it feel earned after useful education.
 
 ${bodySponsorRules}`;
       }
@@ -1109,6 +1348,11 @@ ${bodySponsorRules}`;
       return `${shared}
 
 Rewrite the script to apply the critique and fact/continuity check. Improve opening, pacing, tension, engagement, emotional impact, narration rhythm, clarity, factual safety, and ending.
+
+- Strengthen quote intent, Texas/local relevance, objection handling, and CTA clarity.
+- Remove or hedge any risky coverage, savings, carrier, underwriting, or claim outcome language.
+- Keep one primary CTA and make it feel earned after useful education.
+- Preserve the Baxter voice: local, practical, plain-English, consultative, no hype, no scare tactics, no guaranteed outcomes.
 
 ${bodySponsorRules}
 
@@ -1198,7 +1442,7 @@ Rules:
 - Identify weak episodes, repetition, abrupt endings, continuity issues, unsupported claims, or teleprompter problems.
 - Confirm whether all five episodes are present.
 - Check whether each episode meets the title/thumbnail promise immediately, proves effort or credibility early, delivers an early payoff, and bridges naturally to the next section.
-- Flag missing or heavy-handed CTA/sponsor/affiliate handling, especially if it hurts trust or episode continuity.
+- Flag missing or heavy-handed agency CTA handling, especially if it hurts trust, compliance, or episode continuity.
 - Reject any deliberate factual error, fake engagement bait, or misleading curiosity gap.
 - Do not produce the final scripts here.`;
       }
@@ -1215,7 +1459,13 @@ Clarity Score
 Emotional Payoff Score
 Factual Safety Score
 Publication Readiness Score
-Monetization Fit Score
+Quote Intent Score
+Trust Score
+Compliance Safety Score
+Texas Local Relevance Score
+CTA Strength Score
+Objection Handling Score
+Coverage Promise Safety Score
 Must Fix Before Final Article
 Final Polish Instructions
 
@@ -1224,7 +1474,8 @@ Rules:
 - Be blunt and specific.
 - Identify any remaining repetition, abrupt ending risk, awkward phrasing, weak headings, unsupported claims, or article-readability problems.
 - Flag sponsor, ad, promo, discount, offer, product, or CTA language if it appears in the body article. Sponsor placement belongs only in the opening and closing passes.
-- Flag missing, unclear, or trust-damaging CTA/affiliate language in the article assets.
+- Flag missing, unclear, or trust-damaging quote/review/referral/renewal CTA language in the article assets.
+- Score whether the article is likely to create a qualified agency action without creating compliance risk.
 - Do not produce the final article here.`;
       }
       if (isPodcast) {
@@ -1240,7 +1491,13 @@ Clarity Score
 Emotional Payoff Score
 Factual Safety Score
 Podcast Readiness Score
-Monetization Fit Score
+Quote Intent Score
+Trust Score
+Compliance Safety Score
+Texas Local Relevance Score
+CTA Strength Score
+Objection Handling Score
+Coverage Promise Safety Score
 Must Fix Before Final Podcast Script
 Final Polish Instructions
 
@@ -1249,7 +1506,8 @@ Rules:
 - Be blunt and specific.
 - Identify any remaining repetition, abrupt ending risk, awkward phrasing, unsupported claims, or spoken-readability problems.
 - Flag sponsor, ad, promo, discount, offer, product, or "link in the show notes" language if it appears in the body script. Sponsor placement belongs only in the Podcast Intro and Podcast Outro.
-- Flag missing, unclear, or trust-damaging CTA/affiliate language in the podcast assets.
+- Flag missing, unclear, or trust-damaging quote/review/referral/renewal CTA language in the podcast assets.
+- Score whether the episode is likely to create a qualified agency action without creating compliance risk.
 - Do not produce the final podcast script here.`;
       }
       if (isBook) {
@@ -1293,7 +1551,13 @@ Title Thumbnail Match Score
 First 90 Seconds Score
 Input Bias Score
 Transition Strength Score
-Monetization Fit Score
+Quote Intent Score
+Trust Score
+Compliance Safety Score
+Texas Local Relevance Score
+CTA Strength Score
+Objection Handling Score
+Coverage Promise Safety Score
 Must Fix Before Final
 Final Polish Instructions
 
@@ -1303,7 +1567,8 @@ Rules:
 - Identify any remaining repetition, abrupt ending risk, awkward phrasing, markdown, section labels, unsupported claims, or teleprompter problems.
 - Check whether the script meets the title/thumbnail promise immediately, proves effort or credibility early, delivers an early payoff, and uses curiosity bridges instead of mechanical transitions.
 - Flag sponsor, ad, promo, discount, offer, product, or "link in the description" language if it appears in the body script. Sponsor placement belongs only in the Intro and Outro.
-- Flag missing, unclear, or trust-damaging CTA/affiliate language in the intro, outro, and publishing-pack path.
+- Flag missing, unclear, or trust-damaging quote/review/referral/renewal CTA language in the intro, outro, and publishing-pack path.
+- Score whether the script is likely to create a qualified agency action without creating compliance risk.
 - Reject any deliberate factual error, fake engagement bait, or misleading curiosity gap.
 - Do not produce the final script here.`;
     case "FINAL":
@@ -1339,6 +1604,9 @@ Output rules:
 - Spell out numbers only when it improves readability; article copy may use standard numerals where readers expect them.
 ${bodySponsorRules}
 - Preserve the strongest hook, clear transitions, factual caution, and emotional ending.
+- Preserve the selected agency CTA, Texas/local trust layer, and useful objection handling.
+- Remove any language that promises savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcomes.
+- Keep the Baxter voice local, practical, plain-English, consultative, and calm.
 - The article must have a complete final paragraph and must not end abruptly.`;
       }
       if (isBook) {
@@ -1370,6 +1638,9 @@ Output rules:
 ${ttsOutputRules}
 ${bodySponsorRules}
 - Preserve the strongest hook, clear transitions, tension, and emotional ending.
+- Preserve the selected agency CTA, Texas/local trust layer, and useful objection handling.
+- Remove any language that promises savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcomes.
+- Keep the Baxter voice local, practical, plain-English, consultative, and calm.
 - Remove AI-sounding phrases, unsupported claims, and production notes.
 - Target roughly ${input.targetWordCount.toLocaleString()} words for about ${input.targetLengthMinutes} minutes.
 - The script must have a complete final paragraph and must not end abruptly.
@@ -1380,10 +1651,10 @@ ${bodySponsorRules}
 
 Create closing narration for all five episodes in the series.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link saved for the YouTube description:
+Agency CTA link saved for the YouTube description:
 ${sponsorLinkText}
 
 Output plain text with these exact sections:
@@ -1397,10 +1668,10 @@ Rules:
 - Each outro should be a short human closing paragraph for that specific episode.
 - Episodes one through four should close the episode and naturally tease the next episode without spoiling it.
 - Episode five should close the full series with a satisfying final note and a standard subscribe, like, comment, and share request.
-- If a sponsor blurb is provided, include the sponsor message exactly once at the very end of each outro.
-- Use only the sponsor blurb provided by the user. Never invent generic sponsor wording or default sponsor text.
-- If a sponsor link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the sponsor blurb.
-- If no sponsor blurb is provided, do not mention sponsors, products, or the description.
+- If agency CTA instructions are provided, include the agency CTA message exactly once at the very end of each outro.
+- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
+- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the CTA instructions.
+- If no agency CTA instructions are provided, do not mention sponsors, products, or the description.
 - Do not add new facts, new theories, credits, title cards, or production notes.
 ${ttsOutputRules}
 - Do not use Markdown bullets, bracketed stage directions, or pause markers.`;
@@ -1410,18 +1681,19 @@ ${ttsOutputRules}
 
 Create the last step: The Article Closing CTA.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link saved for the article CTA:
+Agency CTA link saved for the article CTA:
 ${sponsorLinkText}
 
 Output rules:
 - Output one short closing paragraph only.
-- Invite the reader to share the article, leave a comment or question, and follow the publication for more stories like this.
-- If a sponsor blurb is provided, include the sponsor message exactly once at the very end.
-- Use only the sponsor blurb provided by the user. Never invent generic sponsor wording.
-- If no sponsor blurb is provided, do not mention sponsors or products.
+- Invite the reader to take one useful next step: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, refer a friend, or leave a Google review. Choose the one that best fits the article.
+- Keep the CTA educational and low pressure.
+- If agency CTA instructions are provided, include the agency CTA message exactly once at the very end.
+- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or carrier promises.
+- If no agency CTA instructions are provided, do not mention sponsors or products.
 - Do not add new facts, new theories, credits, title cards, or production notes.`;
       }
       if (isPodcast) {
@@ -1429,19 +1701,20 @@ Output rules:
 
 Create the last step: The Podcast Outro.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link saved for the show notes:
+Agency CTA link saved for the show notes:
 ${sponsorLinkText}
 
 Output rules:
 - Output one short human paragraph only.
-- Thank the listener naturally and ask them to follow the show, rate or review it, send questions about the story, and share the episode with someone who would care about it.
-- If a sponsor blurb is provided, include the sponsor message exactly once at the very end.
-- Use only the sponsor blurb provided by the user. Never invent generic sponsor wording or default sponsor text.
-- If a sponsor link is provided, do not read the raw URL aloud. Say the link is in the show notes only if that fits the sponsor blurb.
-- If no sponsor blurb is provided, do not mention sponsors, products, or show notes.
+- Thank the listener naturally and ask for one useful next step: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, refer a friend, leave a Google review, or follow the show if this is truly a podcast-first asset. Choose the one that best fits the episode.
+- Keep the CTA educational and low pressure.
+- If agency CTA instructions are provided, include the agency CTA message exactly once at the very end.
+- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
+- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the show notes only if that fits the CTA instructions.
+- If no agency CTA instructions are provided, do not mention sponsors, products, or show notes.
 - Vary the phrasing from episode to episode. Keep it sincere and conversational, not salesy.
 - Do not add new facts, new theories, credits, title cards, or production notes.
 ${ttsOutputRules}
@@ -1464,20 +1737,21 @@ Output rules:
 
 Create the last step: The Outro.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link saved for the YouTube description:
+Agency CTA link saved for the YouTube description:
 ${sponsorLinkText}
 
 Output rules:
 - Output one short human paragraph only.
-- Thank the listener naturally and ask them to subscribe to the channel, like the video, ask any questions about the story in the comments, and tell their friends or share it with someone who would care about the story.
-- If a sponsor blurb is provided, include the sponsor message exactly once at the very end of this outro, after the subscribe, like, comment, and share request.
-- Use only the sponsor blurb provided by the user. Never invent generic sponsor wording or default sponsor text.
-- Preserve the sponsor's offer, product name, discount code, and description-link instruction when provided. Condense lightly only if needed for flow.
-- If a sponsor link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the sponsor blurb.
-- If no sponsor blurb is provided, do not mention sponsors, products, or the description.
+- Thank the listener naturally and ask for one useful next step: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, refer a friend, leave a Google review, or subscribe only if the asset is clearly a YouTube growth asset. Choose the one that best fits the script.
+- Keep the CTA educational and low pressure.
+- If agency CTA instructions are provided, include the agency CTA message exactly once at the very end of this outro, after any subscribe, like, comment, or share request.
+- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
+- Preserve the CTA's phone number, link, and description-link instruction when provided. Condense lightly only if needed for flow.
+- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the CTA instructions.
+- If no agency CTA instructions are provided, do not mention sponsors, products, or the description.
 - Vary the phrasing from video to video. Keep it sincere and conversational, not salesy.
 - Do not add new facts, new theories, credits, title cards, or production notes.
 ${ttsOutputRules}
@@ -1513,10 +1787,10 @@ Rules:
 
 Create the final Article SEO Pack and Topical Authority Map for this completed article.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link to include when useful:
+Agency CTA link to include when useful:
 ${sponsorLinkText}
 
 SEO keyword hints from DataForSEO, when available:
@@ -1531,10 +1805,19 @@ Schema:
     { "title": "Article headline option 2", "angle": "Why this headline should earn clicks from the right reader" },
     { "title": "Article headline option 3", "angle": "Why this headline should earn clicks from the right reader" }
   ],
-  "description": "CMS-ready article excerpt and reader CTA. Include the sponsor link once if provided.",
+  "description": "CMS-ready article excerpt and reader CTA. Include the agency CTA link once if provided.",
   "tags": ["tag one", "tag two"],
   "thumbnailPrompts": [],
   "pinnedComment": "Reader discussion or social post prompt",
+  "conversionAssets": {
+    "gbpPost": "Google Business Profile post draft",
+    "clientEmail": "short client/prospect email version",
+    "facebookPost": "Facebook or social post",
+    "shortClipHooks": ["short-form clip hook 1", "short-form clip hook 2", "short-form clip hook 3"],
+    "callScript": "short call script for staff or producer",
+    "websiteArticleAngle": "website page/article follow-up angle",
+    "reviewReferralPrompt": "review or referral prompt if relevant"
+  },
   "seoPack": {
     "primaryKeyword": "one main keyword phrase",
     "secondaryKeywords": ["supporting keyword", "related question"],
@@ -1596,13 +1879,14 @@ Rules:
 - thumbnailPrompts must be an empty array for articles.
 - seoPack is required and must be directly useful for publishing the current article.
 - topicalAuthorityMap is required and must help the user know what articles to create next.
+- conversionAssets is required and must adapt the article into agency growth assets without adding unsupported claims.
 - Topical Authority Map should include 3-5 clusters and 12-25 supporting article ideas total.
 - recommendedNextArticles should list the best 5-8 articles to create after this one.
 - For local lead-gen or expert/authority articles, include local service, cost, comparison, objection, FAQ, trust, and decision-intent articles.
 - For story/documentary articles, include background, timeline, evidence, location, unanswered questions, related cases, and source-guide articles.
 - If SEO keyword hints are available, use the most relevant phrases naturally in the primary keyword, secondary keywords, title tag, meta description, tags, and authority map.
-- If a sponsor link is provided, include the exact sponsor link once in the description CTA area: ${sponsorLink || "no sponsor link"}.
-- If no sponsor link is provided, do not add a fake link.
+- If an agency CTA link is provided, include the exact link once in the description CTA area: ${sponsorLink || "no agency CTA link"}.
+- If no agency CTA link is provided, do not add a fake link.
 - Do not use video-only language, podcast language, thumbnail instructions, or Shazi production notes.`;
       }
 
@@ -1628,13 +1912,23 @@ Schema:
   "description": "${nonVideoDescriptionLabel}",
   "tags": ["tag one", "tag two"],
   "thumbnailPrompts": [],
-  "pinnedComment": "${nonVideoPromptLabel}"
+  "pinnedComment": "${nonVideoPromptLabel}",
+  "conversionAssets": {
+    "gbpPost": "Google Business Profile post draft",
+    "clientEmail": "short client/prospect email version",
+    "facebookPost": "Facebook or social post",
+    "shortClipHooks": ["short-form clip hook 1", "short-form clip hook 2", "short-form clip hook 3"],
+    "callScript": "short call script for staff or producer",
+    "websiteArticleAngle": "website page/article follow-up angle",
+    "reviewReferralPrompt": "review or referral prompt if relevant"
+  }
 }
 
 Rules:
 - Provide exactly 3 ${nonVideoTitleKind} options.
 - Titles should be curiosity-driven, factual, human, and clickable without false claims.
 - The description should be ready to paste into ${nonVideoPasteTarget}.
+- conversionAssets is required and must adapt this ${outputName} into agency growth assets without adding unsupported claims.
 ${nonVideoSponsorRules}
 - Tags should include useful names, places, categories, spellings, and broad topic terms without stuffing.
 - If SEO keyword hints are available, use the most relevant phrases naturally.
@@ -1646,10 +1940,10 @@ ${nonVideoSponsorRules}
 
 Create the final YouTube Publishing Packs for this completed five-episode series.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link to include in each YouTube description:
+Agency CTA link to include in each YouTube description:
 ${sponsorLinkText}
 
 Channel thumbnail style guide:
@@ -1696,17 +1990,17 @@ Rules:
 - Descriptions must be ready to paste into YouTube and must accurately summarize only that episode without unsupported claims.
 - Each title, thumbnail, first description sentence, and pinned comment must sell the same promise. Do not create a title/thumbnail promise the episode does not deliver in the first 30 seconds.
 - Each episode description should include a brief value assurance: what the viewer will understand, discover, or feel by watching this part.
-- If an episode has a natural lead magnet, sponsor, or affiliate tie-in, place it in the CTA blocks only after the episode promise is clear. Do not make the whole pack feel like an ad.
+- If an episode has a natural agency CTA, lead magnet, quote request, review request, or referral tie-in, place it in the CTA blocks only after the episode promise is clear. Do not make the whole pack feel like an ad.
 - Each description must follow this exact block order, separated by blank lines:
   1. MAIN KEYWORD: one search-focused phrase for the episode, no label, no hashtag, title case or natural case.
-  2. CTA LINK: if a sponsor link is provided, put a short direct CTA plus the exact sponsor link; if no sponsor link is provided, put a short subscribe/comment CTA with no fake URL.
+  2. CTA LINK: if an agency CTA link is provided, put a short direct CTA plus the exact link; if no CTA link is provided, put a short subscribe/comment CTA with no fake URL.
   3. DESCRIPTION PART 1: 2-4 sentences that hook the viewer and summarize that episode's central story.
   4. TIMESTAMPS: include a "Timestamps:" heading and 5-8 estimated timestamps in MM:SS format for that episode's major story beats.
   5. DESCRIPTION PART 2: 2-4 sentences with deeper context, stakes, and what the viewer will learn in that episode.
-  6. CTA WITH LINK: if a sponsor link is provided, repeat the exact sponsor link with a clear CTA; if no sponsor link is provided, use a like/subscribe/comment CTA with no fake URL.
+  6. CTA WITH LINK: if an agency CTA link is provided, repeat the exact link with a clear CTA; if no CTA link is provided, use a like/subscribe/comment CTA with no fake URL.
   7. 3-5 HASHTAGS: one final line containing only 3-5 relevant hashtags.
 - Do not add labels like "MAIN KEYWORD" or "DESCRIPTION PART 1"; output the actual YouTube-ready text only.
-- If a sponsor link is provided, each description must include the exact sponsor link string at least twice: ${sponsorLink || "no sponsor link"}.
+- If an agency CTA link is provided, each description must include the exact link string at least twice: ${sponsorLink || "no agency CTA link"}.
 - Thumbnail prompts should produce bold clickbait documentary images, not generic stock art or quiet poster art.
 - Keep all fifteen thumbnail prompts in the same channel family while making each part visually distinct.
 - For every thumbnail, provide overlayText as exactly 2-4 punchy all-caps words and include PART 1, PART 2, PART 3, PART 4, or PART 5 as appropriate.
@@ -1722,10 +2016,10 @@ Rules:
 
 Create the final YouTube Publishing Pack for this completed script.
 
-Sponsor blurb provided by the user:
+Agency CTA instructions provided by the user:
 ${sponsorText}
 
-Sponsor link to include in the YouTube description:
+Agency CTA link to include in the YouTube description:
 ${sponsorLinkText}
 
 Channel thumbnail style guide:
@@ -1754,7 +2048,16 @@ Schema:
     "title": "Short track concept title",
     "prompt": "Suno.com background music prompt for this specific video"
   },
-  "pinnedComment": "Pinned comment text"
+  "pinnedComment": "Pinned comment text",
+  "conversionAssets": {
+    "gbpPost": "Google Business Profile post draft",
+    "clientEmail": "short client/prospect email version",
+    "facebookPost": "Facebook or social post",
+    "shortClipHooks": ["short-form clip hook 1", "short-form clip hook 2", "short-form clip hook 3"],
+    "callScript": "short call script for staff or producer",
+    "websiteArticleAngle": "website page/article follow-up angle",
+    "reviewReferralPrompt": "review or referral prompt if relevant"
+  }
 }
 
 Rules:
@@ -1763,19 +2066,19 @@ Rules:
 - Description should be ready to paste into YouTube and accurately summarize the story without unsupported claims.
 - Each title, thumbnail, first description sentence, and pinned comment must sell the same promise. Do not create a title/thumbnail promise the script does not deliver in the first 30 seconds.
 - Include a brief value assurance in the description: what the viewer will understand, discover, or feel by watching.
-- If there is a natural lead magnet, sponsor, or affiliate tie-in, place it in the CTA blocks only after the video promise is clear. Do not make the whole pack feel like an ad.
+- If there is a natural agency CTA, lead magnet, quote request, review request, or referral tie-in, place it in the CTA blocks only after the video promise is clear. Do not make the whole pack feel like an ad.
 - Description must follow this exact block order, separated by blank lines:
   1. MAIN KEYWORD: one search-focused phrase for the video, no label, no hashtag, title case or natural case.
-  2. CTA LINK: if a sponsor link is provided, put a short direct CTA plus the exact sponsor link; if no sponsor link is provided, put a short subscribe/comment CTA with no fake URL.
+  2. CTA LINK: if an agency CTA link is provided, put a short direct CTA plus the exact link; if no CTA link is provided, put a short subscribe/comment CTA with no fake URL.
   3. DESCRIPTION PART 1: 2-4 sentences that hook the viewer and summarize the central story.
   4. TIMESTAMPS: include a "Timestamps:" heading and 5-8 estimated timestamps in MM:SS format for the major story beats. Base timestamps on the actual completed script word count in the context, not the requested target length.
   5. DESCRIPTION PART 2: 2-4 sentences with deeper context, stakes, and what the viewer will learn, without unsupported claims.
-  6. CTA WITH LINK: if a sponsor link is provided, repeat the exact sponsor link with a clear CTA; if no sponsor link is provided, use a like/subscribe/comment CTA with no fake URL.
+  6. CTA WITH LINK: if an agency CTA link is provided, repeat the exact link with a clear CTA; if no CTA link is provided, use a like/subscribe/comment CTA with no fake URL.
   7. 3-5 HASHTAGS: one final line containing only 3-5 relevant hashtags.
 - Do not add labels like "MAIN KEYWORD" or "DESCRIPTION PART 1"; output the actual YouTube-ready text only.
-- If a sponsor link is provided, the description must include the exact sponsor link string at least twice: ${sponsorLink || "no sponsor link"}.
-- If a sponsor blurb is provided, use the sponsor's offer or product name in the two CTA blocks. Do not invent sponsor terms.
-- If no sponsor link is provided, do not add a fake sponsor link.
+- If an agency CTA link is provided, the description must include the exact link string at least twice: ${sponsorLink || "no agency CTA link"}.
+- If agency CTA instructions are provided, use the agency's requested next step in the two CTA blocks. Do not invent sponsor terms, savings claims, or carrier promises.
+- If no agency CTA link is provided, do not add a fake link.
 - Do not put hashtags in the tags array only; the description itself must end with 3-5 hashtags.
 - Tags are secondary; include 12-20 useful tags when possible: names, places, alternate spellings, categories, historical context, documentary phrases, mystery phrases, and broad topic terms without stuffing.
 - If SEO keyword hints are available, use the most relevant high-volume phrases naturally in the main keyword, description, tags, and hashtags.
@@ -1790,6 +2093,8 @@ Rules:
 - Pinned comments should ask for a genuine viewer interpretation, theory, memory, or next-question response. Do not use intentional typos, fake mistakes, or manipulative engagement bait.
 - Do not copy any competitor thumbnail, face, layout, logo, or exact framing.
 - Provide one sunoPrompt for background music specific to this video.
+- conversionAssets is required. Adapt the finished script into a GBP post, short email, Facebook/social post, three short-form clip hooks, staff call script, website article angle, and review/referral prompt when relevant.
+- Every conversion asset must keep the same compliance boundaries: Texas-only, no savings guarantees, no coverage promises, no carrier promises, no claim outcome promises.
 - The Suno prompt must be designed for background music under spoken narration: instrumental only, no vocals, no lyrics, loopable, emotionally aligned to the story, and not so busy that it competes with voiceover.
 - Include genre/style, mood, instrumentation, pacing or BPM feel, emotional arc, and a clear "no vocals, no lyrics" instruction.
 - Do not reference copyrighted songs, bands, composers, celebrity voices, or exact artist styles in the Suno prompt.
@@ -2007,7 +2312,7 @@ export function projectResearchPrompt(input: {
         ? `${input.targetWordCount?.toLocaleString() || "60,000"}-word long form book`
     : `${input.targetLengthMinutes}-minute ${projectOutputName(input.format)}`;
 
-  return `Create a research brief for a ${formatLabel} project.
+  return `Create a PolicyForge research brief and agency script brief for a ${formatLabel} project.
 
 Story title: ${input.title}
 Project type: ${formatLabel}
@@ -2020,26 +2325,46 @@ Target output: ${target}
 Tone: ${input.tone}
 Narration style: ${input.narrationStyle}
 
+${POLICYFORGE_AGENCY_PROFILE}
+
+${POLICYFORGE_SOURCE_MEMORY}
+
 Existing source material / notes:
 ${input.existingNotes || "No notes pasted yet."}
 
 Return plain text notes, not JSON. Organize with these headings:
+Agency Script Brief
+Target Prospect
+Policy Product Focus
+Texas Location And Local Trust Layer
+Pain Point Or Decision Moment
+Recommended Script Structure
+Primary CTA
+Compliance Boundaries
+Useful Objections To Answer
 Confirmed facts to verify
 Likely timeline
 People / organizations
 Places
 Primary source leads
 Secondary source leads
+Reusable source memory
 Research confidence
 Open questions
 Do not say as fact
-Risk notes
+Coverage promise warnings
+Carrier statement warnings
+Claim outcome warnings
+Legal tax or professional advice warnings
+CTA compliance check
 Best narrative angle
 
 Rules:
 - Treat fetched URL excerpts and pasted notes as source material to organize, not automatic proof.
 - Separate what is directly supported, what is repeated by secondary sources, and what still needs verification.
-- For local, professional, sales, education, or business content, do not invent regulations, prices, guarantees, credentials, testimonials, or outcomes.
+- Build a pre-script brief before writing guidance: target prospect, policy/product, Texas location, decision moment, recommended quote-intent structure, CTA, compliance boundaries, and objections.
+- For insurance content, do not invent regulations, prices, guarantees, credentials, testimonials, carrier appetite, underwriting results, savings, coverage, eligibility, or claim outcomes.
+- Treat this as Texas-only agency content for Baxter Insurance Agency, Inc.; flag any out-of-state or non-Texas assumption.
 - Do not present uncertain details as confirmed facts.
 - If source material is thin, make that clear and provide research leads instead of inventing facts.
 - Focus on what would help a writer build the selected output type.
@@ -2057,7 +2382,7 @@ export function fallbackIdeas(input?: Partial<IdeaFactoryInput>) {
         hook: `Most buyers do not know what to ask until after they have already made the decision.`,
         category: input.category || "Buyer Questions",
         summary: `A trust-building guide that teaches ${audience} how to evaluate ${offer} with confidence, spot weak advice, and understand what a serious expert looks for first.`,
-        whyCompelling: "It positions the creator as a patient educator before the sales conversation.",
+        whyCompelling: "It positions the agency as a patient educator before the sales conversation.",
         estimatedLengthPotential: input.desiredLength || "Feature article - about 2,000 words",
         recommendedLengthMinutes: 45,
         recommendedTone: input.tone || "Measured documentary",
@@ -2080,7 +2405,7 @@ export function fallbackIdeas(input?: Partial<IdeaFactoryInput>) {
         hook: `A few familiar assumptions make the whole decision harder than it needs to be.`,
         category: input.category || "Myth Busting",
         summary: `An authority piece that clears up the most common misconceptions in ${niche}, explains why they persist, and gives the audience a cleaner way to think through the next step.`,
-        whyCompelling: "Myth-busting creates curiosity while letting the creator demonstrate judgment.",
+        whyCompelling: "Myth-busting creates curiosity while letting the agency demonstrate judgment.",
         estimatedLengthPotential: input.desiredLength || "Feature article - about 2,000 words",
         recommendedLengthMinutes: 45,
         recommendedTone: input.tone || "Investigative",

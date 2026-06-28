@@ -46,7 +46,7 @@ import { signOut } from "next-auth/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { parsePublishingPack } from "@/lib/publishing-pack";
-import type { ArticleSeoPack, EpisodePublishingPack, SunoMusicPrompt, TopicalAuthorityMap } from "@/lib/publishing-pack";
+import type { ArticleSeoPack, ConversionAssets, EpisodePublishingPack, SunoMusicPrompt, TopicalAuthorityMap } from "@/lib/publishing-pack";
 import { FORGE_NICHES, forgeIdeaBrief, forgeNicheByChannel } from "@/lib/forge-niches";
 import {
   BOOK_ILLUSTRATION_MODEL_OPTIONS,
@@ -441,6 +441,7 @@ type ClientPublishingPack = {
   pinnedComment?: string;
   seoPack?: ArticleSeoPack;
   topicalAuthorityMap?: TopicalAuthorityMap;
+  conversionAssets?: ConversionAssets;
   episodePacks?: EpisodePublishingPack[];
 };
 
@@ -473,6 +474,35 @@ function PublishingDescriptionText({ text }: { text: string }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function ConversionAssetsView({ assets }: { assets: ConversionAssets }) {
+  const cards = [
+    ["GBP Post", assets.gbpPost],
+    ["Client Email", assets.clientEmail],
+    ["Facebook / Social Post", assets.facebookPost],
+    ["Call Script", assets.callScript],
+    ["Website Article Angle", assets.websiteArticleAngle],
+    ["Review / Referral Prompt", assets.reviewReferralPrompt]
+  ] as const;
+  return (
+    <div className="article-seo-grid">
+      {cards.map(([label, value]) => value ? (
+        <div className="seo-card wide" key={label}>
+          <strong>{label}</strong>
+          <p>{value}</p>
+        </div>
+      ) : null)}
+      {assets.shortClipHooks.length ? (
+        <div className="seo-card wide">
+          <strong>Short Clip Hooks</strong>
+          <ol>
+            {assets.shortClipHooks.map((hook) => <li key={hook}>{hook}</li>)}
+          </ol>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -6278,6 +6308,22 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                         <p>{latestPublishingPack.pinnedComment}</p>
                       </div>
                     ) : null}
+                    {latestPublishingPack.conversionAssets ? (
+                      <div className="pack-section">
+                        <div className="pack-section-header">
+                          <strong>Agency Conversion Assets</strong>
+                          <button
+                            className="secondary-button compact"
+                            type="button"
+                            onClick={() => void copyText(JSON.stringify(latestPublishingPack.conversionAssets, null, 2), "Agency conversion assets copied to clipboard.")}
+                          >
+                            <Copy size={14} />
+                            Copy Assets
+                          </button>
+                        </div>
+                        <ConversionAssetsView assets={latestPublishingPack.conversionAssets} />
+                      </div>
+                    ) : null}
                       </>
                     )}
                   </div>
@@ -9845,6 +9891,7 @@ function parseClientPublishingPack(
       pinnedComment: parsed.pinnedComment,
       seoPack: parsed.seoPack,
       topicalAuthorityMap: parsed.topicalAuthorityMap,
+      conversionAssets: parsed.conversionAssets,
       episodePacks: parsed.episodePacks
     };
   } catch {
@@ -10646,12 +10693,14 @@ function qualityScorecardForProject(project: StoryProject) {
 
   const content = quality?.content ?? "";
   const scoreLabels = [
-    ["Hook", "Hook Score"],
-    ["Retention", "Retention Score"],
+    ["Quote Intent", "Quote Intent Score"],
+    ["Trust", "Trust Score"],
     ["Clarity", "Clarity Score"],
-    ["Emotional Payoff", "Emotional Payoff Score"],
-    ["Factual Safety", "Factual Safety Score"],
-    ["Teleprompter", "Teleprompter Readiness Score"]
+    ["Compliance", "Compliance Safety Score"],
+    ["Local Relevance", "Texas Local Relevance Score"],
+    ["CTA Strength", "CTA Strength Score"],
+    ["Objections", "Objection Handling Score"],
+    ["Coverage Safety", "Coverage Promise Safety Score"]
   ] as const;
   const fallbackBase = body ? Math.min(94, Math.max(72, Math.round(body.wordCount / Math.max(1, project.targetWordCount) * 88))) : 0;
   const scores = scoreLabels.map(([label, key], index) => ({
@@ -10675,9 +10724,9 @@ function claimLedgerForProject(project: StoryProject) {
 
   const sections = [
     { label: "Confirmed", items: extractLedgerItems(content, ["Confirmed Facts", "CONFIRMED FACTS TO VERIFY"]) },
-    { label: "Needs Verification", items: extractLedgerItems(content, ["Likely But Needs Verification", "SOURCE LEADS"]) },
-    { label: "Risky Claims", items: extractLedgerItems(content, ["Unverified Or Risky Claims", "RISK NOTES"]) },
-    { label: "Do Not Say As Fact", items: extractLedgerItems(content, ["Do Not Say As Fact", "Unsupported Claims"]) }
+    { label: "Needs Verification", items: extractLedgerItems(content, ["Likely But Needs Verification", "SOURCE LEADS", "Source Leads"]) },
+    { label: "Coverage Warnings", items: extractLedgerItems(content, ["Coverage Promise Warnings", "Carrier Statement Warnings", "Claim Outcome Warnings", "Overstatement Risks"]) },
+    { label: "Do Not Say As Fact", items: extractLedgerItems(content, ["Do Not Say As Fact", "Unsupported Claims", "Legal Tax Or Professional Advice Warnings"]) }
   ].map((section) => ({
     ...section,
     items: section.items.length ? section.items : ["No items extracted yet."]

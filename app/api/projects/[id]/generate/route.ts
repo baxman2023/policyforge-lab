@@ -1617,9 +1617,9 @@ function temperatureForPass(passType: ScriptPassType) {
 function maxTokensForPass(passType: ScriptPassType, format?: StoryProjectFormat | string | null, hasEpisodePlan = false) {
   if (hasEpisodePlan && (passType === ScriptPassType.INTRO || passType === ScriptPassType.OUTRO)) return 3200;
   if (passType === ScriptPassType.INTRO || passType === ScriptPassType.OUTRO) return 1600;
-  if (passType === ScriptPassType.PUBLISHING_PACK && format === "ARTICLE") return 8000;
+  if (passType === ScriptPassType.PUBLISHING_PACK && format === "ARTICLE") return 9000;
   if (passType === ScriptPassType.PUBLISHING_PACK && (format === "EPISODIC_SERIES" || hasEpisodePlan)) return 18000;
-  if (passType === ScriptPassType.PUBLISHING_PACK) return 4500;
+  if (passType === ScriptPassType.PUBLISHING_PACK) return 6000;
   if (
     (format === "EPISODIC_SERIES" || hasEpisodePlan) &&
     (passType === ScriptPassType.DRAFT || passType === ScriptPassType.REWRITE || passType === ScriptPassType.VOICE_POLISH || passType === ScriptPassType.FINAL)
