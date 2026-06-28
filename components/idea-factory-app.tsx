@@ -2571,34 +2571,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     setGenerateCategory(niche.category);
     setTone(niche.tone);
     setSourceType(niche.sourceType);
-    setMessage(`Loaded "${niche.title}" as the direction. Use Create Channel to make it the active channel.`);
-  }
-
-  async function generateAndActivateHotNiche(niche: ChannelHotNiche) {
-    if (!currentChannel) {
-      setMessage("Create or select a channel before creating a insurance lane channel.");
-      return;
-    }
-    if (blockedChannelIdeaKeys.has(channelIdeaKey(niche))) {
-      setMessage(`"${niche.title}" is locked. Uncheck Never use again before using it.`);
-      return;
-    }
-
-    const seed = seedFromHotNiche(niche);
-    setChannelMachineSeed(seed);
-    setNiche(niche.nicheFocus);
-    setGenerateCategory(niche.category);
-    setTone(niche.tone);
-    setSourceType(niche.sourceType);
-    const kitToActivate = channelBlueprintFromHotNiche(niche);
-    setChannelMachineResult(kitToActivate);
-    setChannelBlueprintDraft(kitToActivate);
-    setChannelMachineSaveNotice("");
-    setMessage(`Creating and activating "${niche.title}" now...`);
-
-    await runAction("channel-blueprint", async () => {
-      await createAndActivateChannelKit(kitToActivate);
-    }, { errorKey: "channel-blueprint" });
+    setMessage(`Loaded "${niche.title}" as the Growth Pack Machine direction.`);
   }
 
   async function updateBlockedChannelIdea(input: { key: string; title: string }, blocked: boolean) {
@@ -5087,7 +5060,6 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         </section>
 
         <section className="center-stack">
-          {renderHotNiches({ compact: true, placement: "idea-factory" })}
           <div className="tabs">
             {tabs.map(({ label, count, icon: Icon }) => (
               <button
@@ -7870,15 +7842,11 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     );
   }
 
-  function renderHotNiches(options: { compact?: boolean; placement?: "idea-factory" | "settings" } = {}) {
+  function renderHotNiches(options: { compact?: boolean } = {}) {
     const catalogNiches = hotNiches.length ? hotNiches : rankedForgeCatalog;
     const visibleNiches = options.compact && !showAllForgeRankings ? catalogNiches.slice(0, 10) : catalogNiches;
-    const title = options.placement === "idea-factory"
-      ? "Top Agency Growth Packs"
-      : hotNichesMonth ? `Insurance Lanes: ${hotNichesMonth}` : "Insurance Lane Catalog";
-    const body = options.placement === "idea-factory"
-      ? "Ranked highest-first so the strongest commercial lanes are visible before generating ideas."
-      : "These are the fixed private channel lanes. Use the top channel selector to work inside one niche.";
+    const title = hotNichesMonth ? `Insurance Lanes: ${hotNichesMonth}` : "Insurance Lane Catalog";
+    const body = "These are the fixed private channel lanes. Use the top channel selector to work inside one niche.";
 
     return (
       <div className={cn("hot-niches-panel", options.compact && "idea-factory-rankings-panel")}>
@@ -7943,18 +7911,16 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   <div className="inline-actions">
                     <button className="secondary-button compact" type="button" onClick={() => applyHotNiche(niche)} disabled={isBlocked}>
                       <Lightbulb size={15} />
-                      {options.placement === "idea-factory" ? "Load Direction" : "Use"}
+                      Use
                     </button>
                     <button
                       className="primary-button compact"
                       type="button"
-                      onClick={() => options.placement === "idea-factory"
-                        ? void generateAndActivateHotNiche(niche)
-                        : void runChannelIdeaMachine({ seedOverride: seedFromHotNiche(niche) })}
+                      onClick={() => void runChannelIdeaMachine({ seedOverride: seedFromHotNiche(niche) })}
                       disabled={busy === "channel-machine" || busy === "channel-blueprint" || isBlocked}
                     >
                       {busy === "channel-machine" ? <Loader2 size={15} className="spin" /> : <Zap size={15} />}
-                      {options.placement === "idea-factory" ? "Create Lane" : "Generate Growth Pack"}
+                      Generate Growth Pack
                     </button>
                   </div>
                 </article>
@@ -11592,89 +11558,6 @@ function limitChannelSeed(value: string) {
   const clean = value.replace(/\s+/g, " ").replace(/\s+\n/g, "\n").trim();
   if (clean.length <= CHANNEL_IDEA_MACHINE_SEED_LIMIT) return clean;
   return `${clean.slice(0, CHANNEL_IDEA_MACHINE_SEED_LIMIT - 24).trim()}... [seed compacted]`;
-}
-
-function channelBlueprintFromHotNiche(niche: ChannelHotNiche): ChannelBlueprint {
-  const keywords = niche.keywords.slice(0, 32).map((keyword, index) => ({
-    keyword,
-    intent: index < 4 ? "Core channel discovery keyword." : "Supporting search and packaging keyword.",
-    priority: index < 4 ? "Primary" as const : "Secondary" as const
-  }));
-  const sampleAngles = niche.starterAngles.length ? niche.starterAngles : [
-    `${niche.title} origin story`,
-    `${niche.title} hidden evidence`,
-    `${niche.title} unanswered questions`
-  ];
-
-  return {
-    ...defaultChannelBlueprint,
-    channelName: niche.title,
-    tagline: niche.description.split(" — ")[0] || niche.category,
-    description: fitText([
-      `${niche.title} is an insurance growth channel built around ${niche.description}`,
-      niche.bestViewerPromise,
-      `The channel prioritizes ${niche.nicheFocus.toLowerCase()} topics with ${niche.tone.toLowerCase()} guidance, clear compliance boundaries, and repeatable local SEO, video, email, and sales-support packaging.`,
-      niche.monetizationRationale ? `Revenue note: ${niche.monetizationRationale}` : "",
-      "Use it to educate prospects, support current clients, and create more quote, renewal, cross-sell, referral, and review conversations."
-    ].filter(Boolean).join(" "), 980),
-    targetAudience: "Texas insurance prospects, current clients, homeowners, drivers, families, landlords, and small-business owners who need useful guidance before a quote, renewal, claim, or coverage review.",
-    toneRules: `Default tone: ${niche.tone}. Stay helpful, local, practical, and compliance-safe. Never promise savings, coverage, eligibility, underwriting acceptance, or claim outcomes.`,
-    voiceProfile: "Trusted Texas insurance advisor with warm, direct, plain-English explanations and a clear next step.",
-    introStyle: "Open on a real Texas risk, renewal question, household change, storm concern, vehicle situation, or business decision before explaining the practical insurance takeaway.",
-    formattingRules: "Generate ideas, scripts, SEO pages, emails, titles, thumbnails, and campaign kits only inside this insurance lane. Favor quote-ready education, client retention, cross-sells, and local search value.",
-    phrasesToUse: "coverage depends on policy terms, request a review, quote-ready checklist, Texas homeowners, Houston-area families, talk with a licensed Texas agent",
-    recurringStoryTypes: sampleAngles.join("; "),
-    bannedPhrases: "You won't believe, shocking truth, solved forever, 100% proof, scientists hate this, finally exposed.",
-    phrasesToAvoid: "guaranteed, undeniable proof, no one is talking about this, this changes everything",
-    thumbnailStyle: "Clean professional insurance visuals, Texas/Houston cues, one home/auto/business subject, readable two-to-five-word overlay, trust-first not fear-first.",
-    sponsorRules: "Use Baxter Insurance Agency, Inc. as the natural call-to-action. Mention 281-445-1381 where appropriate. Do not make carrier promises.",
-    publishingRhythm: "Two weekly education assets, one weekly local SEO asset, and one weekly client/referral campaign.",
-    moneyGoal: "Generate quote requests, renewal saves, cross-sells, referrals, local SEO visibility, and long-term agency revenue.",
-    riskTolerance: niche.monetizationScore && niche.monetizationScore >= 8
-      ? "Growth-forward but compliance-safe: prioritize useful education, quote readiness, and licensed-agent review."
-      : "Careful: use educational framing and avoid claims that could sound like coverage, savings, or underwriting promises.",
-    weeklyVideoTarget: 2,
-    emailCapturePlan: "Offer useful checklists such as storm readiness, renewal review, teen driver, home inventory, flood questions, contractor COI prep, or quote-ready worksheets.",
-    primaryCta: "Call Baxter Insurance Agency, Inc. at 281-445-1381 or request a Texas insurance review.",
-    keywords,
-    ideaCombinations: [
-      {
-        nicheFocus: niche.nicheFocus,
-        category: niche.category,
-        tone: niche.tone,
-        desiredLength: "10 minutes",
-        sourceType: niche.sourceType,
-        rationale: `Core ${niche.title} lane ranked ${niche.monetizationScore ?? "unrated"}/10 for agency revenue fit.`,
-        sampleAngles
-      },
-      {
-        nicheFocus: niche.nicheFocus,
-        category: `${niche.category} Deep Dives`,
-        tone: niche.tone,
-        desiredLength: "Article",
-        sourceType: niche.sourceType,
-        rationale: "Search-friendly written asset for local SEO, client education, and quote intent.",
-        sampleAngles: sampleAngles.map((angle) => `${angle} article`)
-      },
-      {
-        nicheFocus: niche.nicheFocus,
-        category: `${niche.category} Client Campaign`,
-        tone: niche.tone,
-        desiredLength: "Email + social sequence",
-        sourceType: niche.sourceType,
-        rationale: "Client nurture and referral-ready sequence for the same insurance topic.",
-        sampleAngles: sampleAngles.map((angle, index) => `${angle} message ${index + 1}`)
-      }
-    ],
-    logoPrompt: `Square premium logo for Baxter Growth Lab ${niche.title}, ${niche.category}, clean Texas insurance advisor brand, shield or document mark, modern navy teal gold palette, no tiny text.`,
-    bannerPrompt: `YouTube or web banner for Baxter Growth Lab ${niche.title}, exact 2560 x 1440 canvas, keep readable text inside the centered safe area, professional Texas insurance background.`
-  };
-}
-
-function fitText(value: string, maxLength: number) {
-  const clean = value.replace(/\s+/g, " ").trim();
-  if (clean.length <= maxLength) return clean;
-  return clean.slice(0, maxLength - 1).trim();
 }
 
 function channelIdeaKey(niche: Pick<ChannelHotNiche, "title" | "seedPrompt">) {
