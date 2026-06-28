@@ -1371,10 +1371,9 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       ]
     },
     {
-      title: "2. Configure buyer handoff and engines",
-      body: "Open Settings once before production work or a buyer demo.",
+      title: "2. Configure engines",
+      body: "Open Settings once before production work.",
       items: [
-        "Use Buyer Handoff / White Label to set the workspace name, tagline, logo URL, sponsor CTA, and schedule note.",
         "Save the generated Channel Kit so the active channel has audience, tone, thumbnail, sponsor, and publishing rules.",
         "Use the insurance lane catalog when you want to review the saved fixed channel lanes.",
         "Switch channels in the top bar to generate ideas inside a specific insurance lane.",
@@ -1444,7 +1443,6 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       body: "Settings has separate save buttons for separate jobs.",
       items: [
         "Channels creates, activates, restores, or deletes channel workspaces.",
-        "Buyer Handoff / White Label uses Save Setup for workspace name, tagline, logo URL, default sponsor CTA, and publishing schedule note.",
         "AI Providers uses Save AI Providers for API keys, fallback models, Runware, DataForSEO, and thumbnail style guide.",
         "Model Routing uses Save Model Routing for OpenRouter model assignments and Auto Model Routing.",
         "Story Defaults uses Save Story Defaults for preferred tone, narration style, and default length."
@@ -1527,15 +1525,6 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Exports downloads Markdown or plain text content for downstream production.",
         "Export Vault lists downloadable current outputs and previous draft outputs with timestamps."
       ]
-    },
-    {
-      title: "Buyer Handoff / White Label",
-      items: [
-        "Set workspace name, tagline, logo URL, default sponsor CTA, and publishing schedule note in Settings.",
-        "Copy Handoff creates a plain-text setup summary for a buyer.",
-        "Load Demo creates a sample workspace that can be used in sales walkthroughs without touching live production channels.",
-        "The saved workspace name, tagline, and logo are reflected in the sidebar brand."
-      ]
     }
   ],
   "Advanced Protocols": [
@@ -1554,7 +1543,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Start on Dashboard and click Load Demo Workspace before a sales call.",
         "Show Buyer Readiness first so the buyer sees the system is packaged, not just a generator.",
         "Open a demo project in Content Lab and show the final output, Scorecard, Claim Ledger, Publishing Pack, thumbnails when available, and Content Pack.",
-        "Finish in Settings with Buyer Handoff / White Label and Saved Channel Strategy to show how the buyer can make the system theirs."
+        "Finish with Saved Channel Strategy to show how the active channel's audience, rhythm, and packaging rules are controlled."
       ]
     },
     {
@@ -2636,17 +2625,6 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     setActiveSection("idea-factory");
     setActiveTab("Generated Ideas");
     setMessage(`Idea Factory loaded with "${combination.category}". Generate 20 ideas when ready.`);
-  }
-
-  async function copyBuyerHandoffSummary() {
-    const text = buyerHandoffSummary(settingsDraft, currentChannel, channelBlueprintDraft);
-    try {
-      await navigator.clipboard.writeText(text);
-      setMessage("Buyer handoff summary copied.");
-    } catch {
-      downloadTextFile("buyer-handoff-summary.txt", text);
-      setMessage("Buyer handoff summary downloaded.");
-    }
   }
 
   function updateSourceMaterial(value: string, projectId = selectedProject?.id) {
@@ -7910,63 +7888,6 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             ) : null}
           </div>
 
-          <div className="panel pad">
-            <h2 className="panel-title">
-              <ShieldCheck size={18} />
-              Buyer Handoff / White Label
-            </h2>
-            <Field label="Workspace Name">
-              <input
-                value={settingsDraft.workspaceName}
-                onChange={(event) => setSettingsDraft((current) => ({ ...current, workspaceName: event.target.value }))}
-                placeholder="PolicyForge LAB"
-              />
-            </Field>
-            <Field label="Workspace Tagline">
-              <input
-                value={settingsDraft.workspaceTagline}
-                onChange={(event) => setSettingsDraft((current) => ({ ...current, workspaceTagline: event.target.value }))}
-                placeholder="AI Script Engine"
-              />
-            </Field>
-            <Field label="Logo URL">
-              <input
-                value={settingsDraft.workspaceLogoUrl ?? ""}
-                onChange={(event) => setSettingsDraft((current) => ({ ...current, workspaceLogoUrl: event.target.value }))}
-                placeholder="https://..."
-              />
-            </Field>
-            <Field label="Default Sponsor CTA">
-              <textarea
-                className="short-textarea"
-                value={settingsDraft.defaultSponsorCta ?? ""}
-                onChange={(event) => setSettingsDraft((current) => ({ ...current, defaultSponsorCta: event.target.value }))}
-                placeholder="Paste the default sponsor wording a buyer can reuse across demo projects."
-              />
-            </Field>
-            <Field label="Publishing Schedule Note">
-              <input
-                value={settingsDraft.publishingScheduleNote}
-                onChange={(event) => setSettingsDraft((current) => ({ ...current, publishingScheduleNote: event.target.value }))}
-                placeholder="Mondays and Thursdays; one monthly episode week."
-              />
-            </Field>
-            <div className="inline-actions">
-              <button className="primary-button compact" type="button" onClick={saveSettings} disabled={busy === "settings"}>
-                {busy === "settings" ? <Loader2 size={15} className="spin" /> : <Save size={15} />}
-                Save Setup
-              </button>
-              <button className="secondary-button compact" type="button" onClick={() => void copyBuyerHandoffSummary()}>
-                <Copy size={15} />
-                Copy Handoff
-              </button>
-              <button className="secondary-button compact" type="button" onClick={() => void seedDemoWorkspace()} disabled={busy === "demo-seed"}>
-                {busy === "demo-seed" ? <Loader2 size={15} className="spin" /> : <Play size={15} />}
-                Load Demo
-              </button>
-            </div>
-          </div>
-
           <div className="panel pad channel-machine-panel">
             <div className="panel-title-row">
               <div>
@@ -11022,48 +10943,6 @@ function parseChannelBlueprint(description?: string | null): ChannelBlueprint {
   } catch {
     return { ...defaultChannelBlueprint, targetAudience: description };
   }
-}
-
-function buyerHandoffSummary(settings: UserSettings, channel: Channel | undefined, blueprint: ChannelBlueprint) {
-  return [
-    `${settings.workspaceName || "PolicyForge LAB"} Buyer Handoff`,
-    "",
-    `Workspace: ${settings.workspaceName || "PolicyForge LAB"}`,
-    `Tagline: ${settings.workspaceTagline || "AI Script Engine"}`,
-    `Active channel: ${channel?.name || "Main Channel"}`,
-    `Publishing schedule: ${settings.publishingScheduleNote}`,
-    "",
-    "Required setup:",
-    `- OpenRouter key: ${settings.hasOpenRouterApiKey ? "configured" : "not configured"}`,
-    `- Anthropic fallback key: ${settings.hasAnthropicApiKey ? "configured" : "not configured"}`,
-    `- OpenAI fallback key: ${settings.hasOpenAiApiKey ? "configured" : "not configured"}`,
-    `- Runware key: ${settings.hasRunwareApiKey ? "configured" : "optional; needed for in-app thumbnails"}`,
-    `- DataForSEO credentials: ${settings.hasDataForSeoCredentials ? "configured" : "optional; improves keyword and tag selection"}`,
-    `- WordPress credentials: ${settings.hasWordPressCredentials ? "configured" : "optional; needed for article draft uploads"}`,
-    `- Default model: ${settings.defaultModel}`,
-    `- Discovery model: ${settings.discoveryModel}`,
-    `- Drafting model: ${settings.draftingModel}`,
-    `- Anthropic fallback model: ${settings.anthropicModel}`,
-    `- OpenAI fallback model: ${settings.openAiModel}`,
-    "",
-    "Channel blueprint:",
-    `- Generated channel name: ${blueprint.channelName || channel?.name || "Not generated"}`,
-    `- Tagline: ${blueprint.tagline || "Not generated"}`,
-    `- Audience: ${blueprint.targetAudience}`,
-    `- Tone rules: ${blueprint.toneRules}`,
-    `- Brand voice: ${blueprint.voiceProfile}`,
-    `- Intro style: ${blueprint.introStyle}`,
-    `- Formatting rules: ${blueprint.formattingRules}`,
-    `- Preferred phrases: ${blueprint.phrasesToUse}`,
-    `- Story types: ${blueprint.recurringStoryTypes}`,
-    `- Banned phrases: ${blueprint.bannedPhrases}`,
-    `- Phrases to avoid: ${blueprint.phrasesToAvoid}`,
-    `- Thumbnail style: ${blueprint.thumbnailStyle}`,
-    `- Sponsor rules: ${blueprint.sponsorRules}`,
-    "",
-    "Default sponsor CTA:",
-    settings.defaultSponsorCta || "No default sponsor CTA saved."
-  ].join("\n");
 }
 
 function channelNameForPatch(value: string | undefined, fallback: string) {
