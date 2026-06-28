@@ -1033,7 +1033,7 @@ const navItems: Array<{ id: AppSection; label: string; icon: LucideIcon }> = [
   { id: "idea-factory", label: "Idea Factory", icon: Lightbulb },
   { id: "projects", label: "Campaign Projects", icon: FolderKanban },
   { id: "script-lab", label: "Content Lab", icon: FileText },
-  { id: "calendar", label: "Publishing Calendar", icon: CalendarDays },
+  { id: "calendar", label: "Campaign Calendar", icon: CalendarDays },
   { id: "published", label: "Published", icon: Globe2 },
   { id: "media", label: "Media", icon: ImageIcon },
   { id: "exports", label: "Exports", icon: LayoutList },
@@ -1064,7 +1064,7 @@ const categoryOptions = [
 
 const expertCategoryOptions = [
   "Educational Guides",
-  "Buyer Questions",
+  "Prospect Questions",
   "Problem / Solution",
   "Myth Busting",
   "Comparison Content",
@@ -1077,7 +1077,7 @@ const expertCategoryOptions = [
 const localLeadCategoryOptions = [
   "Local SEO",
   "Service Area Guides",
-  "Local Buyer Questions",
+  "Local Prospect Questions",
   "Emergency / What To Do",
   "Seasonal Local Demand",
   "Cost and Pricing Guides",
@@ -1140,7 +1140,7 @@ const brandStrategyCategoryOptions = [
   "Content Pillars",
   "Channel Naming",
   "Visual Identity",
-  "Publishing Calendar",
+  "Campaign Calendar",
   "Offer Ladder",
   "Keyword Strategy",
   "Launch Plan"
@@ -1156,7 +1156,7 @@ const storySourceTypeOptions = [
 
 const expertSourceTypeOptions = [
   "Industry expertise and client questions",
-  "FAQs, objections, and buyer concerns",
+  "FAQs, objections, and prospect concerns",
   "Case studies and proof points",
   "Regulatory/compliance-safe guidance",
   "Search questions and keyword research"
@@ -1231,51 +1231,39 @@ const contentModeOptions: Array<{
   icon: LucideIcon;
 }> = [
   {
-    value: "STORY_DOCUMENTARY",
-    label: "Story / Documentary",
-    description: "True stories, mysteries, history, and narrative arcs.",
-    icon: Play
-  },
-  {
     value: "EXPERT_AUTHORITY",
-    label: "Expert / Authority",
-    description: "Trust-building content for professionals and niche experts.",
+    label: "Client Education",
+    description: "Plain-English insurance answers that build trust.",
     icon: ShieldCheck
   },
   {
     value: "LOCAL_LEAD_GEN",
-    label: "Local Lead Gen",
-    description: "Geo-service ideas built for local SEO and inquiries.",
+    label: "Local SEO",
+    description: "Texas and Houston-area content built for search and quote requests.",
     icon: Navigation
   },
   {
     value: "SALES_OFFER",
-    label: "Sales / Offer",
-    description: "Sales pages, promos, VSLs, proposals, and follow-up.",
+    label: "Quote Campaign",
+    description: "Quote-ready pages, emails, call scripts, and follow-up.",
     icon: Zap
   },
   {
     value: "EDUCATION_COURSE",
-    label: "Education / Course",
-    description: "Courses, modules, lessons, worksheets, and quizzes.",
-    icon: BookOpen
-  },
-  {
-    value: "BOOK_PUBLISHING",
-    label: "Book / Publishing",
-    description: "Nonfiction, lead magnet, Kindle, and authority books.",
+    label: "Referral / Review",
+    description: "Client prompts that ask for referrals, reviews, and introductions.",
     icon: BookOpen
   },
   {
     value: "REPURPOSE_MULTIPLIER",
-    label: "Repurpose",
-    description: "Turn one source into posts, emails, notes, and campaigns.",
+    label: "Social / GBP Post",
+    description: "Turn one insurance topic into posts, GBP updates, and short emails.",
     icon: RefreshCw
   },
   {
     value: "BRAND_CHANNEL_STRATEGY",
-    label: "Brand / Strategy",
-    description: "Niche, positioning, pillars, identity, and calendar.",
+    label: "Renewal / Cross-Sell",
+    description: "Renewal reviews, coverage gaps, companion policies, and retention.",
     icon: Globe2
   }
 ];
@@ -1289,38 +1277,20 @@ const projectFormatOptions: Array<{
   {
     value: "STANDALONE",
     label: "Video Script",
-    description: "YouTube-ready script, publishing pack, and thumbnails.",
+    description: "Insurance video script, publishing pack, and thumbnails.",
     icon: Play
-  },
-  {
-    value: "EPISODIC_SERIES",
-    label: "Episodic Series",
-    description: "Five connected video episodes from one strong idea.",
-    icon: CalendarDays
   },
   {
     value: "PODCAST_EPISODE",
     label: "Podcast Episode",
-    description: "Spoken episode script with show notes.",
+    description: "Spoken insurance episode script with show notes.",
     icon: Mic2
   },
   {
     value: "ARTICLE",
     label: "Article",
-    description: "Researched article with SEO notes.",
+    description: "Texas insurance article with SEO notes.",
     icon: Newspaper
-  },
-  {
-    value: "SHORT_BOOK",
-    label: "Short Book",
-    description: "Chaptered short book draft with launch notes.",
-    icon: BookOpen
-  },
-  {
-    value: "LONG_BOOK",
-    label: "Long Form Book",
-    description: "Deep book blueprint, manuscript draft, and launch notes.",
-    icon: BookOpen
   }
 ];
 
@@ -1361,27 +1331,26 @@ const guideTabs: GuideTab[] = ["Quick Start", "User Manual", "Advanced Protocols
 const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items: string[] }>> = {
   "Quick Start": [
     {
-      title: "1. Load a demo or pick a channel",
-      body: "Use the Channel selector in the top bar before creating anything.",
+      title: "1. Pick a growth lane",
+      body: "Use the top selector before creating anything.",
       items: [
-        "For a buyer walkthrough, open Dashboard and click Load Demo Workspace.",
-        "Create extra channels in Settings > Channels.",
-        "Ideas, projects, outputs, video thumbnails, and calendar slots stay inside the active channel.",
-        "Use Main Channel for live production work and Demo Channel for sales walkthroughs."
+        "Choose the Texas insurance niche pack you want to work inside.",
+        "Ideas, projects, outputs, thumbnails, and calendar slots stay inside the active lane.",
+        "Use separate lanes for carrier products, local SEO campaigns, referral pushes, and renewal campaigns."
       ]
     },
     {
       title: "2. Configure engines",
       body: "Open Settings once before production work.",
       items: [
-        "Save the generated Channel Kit so the active channel has audience, tone, thumbnail, sponsor, and publishing rules.",
-        "Use the insurance lane catalog when you want to review the saved fixed channel lanes.",
-        "Switch channels in the top bar to generate ideas inside a specific insurance lane.",
+        "Save the active growth strategy so the app has audience, tone, compliance, CTA, thumbnail, and publishing rules.",
+        "Use the insurance lane catalog when you want to review fixed Texas carrier and product lanes.",
+        "Switch lanes in the top bar to generate ideas inside a specific insurance focus.",
         "Add or confirm at least one text provider key: OpenRouter primary, with Anthropic and OpenAI available as direct fallbacks.",
         "Click Test beside each API key to confirm it works before running production jobs.",
         "Choose Anthropic and OpenAI fallback models from the live provider dropdowns after saving those keys.",
-        "Add Runware only if you want video thumbnails or optional book illustrations generated inside PolicyForge LAB.",
-        "Add DataForSEO if you want keyword metrics to improve channel planning, tags, and Publishing Pack descriptions.",
+        "Add Runware only if you want video thumbnails, logos, or banners generated inside PolicyForge LAB.",
+        "Add DataForSEO if you want keyword metrics to improve local SEO pages, tags, and publishing descriptions.",
         "Open Model Routing, choose the models for discovery, research, drafting, critique, rewrite, and publishing packs, then click Save Model Routing.",
         "Save AI Providers saves keys and provider settings. Save Model Routing saves the routing dropdowns."
       ]
@@ -1389,11 +1358,11 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
     {
       title: "3. Generate and triage ideas",
       items: [
-        "Open Idea Factory and choose Content Mode first: Story / Documentary, Expert / Authority, Local Lead Gen, Sales / Offer, Education / Course, Book / Publishing, Repurpose, or Brand / Strategy.",
-        "Then choose Project Type: Video Script, Podcast Episode, Article, Short Book, or Long Form Book.",
+        "Open Idea Factory and choose Content Mode: Local SEO, Client Education, Quote Campaign, Referral / Review, Social / GBP Post, or Renewal / Cross-Sell.",
+        "Then choose Project Type: Video Script, Podcast Episode, or Article.",
         "Then choose Niche / Focus, Tone, Category, Target Size, Source Type, and Number of Ideas.",
-        "Use a saved Channel Idea Machine combination when you want the dropdowns filled with a proven content lane.",
-        "Use the Depth chip to judge whether an idea has enough source material for a long output. Low depth may produce shorter scripts.",
+        "Use a saved growth-lane combination when you want the dropdowns filled with a proven insurance campaign direction.",
+        "Use the Depth chip to judge whether an idea has enough source material for a useful output. Low depth is better for short social or GBP posts.",
         "Save strong ideas, reject weak ones, and start projects from ideas that fit the active channel.",
         "Duplicate prevention compares against ideas in the active channel.",
         "Delete All clears the active channel's idea list while keeping existing content projects.",
@@ -1405,23 +1374,20 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       items: [
         "Open Content Lab, select a project, and run Fully Auto for the complete pass sequence.",
         "Use manual step buttons when you want to inspect or rerun one pass before moving forward.",
-        "Video and podcast projects create spoken scripts; article projects create publication-ready prose; book projects create chaptered manuscripts.",
-        "For video, podcast, and article projects, add sponsor copy and a Sponsor Link before running Intro, Lead, or Fully Auto; the final assembled output places sponsor copy only in the opening and closing areas.",
-        "Use Generate Sponsor Blurb when you have an offer URL and want the AI to draft medium-specific sponsor copy for that project.",
-        "Short Book and Long Form Book projects do not use sponsor blurbs.",
-        "For book projects, use Book Illustrations only when artwork improves the book; click Plan Illustrations before generating image assets.",
+        "Video and podcast projects create spoken scripts; article projects create publication-ready prose.",
+        "Use the saved agency CTA and compliance rules to keep every output pointed toward quote requests, calls, reviews, referrals, or renewal conversations.",
         "Video and podcast body passes now enforce a minimum useful length. If the model comes back too short, PolicyForge LAB attempts one automatic expansion before saving.",
         "If Teleprompter Polish repeatedly says the final output appears incomplete, use Force Save Final only after you are willing to review the saved result manually.",
-        "Use the Quality Scorecard and Research Confidence / Claim Ledger before considering content production-ready."
+        "Use the Quality Scorecard and Compliance Check before considering content production-ready."
       ]
     },
     {
       title: "5. Package, schedule, export",
       items: [
-        "Run the final pack for titles, descriptions or show notes, tags, and reader/listener/viewer prompts.",
+        "Run the final pack for titles, descriptions or show notes, tags, and prospect prompts.",
         "Video descriptions and timestamps are based on the actual saved script length, not just the requested target length.",
-        "Create thumbnails for video projects when Runware is configured, or generate planned book illustrations for book projects.",
-        "Download the one-click Content Pack for output, metadata, video thumbnails or book illustrations when available, scorecard, claim ledger, and sponsor copy when that format supports sponsors.",
+        "Create thumbnails for video projects when Runware is configured.",
+        "Download the one-click Content Pack for output, metadata, thumbnails when available, scorecard, and compliance notes.",
         "Schedule before a future release date, mark Produced when the content file is finished, and mark Published only after it is live.",
         "Use Export Vault when you need older drafts or timestamped downloadable history."
       ]
@@ -1430,12 +1396,11 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
   "User Manual": [
     {
       title: "Dashboard",
-      body: "Dashboard is the production and demo command center.",
+      body: "Dashboard is the agency production command center.",
       items: [
-        "Load Demo Workspace creates a polished sample channel with ideas, outputs, publishing packs, thumbnails, and calendar slots.",
         "Content Pipeline Board shows where each item sits from ideas through published work.",
-        "Buyer Readiness checks whether the workspace has demo content, outputs, packs, video thumbnails, scorecards, saved strategy, and API setup.",
-        "Saved Channel Strategy preview shows the active channel's audience, rhythm, and thumbnail rules."
+        "Agency Growth Readiness checks whether the workspace has outputs, packs, thumbnails, scorecards, saved strategy, and API setup.",
+        "Saved Growth Strategy preview shows the active lane's audience, rhythm, and thumbnail rules."
       ]
     },
     {
@@ -1449,23 +1414,23 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       ]
     },
     {
-      title: "Channels",
-      body: "Channels are separate workspaces under the same user account.",
+      title: "Growth Lanes",
+      body: "Growth lanes are separate workspaces under the same user account.",
       items: [
-        "Switch channels from the top bar.",
-        "Create channels in Settings > Channels.",
-        "Every channel has its own idea list, project list, publishing calendar, duplicate pool, thumbnails, and outputs.",
-        "Use Settings > Channel Idea Machine only when you want to experiment beyond the fixed insurance lanes.",
-        "Save Kit creates and activates a new channel from the generated channel kit.",
-        "Saved Channel Strategy is the editable saved result from a generated Channel Kit; you usually do not fill it manually.",
-        "Use Surprise Me in Channel Idea Machine when you want a fresh channel strategy generated from scratch."
+        "Switch lanes from the top bar.",
+        "Create lanes in Settings > Growth Lanes.",
+        "Every lane has its own idea list, project list, campaign calendar, duplicate pool, thumbnails, and outputs.",
+        "Use Settings > Growth Pack Machine only when you want to experiment beyond the fixed insurance lanes.",
+        "Save Kit creates and activates a new lane from the generated growth pack.",
+        "Saved Growth Strategy is the editable saved result from a generated growth pack; you usually do not fill it manually.",
+        "Use Surprise Me in Growth Pack Machine when you want a fresh insurance campaign strategy generated from scratch."
       ]
     },
     {
       title: "Idea Factory",
       items: [
-        "Choose Content Mode first so the AI knows whether you are making stories, authority content, local lead-gen content, sales assets, course material, book publishing assets, repurposing campaigns, or brand/channel strategy.",
-        "Then choose Project Type: Video Script, Podcast Episode, Article, Short Book, or Long Form Book.",
+        "Choose Content Mode first so the AI knows whether you are making local SEO, client education, quote campaigns, referral/review prompts, social posts, or renewal/cross-sell content.",
+        "Then choose Project Type: Video Script, Podcast Episode, or Article.",
         "Generated Ideas holds new ideas for the active channel.",
         "Saved Ideas is your shortlist.",
         "Idea Queue includes saved, in-progress, and drafted ideas.",
@@ -1478,26 +1443,24 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       title: "Campaign Projects",
       items: [
         "Start a project from an idea or create one through Monthly Auto.",
-        "Project rows show the output type, such as Video script, Podcast episode, Article, Short book, or Long form book.",
+        "Project rows show the output type, such as Video script, Podcast episode, or Article.",
         "Delete removes the project and drafts, but the original idea can return to Saved Ideas if no other project uses it.",
         "Produced means finished but not live yet; it can still be scheduled. Published means live/final. Produced, Published, and Archived also update the linked idea for duplicate prevention.",
-        "Download Content Pack from a finished project when you need a complete handoff bundle."
+        "Download Content Pack from a finished project when you need a complete production bundle."
       ]
     },
     {
       title: "Content Lab",
       items: [
         "Research collects source notes and fact-checking targets.",
-        "Video projects create teleprompter scripts, podcast projects create spoken episode scripts, article projects create publication-ready prose, and book projects create chaptered manuscripts.",
-        "Intro/Outro, Podcast Intro/Outro, Article Lead/Closing CTA, and Book Preface/Author Note are separate passes so sponsor copy stays controlled for supported formats.",
+        "Video projects create teleprompter scripts, podcast projects create spoken episode scripts, and article projects create publication-ready prose.",
+        "Intro/Outro, Podcast Intro/Outro, and Article Lead/Closing CTA are separate passes so calls to action stay controlled.",
         "Fully Auto runs the required sequence in order; manual buttons let you rerun individual passes.",
         "Quality Scorecard appears after a Quality Gate or finished output exists.",
-        "Research Confidence / Claim Ledger summarizes confirmed facts, verification targets, risky claims, and do-not-say-as-fact notes.",
-        "Generate Sponsor Blurb reads an offer URL, creates video, podcast, or article-specific sponsor copy, and saves the Sponsor Link for publishing descriptions.",
-        "Short Book and Long Form Book projects can optionally Plan Illustrations, review a style bible and chapter prompts, then Generate Images with Runware.",
+        "Compliance Check summarizes confirmed facts, verification targets, risky claims, and do-not-say-as-fact notes.",
         "Teleprompter Polish creates the clean final video script. If the ending guard keeps blocking a result, Force Save Final reruns and saves the pass anyway.",
         "Copy copies the current output to your clipboard; Download saves the current output as a local text file.",
-        "Content Pack downloads the complete output, scorecard, claim ledger, publishing pack, video thumbnails or book illustrations when available, and sponsor details for supported formats."
+        "Content Pack downloads the complete output, scorecard, compliance notes, publishing pack, and video thumbnails when available."
       ]
     },
     {
@@ -1506,20 +1469,18 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Video Publishing Pack creates three titles, YouTube metadata, tags, pinned comment, and three thumbnail prompts.",
         "Podcast Show Notes Pack creates three episode titles, show notes, tags, and a listener prompt.",
         "Article SEO Pack creates three headlines, SEO description, tags, and a reader prompt.",
-        "Book Launch Pack creates three book titles/subtitles, a back-cover description, keywords, and a reader prompt for Short Book and Long Form Book projects.",
         "When DataForSEO is configured, Publishing Pack can favor stronger keyword phrases in titles, descriptions, tags, and hashtags.",
         "Description follows this order: main keyword, CTA link, description part one, timestamps, description part two, CTA with link, and 3-5 hashtags.",
         "Video timestamps are rebuilt around the actual saved script duration when the generated timestamps do not fit.",
         "Use Regenerate Description in the video Description block when YouTube metadata needs a fresh pass.",
         "Thumbnail generation creates three 16:9 Runware images from the pack prompts, using Ideogram 4 by default.",
-        "Book illustration generation is optional and uses non-FLUX Runware models for chapter openers, key scenes, or fuller illustrated editions.",
         "The Thumbnail Style Guide in Settings controls the shared video thumbnail look, headline treatment, arrows, colors, and clickability."
       ]
     },
     {
-      title: "Calendar, Published, Media, Export Vault",
+      title: "Campaign Calendar, Published, Media, Export Vault",
       items: [
-        "Publishing Calendar schedules Monday/Thursday one-off content and episodic Mon-Fri video series weeks.",
+        "Campaign Calendar schedules insurance videos, articles, podcast episodes, GBP posts, and seasonal campaigns.",
         "Production Status separates Produced work that is finished but still schedulable from Published work that is already live/final.",
         "Media shows project assets and thumbnails.",
         "Exports downloads Markdown or plain text content for downstream production.",
@@ -1529,21 +1490,12 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
   ],
   "Advanced Protocols": [
     {
-      title: "Channel Isolation Protocol",
+      title: "Growth Lane Isolation Protocol",
       items: [
-        "Switch to the correct channel before generating ideas or starting projects.",
-        "Do not reuse one project across channels; create separate projects so outputs, thumbnails, and calendar slots remain partitioned.",
-        "Save a Channel Kit for each channel so its audience, sponsor rules, thumbnail style, and publishing rhythm are explicit.",
-        "Use channel-specific thumbnail style guides when the brands should look different."
-      ]
-    },
-    {
-      title: "Buyer Demo Protocol",
-      items: [
-        "Start on Dashboard and click Load Demo Workspace before a sales call.",
-        "Show Buyer Readiness first so the buyer sees the system is packaged, not just a generator.",
-        "Open a demo project in Content Lab and show the final output, Scorecard, Claim Ledger, Publishing Pack, thumbnails when available, and Content Pack.",
-        "Finish with Saved Channel Strategy to show how the active channel's audience, rhythm, and packaging rules are controlled."
+        "Switch to the correct growth lane before generating ideas or starting projects.",
+        "Do not reuse one project across lanes; create separate projects so outputs, thumbnails, and calendar slots remain partitioned.",
+        "Save a Growth Pack for each lane so its audience, CTA rules, thumbnail style, and publishing rhythm are explicit.",
+        "Use lane-specific thumbnail style guides when carrier/product campaigns should look different."
       ]
     },
     {
@@ -1560,9 +1512,9 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       title: "Idea Quality Protocol",
       items: [
         "Generate broad batches first, then narrow with Category and Tone once patterns emerge.",
-        "Prefer ideas with high curiosity, originality, escalation, and length potential.",
-        "Use Depth as an early warning. Low-depth ideas can still be useful, but they are better for articles, podcasts, shorter videos, or short books.",
-        "Reject ideas that lack a central unanswered question, timeline, reveal path, or enough source material."
+        "Prefer ideas with urgent insurance intent, local relevance, clear CTA fit, compliance-safe framing, and enough source depth.",
+        "Use Depth as an early warning. Low-depth ideas can still be useful, but they are better for short posts, GBP updates, or simple FAQ pages.",
+        "Reject ideas that lack a real prospect question, seasonal trigger, coverage gap, quote intent, or enough source material."
       ]
     },
     {
@@ -1577,22 +1529,11 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       title: "Script Quality Protocol",
       items: [
         "Run Hook Lab before drafting so the best opening angle is chosen automatically.",
-        "Use Critique and Fact Check before Rewrite for high-risk or sensitive stories.",
+        "Use Critique and Fact Check before Rewrite for high-risk coverage, carrier, claims, legal, or savings language.",
         "Use Quality Gate before Final so the scorecard can identify hook, retention, clarity, emotional payoff, factual safety, and teleprompter risk.",
         "Final should remove production markers and produce clean formatting for the selected project type.",
         "If Final is rejected as incomplete, first rerun it normally. Use Force Save Final only when repeated attempts fail and you are prepared to review the saved output yourself.",
-        "Check the Scorecard and Claim Ledger before exporting a Content Pack."
-      ]
-    },
-    {
-      title: "Sponsor Placement Protocol",
-      items: [
-        "Use sponsor copy only for Video Script, Podcast Episode, and Article projects. Short Book and Long Form Book projects should not contain sponsors.",
-        "Put sponsor copy in Sponsor Blurb before running Intro, Outro, Lead, Closing CTA, or Fully Auto, or use Generate Sponsor Blurb from an offer URL.",
-        "Put the destination URL in Sponsor Link so supported Publishing Pack descriptions and Content Pack exports include the exact link.",
-        "The assembled final output should contain the sponsor once near the beginning and once at the end for supported formats.",
-        "Draft, Rewrite, and Final body passes should not contain sponsor, ad, promo, or link language.",
-        "If old body drafts contain sponsor text, final output assembly and exports clean the body during assembly."
+        "Check the Scorecard and Compliance Check before exporting a Content Pack."
       ]
     },
     {
@@ -1600,33 +1541,19 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       items: [
         "Use Monthly Auto only when the channel has at least seven unused or saved ideas.",
         "Schedule one-offs after the final or publishing pack is ready.",
-        "Download a Content Pack before sending content to production or a buyer.",
+        "Download a Content Pack before sending content to production.",
         "Mark Published only after the content is live; Produced is for finished content waiting to publish."
       ]
     },
     {
       title: "Content Mode Protocol",
       items: [
-        "Content Mode tells the AI what kind of business or creative work this is: Story / Documentary, Expert / Authority, Local Lead Gen, Sales / Offer, Education / Course, Book / Publishing, Repurpose, or Brand / Strategy.",
-        "Project Type tells the AI what format to produce: Video Script, Podcast Episode, Article, Short Book, or Long Form Book.",
-        "Use Sales / Offer for sales letters, Gumroad pages, offer pages, email promos, webinar scripts, VSLs, proposals, and follow-up sequences.",
-        "Use Education / Course for courses, modules, lesson plans, worksheets, quizzes, training scripts, and paid community content.",
-        "Use Repurpose when one source needs to become emails, shorts, posts, blog articles, podcast notes, newsletters, or platform-specific campaigns.",
-        "Use Brand / Strategy when the output should define niche, positioning, audience, content pillars, visual identity, keywords, and calendar direction.",
-        "Use Short Book when the topic can support a compact chaptered manuscript, and Long Form Book only for high-depth topics with enough substance for a full manuscript.",
-        "For Short Book and Long Form Book, use Book Illustrations only when art improves reader value; plan prompts first and keep image count controlled."
-      ]
-    },
-    {
-      title: "Book Illustration Protocol",
-      items: [
-        "Start with Plan Illustrations before spending image credits.",
-        "Use Chapter Openers as the default because it adds polish without overproducing the book.",
-        "Use Key Scenes when only a few maps, places, objects, or moments need visual support.",
-        "Use Full Illustrated only for buyer demos or books where artwork is part of the offer.",
-        "Avoid FLUX for book art; use a lower-cost non-FLUX Runware model ID or the saved Runware model if appropriate.",
-        "Review the Style Bible for consistency before generating images.",
-        "Book art should not contain text, labels, logos, watermarks, gore, fake evidence, or YouTube thumbnail styling."
+        "Content Mode tells the AI what kind of insurance growth asset this is: Local SEO, Client Education, Quote Campaign, Referral / Review, Social / GBP Post, or Renewal / Cross-Sell.",
+        "Project Type tells the AI what format to produce: Video Script, Podcast Episode, or Article.",
+        "Use Quote Campaign for quote pages, email promos, renewal outreach, call scripts, proposals, and follow-up sequences.",
+        "Use Referral / Review for client prompts, review requests, referral asks, testimonial workflows, and relationship nurturing.",
+        "Use Social / GBP Post when one insurance topic needs to become GBP updates, social posts, emails, short scripts, or platform-specific campaigns.",
+        "Use Renewal / Cross-Sell when the output should identify coverage gaps, companion policies, annual review prompts, and retention opportunities."
       ]
     },
     {
@@ -1640,7 +1567,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
     {
       title: "Export Vault Protocol",
       items: [
-        "Use Content Pack for the clean current handoff bundle.",
+        "Use Content Pack for the clean current production bundle.",
         "Use Markdown or plain text export for a lightweight content-only handoff.",
         "Use Export Vault History when you need to recover an older draft, earlier publishing pack, or previous workflow output.",
         "Avoid copying raw Draft, Rewrite, or Final when an assembled final output exists, because it includes the opening, cleaned body, and closing."
@@ -1653,8 +1580,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "If a pass stalls, refresh and check whether the previous output was saved before rerunning.",
         "If generated thumbnails fail, confirm the Runware key and model, then rerun Create Thumbnails.",
         "If Teleprompter Polish keeps failing with an incomplete-output warning, use Force Save Final from the Final step, then inspect the saved script before creating the Publishing Pack.",
-        "If model choices appear to revert, return to Settings > Model Routing, choose the models again, and click Save Model Routing.",
-        "If the demo channel is missing sample data, click Load Demo Workspace again; the app will reuse or rebuild the demo channel."
+        "If model choices appear to revert, return to Settings > Model Routing, choose the models again, and click Save Model Routing."
       ]
     }
   ]
@@ -1667,7 +1593,7 @@ const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
   },
   "idea-factory": {
     title: "Growth Idea Factory",
-    subtitle: "Generate, score, save, triage, and protect against duplicate stories."
+    subtitle: "Generate, score, save, triage, and protect against duplicate insurance growth ideas."
   },
   projects: {
     title: "Campaign Projects",
@@ -1675,11 +1601,11 @@ const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
   },
   "script-lab": {
     title: "Content Lab",
-    subtitle: "Run guided workflows for video scripts, podcast episodes, articles, and books."
+    subtitle: "Run guided workflows for video scripts, podcast episodes, and articles."
   },
   calendar: {
-    title: "Publishing Calendar",
-    subtitle: "Queue Monday, Thursday, and episodic series publishing dates."
+    title: "Campaign Calendar",
+    subtitle: "Queue local SEO pages, GBP posts, emails, renewal pushes, and video publishing dates."
   },
   published: {
     title: "Production Status",
@@ -1687,7 +1613,7 @@ const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
   },
   media: {
     title: "Media",
-    subtitle: "Prepare source, visual, and production asset needs for each story."
+    subtitle: "Prepare source, visual, and production asset needs for each campaign."
   },
   exports: {
     title: "Exports",
@@ -2063,7 +1989,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       .map((niche, index) => ({
         title: niche.name,
         description: `${niche.title} — ${niche.description}`,
-        whyHotThisMonth: `${niche.monetizationTier}. Prioritized by advertiser safety, CPM potential, repeatable topics, and likely watch time.`,
+        whyHotThisMonth: `${agencyRevenueTierLabel(niche.monetizationTier)}. Prioritized by compliance fit, local demand, repeatable topics, and likely prospect intent.`,
         bestViewerPromise: niche.viewerPromise,
         monetizationRank: index + 1,
         monetizationScore: niche.monetizationScore,
@@ -2194,7 +2120,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       const payload = await fetchJson<{ workspace: WorkspaceSummary }>("/api/workspaces", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newWorkspaceName || "New Buyer Workspace" })
+        body: JSON.stringify({ name: newWorkspaceName || "New Agency Workspace" })
       });
       setNewWorkspaceName("");
       setSelectedChannelId("");
@@ -2373,7 +2299,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       }
       await loadAppData(payload.channel.id);
       setActiveSection("dashboard");
-      setMessage(`Demo workspace loaded: ${payload.channel.name}.`);
+      setMessage(`Sample workspace loaded: ${payload.channel.name}.`);
     });
   }
 
@@ -2393,7 +2319,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         })
       });
       setChannels((current) => current.map((channel) => (channel.id === payload.channel.id ? payload.channel : channel)));
-      setMessage(`Saved Channel Strategy updated for "${payload.channel.name}".`);
+      setMessage(`Saved Growth Strategy updated for "${payload.channel.name}".`);
     });
   }
 
@@ -2424,7 +2350,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
 
   async function runChannelIdeaMachine(options: { surpriseMe?: boolean; seedOverride?: string } = {}) {
     if (!currentChannel) {
-      setMessage("Create or select a channel before running the Channel Idea Machine.");
+      setMessage("Create or select a growth lane before running the Growth Pack Machine.");
       return;
     }
 
@@ -2654,17 +2580,17 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
 
   async function generateSponsorBlurb(project = selectedProject) {
     if (!project) {
-      setMessage("Create or select a project before generating a sponsor blurb.");
+      setMessage("Create or select a project before generating CTA copy.");
       return;
     }
     if (!supportsSponsorBlurb(project.format)) {
-      setMessage("Sponsor blurbs are disabled for short and long form book projects.");
+      setMessage("CTA helper copy is disabled for this project type.");
       return;
     }
 
     const url = (sponsorOfferUrlByProjectId[project.id] ?? sponsorLinkByProjectId[project.id] ?? project.sponsorLink ?? "").trim();
     if (!url) {
-      setMessage("Enter a sponsor offer URL before generating the sponsor blurb.");
+      setMessage("Enter a quote or service URL before generating CTA copy.");
       return;
     }
 
@@ -2678,7 +2604,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       updateSponsorBlurb(normalizeSponsorBlurbForFormat(payload.sponsorBlurb, project.format), project.id);
       updateSponsorLink(payload.sponsorLink, project.id);
       updateSponsorOfferUrl(payload.sponsorLink, project.id);
-      setMessage(`Sponsor blurb generated and saved. Model: ${payload.modelUsed}.`);
+      setMessage(`CTA copy generated and saved. Model: ${payload.modelUsed}.`);
     }, { errorKey: "sponsor-blurb" });
   }
 
@@ -3502,7 +3428,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
     if (!supportsBookIllustrations(project)) {
-      setMessage("Book illustrations are only available for Short Book and Long Form Book projects.");
+      setMessage("Illustration generation is not available for this PolicyForge project type.");
       return;
     }
 
@@ -3523,7 +3449,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
     if (!supportsBookIllustrations(project)) {
-      setMessage("Book illustrations are only available for Short Book and Long Form Book projects.");
+      setMessage("Illustration generation is not available for this PolicyForge project type.");
       return;
     }
     if (!settings.hasRunwareApiKey) {
@@ -3999,7 +3925,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             <div className="status-pill">
               <span>API Key</span>
               <span className={cn("status-dot", !hasTextGenerationProvider(settings) && "muted")} />
-              <strong>{hasTextGenerationProvider(settings) ? "Configured" : "Demo fallback"}</strong>
+              <strong>{hasTextGenerationProvider(settings) ? "Configured" : "Provider needed"}</strong>
             </div>
             <div className="mode-toggle" aria-label="Experience mode">
               {(["GUIDED", "POWER"] as const).map((mode) => (
@@ -4055,7 +3981,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
 
   function renderDashboard() {
     const boardColumns = pipelineBoard(projects, ideas, publishingSlots);
-    const readiness = buyerReadinessItems(projects, settings, currentChannel, channelBlueprintDraft);
+    const readiness = agencyReadinessItems(projects, settings, currentChannel, channelBlueprintDraft);
     const commandItems = commandCenterItems({ ideas, projects, slots: publishingSlots, analytics: youtubeAnalytics, blueprint: channelBlueprintDraft })
       .map((item) => ({ ...item, action: () => goToSection(item.section, item.tab) }));
     const qualityQueue = qualityGateQueue(projects).slice(0, 5);
@@ -4079,7 +4005,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           <Metric label="In progress" value={counts.inProgress} />
           <Metric label="Completed outputs" value={counts.completedScripts} />
           <Metric label="Scheduled content" value={counts.scheduled} />
-          <Metric label="Published stories" value={counts.published} />
+          <Metric label="Published content" value={counts.published} />
         </div>
         <div className="action-strip">
           <button className="primary-button fit" type="button" onClick={() => goToSection("idea-factory", "Generated Ideas")}>
@@ -4092,14 +4018,10 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           </button>
           <button className="secondary-button" type="button" onClick={() => goToSection("calendar")}>
             <CalendarDays size={16} />
-            Publishing Calendar
-          </button>
-          <button className="secondary-button" type="button" onClick={() => void seedDemoWorkspace()} disabled={busy === "demo-seed"}>
-            {busy === "demo-seed" ? <Loader2 size={16} className="spin" /> : <Play size={16} />}
-            Load Demo Workspace
+            Campaign Calendar
           </button>
         </div>
-        <Panel title="Creator Cockpit">
+        <Panel title="Agency Growth Cockpit">
           <div className="creator-cockpit">
             {cockpitItems.map((item) => (
               <button className={cn("creator-cockpit-card", item.level)} type="button" key={item.label} onClick={() => goToSection(item.section, item.tab)}>
@@ -4113,14 +4035,14 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         <ClientJobQueue jobs={clientJobs} />
         <div className="money-path-panel">
           <div>
-            <span className="eyebrow">First-Run Money Path</span>
-            <h2>{moneyPathReady ? "Channel strategy is monetization-ready" : "Finish the money path before scaling production"}</h2>
-            <p>{moneyPathReady ? `${channelBlueprintDraft.moneyGoal} Production target: ${channelBlueprintDraft.weeklyVideoTarget || 2} videos per week.` : "Save a revenue goal, risk lane, output pace, CTA, and offer so every idea, script, pack, and warning points toward the same business outcome."}</p>
+            <span className="eyebrow">First-Run Revenue Path</span>
+            <h2>{moneyPathReady ? "Growth strategy is revenue-ready" : "Finish the revenue path before scaling production"}</h2>
+            <p>{moneyPathReady ? `${channelBlueprintDraft.moneyGoal} Production target: ${channelBlueprintDraft.weeklyVideoTarget || 2} content pieces per week.` : "Save a revenue goal, compliance lane, output pace, CTA, and service focus so every idea, script, pack, and warning points toward new business."}</p>
           </div>
           <div className="money-path-actions">
             <button className="primary-button fit" type="button" onClick={() => goToSection("settings")}>
               <Settings size={16} />
-              Set Money Path
+              Set Revenue Path
             </button>
             <button className="secondary-button compact" type="button" onClick={() => goToSection("idea-factory")}>
               <Lightbulb size={15} />
@@ -4129,7 +4051,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           </div>
         </div>
         <div className="dashboard-grid three">
-          <Panel title="Channel Profit Score">
+          <Panel title="Agency Revenue Score">
             <div className="money-score-card">
               <strong>{profitScore.score}</strong>
               <span>{profitScore.label}</span>
@@ -4178,7 +4100,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               ))}
             </div>
           </Panel>
-          <Panel title="Monetization Strategy Layer">
+          <Panel title="Agency Revenue Strategy">
             <div className="money-strategy-list">
               {monetizationItems.map((item) => (
                 <div className="money-strategy-item" key={item.label}>
@@ -4189,7 +4111,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             </div>
           </Panel>
         </div>
-        <Panel title="Money-Focused Analytics">
+        <Panel title="Lead-Focused Analytics">
           <div className="money-analytics-grid">
             {moneyAnalytics.map((item) => (
               <div className="money-analytics-card" key={item.label}>
@@ -4200,7 +4122,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             ))}
           </div>
         </Panel>
-        <Panel title="Channel Command Center">
+        <Panel title="Agency Command Center">
           <div className="command-center-grid">
             {commandItems.map((item) => (
               <button
@@ -4301,11 +4223,11 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           <Panel title="Guided Create Flow">
             <div className="guided-create-flow">
               {[
-                { label: "Choose Mode", detail: "Pick video, podcast, article, book, sales, education, authority, local lead gen, strategy, or repurpose.", done: true, action: () => goToSection("idea-factory") },
+                { label: "Choose Mode", detail: "Pick video, podcast, article, quote campaign, client education, local SEO, renewal, review, or social/GBP content.", done: true, action: () => goToSection("idea-factory") },
                 { label: "Generate Ideas", detail: `${counts.unused} unused ideas available in this channel.`, done: counts.unused > 0, action: () => goToSection("idea-factory", "Generated Ideas") },
                 { label: "Build Project", detail: `${counts.projects} project${counts.projects === 1 ? "" : "s"} created.`, done: counts.projects > 0, action: () => goToSection("projects") },
                 { label: "Run Workflow", detail: `${counts.completedScripts} finished output${counts.completedScripts === 1 ? "" : "s"} ready.`, done: counts.completedScripts > 0, action: () => goToSection("script-lab") },
-                { label: "Package Assets", detail: "Create publishing packs, thumbnails, article images, or book exports.", done: projects.some((project) => latestDraftForPass(project, "PUBLISHING_PACK")), action: () => goToSection("media") },
+                { label: "Package Assets", detail: "Create publishing packs, thumbnails, article images, exports, and calls to action.", done: projects.some((project) => latestDraftForPass(project, "PUBLISHING_PACK")), action: () => goToSection("media") },
                 { label: "Schedule / Publish", detail: `${counts.scheduled} scheduled item${counts.scheduled === 1 ? "" : "s"} waiting.`, done: counts.scheduled > 0 || counts.published > 0, action: () => goToSection("calendar") }
               ].map((step, index) => (
                 <button className={cn("guided-step", step.done && "done")} type="button" key={step.label} onClick={step.action}>
@@ -4316,28 +4238,6 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   </div>
                 </button>
               ))}
-            </div>
-          </Panel>
-          <Panel title="Buyer Demo Mode">
-            <div className="buyer-demo-panel">
-              <p>Use this when showing the system to a buyer. It loads sample data, then walks through the most persuasive product moments.</p>
-              <div className="inline-actions">
-                <button className="primary-button fit" type="button" onClick={() => void seedDemoWorkspace()} disabled={busy === "demo-seed"}>
-                  {busy === "demo-seed" ? <Loader2 size={15} className="spin" /> : <Play size={15} />}
-                  Load Demo
-                </button>
-                <button className="secondary-button compact" type="button" onClick={() => goToSection("idea-factory")}>Ideas</button>
-                <button className="secondary-button compact" type="button" onClick={() => goToSection("script-lab")}>Workflow</button>
-                <button className="secondary-button compact" type="button" onClick={() => goToSection("calendar")}>Calendar</button>
-              </div>
-              <div className="demo-checks">
-                {readiness.slice(0, 4).map((item) => (
-                  <span className={cn(item.ready && "ready")} key={item.label}>
-                    {item.ready ? <CheckCircle2 size={13} /> : <CircleSlash size={13} />}
-                    {item.label}
-                  </span>
-                ))}
-              </div>
             </div>
           </Panel>
         </div>
@@ -4375,7 +4275,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           </div>
         </Panel>
         <div className="dashboard-grid two">
-          <Panel title="Buyer Readiness">
+          <Panel title="Agency Growth Readiness">
             <div className="readiness-list">
               {readiness.map((item) => (
                 <div className={cn("readiness-row", item.ready && "ready")} key={item.label}>
@@ -4388,7 +4288,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               ))}
             </div>
           </Panel>
-          <Panel title="Saved Channel Strategy">
+          <Panel title="Saved Growth Strategy">
             <div className="blueprint-snapshot">
               <div>
                 <strong>Audience</strong>
@@ -4525,87 +4425,82 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 })}
               </div>
             </Field>
-            {contentMode === "STORY_DOCUMENTARY" ? (
-              <div className="forge-lane-panel">
-                <div>
-                  <span>Active Insurance Lane</span>
-                  <strong>{currentForgeNiche?.name || currentChannel?.name || niche}</strong>
-                </div>
-                <p>{currentForgeNiche?.description || "Ideas will be generated inside the selected channel."}</p>
-                {currentForgeNiche ? (
-                  <div className="monetization-rank-strip forge-active-score">
-                    <strong>{currentForgeNiche.monetizationScore}/10</strong>
-                    <span>{currentForgeNiche.monetizationTier}</span>
-                    {currentForgeNicheRank ? <small>Rank #{currentForgeNicheRank}</small> : null}
-                  </div>
-                ) : null}
-                {currentForgeNiche ? (
-                  <div className="keyword-cloud compact-cloud">
-                    {currentForgeNiche.keywords.slice(0, 4).map((keyword) => (
-                      <span className="keyword-pill" key={keyword}>
-                        <strong>{keyword}</strong>
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-                <small>Switch the channel in the top bar to generate inside a different insurance lane.</small>
+            <div className="forge-lane-panel">
+              <div>
+                <span>Active Insurance Lane</span>
+                <strong>{currentForgeNiche?.name || currentChannel?.name || niche}</strong>
               </div>
-            ) : (
-              <>
-                <Field label={modeCopy.nicheLabel}>
-                  <input
-                    value={niche}
-                    onChange={(event) => setNiche(event.target.value)}
-                    placeholder={modeCopy.nichePlaceholder}
-                  />
-                </Field>
-                <div className="business-context-grid">
-                  <Field label={modeCopy.audienceLabel}>
-                    <input
-                      value={businessAudience}
-                      onChange={(event) => setBusinessAudience(event.target.value)}
-                      placeholder={modeCopy.audiencePlaceholder}
-                    />
-                  </Field>
-                  <Field label={modeCopy.locationLabel}>
-                    <input
-                      value={businessLocation}
-                      onChange={(event) => setBusinessLocation(event.target.value)}
-                      placeholder={modeCopy.locationPlaceholder}
-                    />
-                  </Field>
-                  <Field label={modeCopy.offerLabel}>
-                    <input
-                      value={businessOffer}
-                      onChange={(event) => setBusinessOffer(event.target.value)}
-                      placeholder={modeCopy.offerPlaceholder}
-                    />
-                  </Field>
-                  <Field label={modeCopy.goalLabel}>
-                    <select value={businessGoal} onChange={(event) => setBusinessGoal(event.target.value)}>
-                      {goalOptions.map((item) => (
-                        <option key={item}>{item}</option>
-                      ))}
-                    </select>
-                  </Field>
-                  <Field label={modeCopy.ctaLabel}>
-                    <input
-                      value={businessCta}
-                      onChange={(event) => setBusinessCta(event.target.value)}
-                      placeholder={modeCopy.ctaPlaceholder}
-                    />
-                  </Field>
-                  <Field label={modeCopy.boundariesLabel}>
-                    <textarea
-                      className="short-textarea"
-                      value={businessCompliance}
-                      onChange={(event) => setBusinessCompliance(event.target.value)}
-                      placeholder={modeCopy.boundariesPlaceholder}
-                    />
-                  </Field>
+              <p>{currentForgeNiche?.description || "Ideas will be generated inside the selected growth lane."}</p>
+              {currentForgeNiche ? (
+                <div className="monetization-rank-strip forge-active-score">
+                  <strong>{currentForgeNiche.monetizationScore}/10</strong>
+                  <span>{agencyRevenueTierLabel(currentForgeNiche.monetizationTier)}</span>
+                  {currentForgeNicheRank ? <small>Rank #{currentForgeNicheRank}</small> : null}
                 </div>
-              </>
-            )}
+              ) : null}
+              {currentForgeNiche ? (
+                <div className="keyword-cloud compact-cloud">
+                  {currentForgeNiche.keywords.slice(0, 4).map((keyword) => (
+                    <span className="keyword-pill" key={keyword}>
+                      <strong>{keyword}</strong>
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <small>Switch the growth lane in the top bar to generate inside a different Texas insurance pack.</small>
+            </div>
+            <Field label={modeCopy.nicheLabel}>
+              <input
+                value={niche}
+                onChange={(event) => setNiche(event.target.value)}
+                placeholder={modeCopy.nichePlaceholder}
+              />
+            </Field>
+            <div className="business-context-grid">
+              <Field label={modeCopy.audienceLabel}>
+                <input
+                  value={businessAudience}
+                  onChange={(event) => setBusinessAudience(event.target.value)}
+                  placeholder={modeCopy.audiencePlaceholder}
+                />
+              </Field>
+              <Field label={modeCopy.locationLabel}>
+                <input
+                  value={businessLocation}
+                  onChange={(event) => setBusinessLocation(event.target.value)}
+                  placeholder={modeCopy.locationPlaceholder}
+                />
+              </Field>
+              <Field label={modeCopy.offerLabel}>
+                <input
+                  value={businessOffer}
+                  onChange={(event) => setBusinessOffer(event.target.value)}
+                  placeholder={modeCopy.offerPlaceholder}
+                />
+              </Field>
+              <Field label={modeCopy.goalLabel}>
+                <select value={businessGoal} onChange={(event) => setBusinessGoal(event.target.value)}>
+                  {goalOptions.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label={modeCopy.ctaLabel}>
+                <input
+                  value={businessCta}
+                  onChange={(event) => setBusinessCta(event.target.value)}
+                  placeholder={modeCopy.ctaPlaceholder}
+                />
+              </Field>
+              <Field label={modeCopy.boundariesLabel}>
+                <textarea
+                  className="short-textarea"
+                  value={businessCompliance}
+                  onChange={(event) => setBusinessCompliance(event.target.value)}
+                  placeholder={modeCopy.boundariesPlaceholder}
+                />
+              </Field>
+            </div>
             <Field label="Tone">
               <select value={tone} onChange={(event) => setTone(event.target.value)}>
                 {toneOptions.map((item) => (
@@ -4711,7 +4606,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         </section>
 
         <section className="center-stack">
-          {contentMode === "STORY_DOCUMENTARY" ? renderHotNiches({ compact: true, placement: "idea-factory" }) : null}
+          {renderHotNiches({ compact: true, placement: "idea-factory" })}
           <div className="tabs">
             {tabs.map(({ label, count, icon: Icon }) => (
               <button
@@ -4859,17 +4754,6 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                         >
                           {busy === `project-${idea.id}-${projectFormat}` ? <Loader2 size={14} className="spin" /> : <Play size={14} fill="currentColor" />}
                           <span>Build</span>
-                        </button>
-                        <button
-                          className="row-action"
-                          type="button"
-                          onClick={() => void startProject(idea, "EPISODIC_SERIES")}
-                          disabled={busy === `project-${idea.id}-EPISODIC_SERIES`}
-                          aria-label="Create episode series from this idea"
-                          title="Create a five-episode video series from this idea"
-                        >
-                          {busy === `project-${idea.id}-EPISODIC_SERIES` ? <Loader2 size={14} className="spin" /> : <CalendarDays size={14} />}
-                          <span>Episodes</span>
                         </button>
                         <button
                           className="row-action used-action"
@@ -5226,7 +5110,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         id: "intro",
         number: 1,
         title: isArticleProject ? "Lead" : isPodcastProject ? "Podcast Intro" : isBookProject ? "Preface" : "Intro",
-        description: isArticleProject ? "One strong opening paragraph, with optional sponsor mention." : isPodcastProject ? "One human opening paragraph for the listener, with optional sponsor mention." : isBookProject ? "One concise reader-facing preface." : "One human opening paragraph, with optional sponsor mention.",
+        description: isArticleProject ? "One strong opening paragraph with a clear agency CTA path." : isPodcastProject ? "One human opening paragraph for the listener with a clear agency CTA path." : isBookProject ? "One concise reader-facing preface." : "One human opening paragraph with a clear agency CTA path.",
         complete: hasPass("INTRO"),
         enabled: Boolean(selectedProject),
         busyKey: "pass-INTRO",
@@ -5677,73 +5561,6 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   />
                   <p className="field-hint">Use Source URLs for source ingestion. Use Source Material for pasted notes, transcripts, facts, or constraints.</p>
                 </div>
-                {selectedProjectSupportsSponsor ? (
-                  <>
-                    <div className="field sponsor-generator power-only">
-                      <div className="field-action-row">
-                        <span>Generate Sponsor Blurb</span>
-                        <small>Paste an offer URL</small>
-                      </div>
-                      <div className="inline-field-action">
-                        <input
-                          value={sponsorOfferUrl}
-                          onChange={(event) => updateSponsorOfferUrl(event.target.value)}
-                          placeholder="https://example.com/offer"
-                        />
-                        <button
-                          className="secondary-button compact"
-                          type="button"
-                          onClick={() => void generateSponsorBlurb()}
-                          disabled={Boolean(busy) || !selectedProject || !sponsorOfferUrl.trim()}
-                        >
-                          {busy === `sponsor-blurb-${selectedProject.id}` ? <Loader2 size={15} className="spin" /> : <Zap size={15} />}
-                          Generate
-                        </button>
-                      </div>
-                      <p className="field-hint">PolicyForge LAB writes sponsor copy for this project type and saves the link for the publishing pack.</p>
-                      {workflowErrors["sponsor-blurb"] ? (
-                        <div className="workflow-step-error compact-error">
-                          <CircleSlash size={15} />
-                          <span>{workflowErrors["sponsor-blurb"]}</span>
-                        </div>
-                      ) : null}
-                    </div>
-                    <div className="field">
-                      <div className="field-action-row">
-                        <span>Sponsor Blurb</span>
-                        <small>{sponsorBlurb.trim() ? "Appears once near the start and once at the end" : "Optional"}</small>
-                      </div>
-                      <textarea
-                        className="short-textarea"
-                        value={sponsorBlurb}
-                        onChange={(event) => updateSponsorBlurb(event.target.value)}
-                        placeholder="Paste sponsor copy, offer details, and description-link wording. Leave blank when there is no sponsor."
-                      />
-                    </div>
-                    <div className="field">
-                      <div className="field-action-row">
-                        <span>Sponsor Link</span>
-                        <small>{sponsorLink.trim() ? "Added to publishing pack" : "Optional"}</small>
-                      </div>
-                      <input
-                        value={sponsorLink}
-                        onChange={(event) => {
-                          updateSponsorLink(event.target.value);
-                          if (!sponsorOfferUrlByProjectId[selectedProject.id]) {
-                            updateSponsorOfferUrl(event.target.value);
-                          }
-                        }}
-                        placeholder="https://example.com/offer"
-                      />
-                      <p className="field-hint">This exact link is added to supported publishing packs and content packs.</p>
-                    </div>
-                  </>
-                ) : (
-                  <div className="inline-info">
-                    <BookOpen size={16} />
-                    <span>Book projects skip sponsor blurbs so the manuscript stays clean.</span>
-                  </div>
-                )}
                 <div className="project-input-actions">
                   <button
                     className="secondary-button compact"
@@ -5880,7 +5697,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 ) : null}
                 <div className="workflow-header">
                   <div>
-                    <h3>{isArticleProject ? "Article Workflow" : isPodcastProject ? "Podcast Workflow" : isLongBookProject ? "Long Form Book Workflow" : isShortBookProject ? "Short Book Workflow" : "Script Workflow"}</h3>
+                    <h3>{isArticleProject ? "Article Workflow" : isPodcastProject ? "Podcast Workflow" : "Script Workflow"}</h3>
                     <p>Complete each step to unlock the next pass.</p>
                   </div>
                   <div className="workflow-header-actions">
@@ -6219,7 +6036,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 {claimLedger ? (
                   <div className="claim-ledger-panel">
                     <div className="claim-ledger-head">
-                      <strong>Research Confidence / Claim Ledger</strong>
+                      <strong>Compliance Check / Coverage Claim Review</strong>
                       <span>{claimLedger.source}</span>
                     </div>
                     <div className="claim-ledger-grid">
@@ -7261,16 +7078,16 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         <div className="stats-grid">
           <Metric label="7-day views" value={formatCompact(summary?.currentViews ?? 0)} />
           <Metric label="7-day watch hours" value={formatOneDecimal(summary?.currentWatchHours ?? 0)} />
-          <Metric label="Net subscribers" value={formatSigned(summary?.currentSubscribersNet ?? 0)} />
+          <Metric label="Audience growth" value={formatSigned(summary?.currentSubscribersNet ?? 0)} />
           <Metric label="Avg retention" value={`${formatOneDecimal(summary?.averageRetention ?? 0)}%`} />
         </div>
         <div className="stats-grid">
           <Metric label="12-month watch hours" value={formatOneDecimal(summary?.annualWatchHours ?? 0)} />
-          <Metric label="To 4K hours" value={formatOneDecimal(summary?.monetization.watchHoursTo4000 ?? 4000)} />
-          <Metric label="To 1K subscribers" value={formatCompact(summary?.monetization.subscribersTo1000 ?? 1000)} />
+          <Metric label="Watch baseline" value={formatOneDecimal(summary?.annualWatchHours ?? 0)} />
+          <Metric label="Audience baseline" value={formatCompact(summary?.currentSubscribersNet ?? 0)} />
           <Metric label="Avg CTR" value={`${formatOneDecimal(summary?.averageCtr ?? 0)}%`} />
         </div>
-        <Panel title="Money-Focused Readout">
+        <Panel title="Lead-Focused Readout">
           <div className="money-analytics-grid">
             {moneyFocusedAnalytics({ analytics, projects, blueprint: channelBlueprintDraft }).map((item) => (
               <div className="money-analytics-card" key={item.label}>
@@ -7312,7 +7129,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                     ) : null}
                     <div>
                       <strong>{video.title}</strong>
-                      <span>{formatCompact(video.views)} views · {formatOneDecimal(video.watchHours)} watch hours · {formatOneDecimal(video.averageViewPercentage)}% retained · {formatSigned(video.subscribersGained)} subs</span>
+                      <span>{formatCompact(video.views)} views · {formatOneDecimal(video.watchHours)} watch hours · {formatOneDecimal(video.averageViewPercentage)}% retained · {formatSigned(video.subscribersGained)} audience growth</span>
                     </div>
                   </div>
                 ))}
@@ -7424,7 +7241,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const catalogNiches = hotNiches.length ? hotNiches : rankedForgeCatalog;
     const visibleNiches = options.compact && !showAllForgeRankings ? catalogNiches.slice(0, 10) : catalogNiches;
     const title = options.placement === "idea-factory"
-      ? "Top Monetization Niches"
+      ? "Top Agency Growth Packs"
       : hotNichesMonth ? `Insurance Lanes: ${hotNichesMonth}` : "Insurance Lane Catalog";
     const body = options.placement === "idea-factory"
       ? "Ranked highest-first so the strongest commercial lanes are visible before generating ideas."
@@ -7472,7 +7289,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   {typeof niche.monetizationScore === "number" ? (
                     <div className="monetization-rank-strip">
                       <strong>{niche.monetizationScore}/10</strong>
-                      <span>{niche.monetizationTier || "Monetization fit"}</span>
+                      <span>{agencyRevenueTierLabel(niche.monetizationTier)}</span>
                       {niche.monetizationRank ? <small>Rank #{niche.monetizationRank}</small> : null}
                     </div>
                   ) : null}
@@ -7485,8 +7302,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                     <span>{isBlocked ? "Hidden. Uncheck to restore." : "Hide this insurance lane from this panel"}</span>
                   </label>
                   <p><strong>Why now:</strong> {niche.whyHotThisMonth}</p>
-                  {niche.monetizationRationale ? <p><strong>Monetization:</strong> {niche.monetizationRationale}</p> : null}
-                  <p><strong>Viewer promise:</strong> {niche.bestViewerPromise}</p>
+                  {niche.monetizationRationale ? <p><strong>Revenue fit:</strong> {niche.monetizationRationale}</p> : null}
+                  <p><strong>Prospect promise:</strong> {niche.bestViewerPromise}</p>
                   <div className="keyword-cloud compact-cloud">
                     {niche.keywords.slice(0, 4).map((keyword) => <span className="keyword-pill" key={keyword}><strong>{keyword}</strong></span>)}
                   </div>
@@ -7504,7 +7321,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                       disabled={busy === "channel-machine" || busy === "channel-blueprint" || isBlocked}
                     >
                       {busy === "channel-machine" ? <Loader2 size={15} className="spin" /> : <Zap size={15} />}
-                      {options.placement === "idea-factory" ? "Create Channel" : "Generate Channel Kit"}
+                      {options.placement === "idea-factory" ? "Create Lane" : "Generate Growth Pack"}
                     </button>
                   </div>
                 </article>
@@ -7673,7 +7490,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   <ShieldCheck size={18} />
                   Workspace Setup
                 </h2>
-                <p className="settings-note">Use this for each buyer, brand, or tenant. Content stays inside the active workspace.</p>
+                <p className="settings-note">Use this for each agency, brand, or operating workspace. Content stays inside the active workspace.</p>
               </div>
               {activeWorkspace ? <span className="status-pill small">{subscriptionLabel(activeWorkspace.subscriptionStatus)}</span> : null}
             </div>
@@ -7699,7 +7516,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               <input
                 value={newWorkspaceName}
                 onChange={(event) => setNewWorkspaceName(event.target.value)}
-                placeholder="New buyer workspace"
+                placeholder="New agency workspace"
               />
               <button className="secondary-button compact" type="button" onClick={createWorkspace} disabled={busy === "workspace-create" || newWorkspaceName.trim().length < 2}>
                 {busy === "workspace-create" ? <Loader2 size={15} className="spin" /> : <Save size={15} />}
@@ -7719,9 +7536,9 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               <div>
                 <h2 className="panel-title">
                   <UserCog size={18} />
-                  Buyer Admin & Members
+                  Team Admin & Members
                 </h2>
-                <p className="settings-note">Invite buyer admins or production members with a copyable sign-up link.</p>
+                <p className="settings-note">Invite agency admins or production members with a copyable sign-up link.</p>
               </div>
             </div>
             {canManageWorkspace ? (
@@ -7791,7 +7608,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               <BarChart3 size={18} />
               Workspace Usage
             </h2>
-            <p className="settings-note">Activity tracking only. Each member still uses their own saved API keys; this is not a buyer billing meter.</p>
+            <p className="settings-note">Activity tracking only. Each member still uses their own saved API keys; this is not a client billing meter.</p>
             <div className="workspace-usage-grid">
               <Metric label="Generations" value={workspaceUsage?.generationCount ?? 0} />
               <Metric label="Last 30 days" value={workspaceUsage?.recentGenerationCount ?? 0} />
@@ -7834,7 +7651,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             </Field>
             <button className="primary-button" type="button" onClick={createChannel} disabled={busy === "channel-create" || newChannelName.trim().length < 2}>
               {busy === "channel-create" ? <Loader2 size={16} className="spin" /> : <Save size={16} />}
-              Add + Activate Channel
+                  Add + Activate Lane
             </button>
             <div className="channel-list">
               {alphabetizedChannels.map((channel) => (
@@ -7860,7 +7677,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             </div>
             {archivedChannels.length ? (
               <div className="archived-channel-list">
-                <h3>Archived Channels</h3>
+                <h3>Archived Growth Lanes</h3>
                 {alphabetizedArchivedChannels.map((channel) => (
                   <div className="channel-row archived" key={channel.id}>
                     <div className="channel-row-main static">
@@ -7893,21 +7710,21 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               <div>
                 <h2 className="panel-title">
                   <Lightbulb size={18} />
-                  Channel Idea Machine
+                  Growth Pack Machine
                 </h2>
                 <p className="settings-note">The private app starts from the fixed insurance catalog. Use this only for experiments outside the saved lanes.</p>
               </div>
               {channelMachineModel ? <span className="status-pill small">Model {channelMachineModel}</span> : null}
             </div>
             {renderHotNiches()}
-            <Field label="Optional Channel Direction">
+            <Field label="Optional Growth Direction">
               <textarea
                 className="short-textarea"
                 value={channelMachineSeed}
                 onChange={(event) => setChannelMachineSeed(event.target.value)}
-                placeholder="Example: dark archival mysteries, forgotten American history, missing places, documentary tone, no sensational claims..."
+                placeholder="Example: Houston homeowners, Germania home policies, storm readiness, plain-English local expert tone..."
               />
-              <small className="field-hint">Use this only when you already have a direction. Otherwise choose a hot niche or click Surprise Me.</small>
+              <small className="field-hint">Use this only when you already have a direction. Otherwise choose an insurance lane or click Surprise Me.</small>
             </Field>
             <div className="toggle-row compact-row">
               <div>
@@ -7926,7 +7743,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             <div className="inline-actions">
               <button className="primary-button compact" type="button" onClick={() => void runChannelIdeaMachine()} disabled={busy === "channel-machine"}>
                 {busy === "channel-machine" ? <Loader2 size={15} className="spin" /> : <Zap size={15} />}
-                Generate Channel Kit
+                Generate Growth Pack
               </button>
               <button className="secondary-button compact" type="button" onClick={() => void runChannelIdeaMachine({ surpriseMe: true })} disabled={busy === "channel-machine"}>
                 {busy === "channel-machine" ? <Loader2 size={15} className="spin" /> : <Lightbulb size={15} />}
@@ -7934,10 +7751,10 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               </button>
               <button className="secondary-button compact" type="button" onClick={() => void saveChannelMachineKit()} disabled={!channelMachineResult || busy === "channel-blueprint"}>
                 {busy === "channel-blueprint" ? <Loader2 size={15} className="spin" /> : <Save size={15} />}
-                {busy === "channel-blueprint" ? "Creating..." : channelMachineSaveNotice ? "Created + Active" : "Create & Activate Channel"}
+                {busy === "channel-blueprint" ? "Creating..." : channelMachineSaveNotice ? "Created + Active" : "Create & Activate Lane"}
               </button>
             </div>
-            {busy === "channel-machine" ? <div className="inline-info">Building the full channel kit: name, positioning, keywords, logo/banner prompts, and Idea Factory combinations...</div> : null}
+            {busy === "channel-machine" ? <div className="inline-info">Building the full growth pack: name, positioning, keywords, logo/banner prompts, and Idea Factory combinations...</div> : null}
             {workflowErrors["channel-machine"] ? <div className="inline-warning">{workflowErrors["channel-machine"]}</div> : null}
             {workflowErrors["channel-blueprint"] ? <div className="inline-warning">{workflowErrors["channel-blueprint"]}</div> : null}
             {channelMachineSaveNotice ? <div className="inline-info">{channelMachineSaveNotice}</div> : null}
@@ -7949,16 +7766,16 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               <div>
                 <h2 className="panel-title">
                   <BookOpen size={18} />
-                  Saved Channel Strategy
+                  Saved Growth Strategy
                 </h2>
-                <p className="settings-note">This is the saved strategy the app uses for the active channel. Normally it is auto-filled when you generate and save a Channel Kit; edit manually only when you want to override the AI result.</p>
+                <p className="settings-note">This is the saved strategy the app uses for the active growth lane. Normally it is auto-filled when you generate and save a Growth Pack; edit manually only when you want to override the AI result.</p>
               </div>
             </div>
-            <Field label="Generated Channel Name">
+            <Field label="Generated Growth Lane Name">
               <input
                 value={channelBlueprintDraft.channelName ?? ""}
                 onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, channelName: event.target.value }))}
-                placeholder={currentChannel?.name || "Channel name"}
+                placeholder={currentChannel?.name || "Growth lane name"}
               />
             </Field>
             <Field label="Generated Tagline">
@@ -7968,15 +7785,15 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 placeholder="Short banner subtitle"
               />
             </Field>
-            <Field label="Channel Description">
+            <Field label="Growth Lane Description">
               <textarea
                 className="short-textarea"
                 value={channelBlueprintDraft.description ?? ""}
                 onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, description: event.target.value }))}
-                placeholder="YouTube About description"
+                placeholder="Public-facing lane or campaign description"
               />
               <small className={cn("field-hint", (channelBlueprintDraft.description?.length ?? 0) > 1000 && "warning-text")}>
-                {(channelBlueprintDraft.description?.length ?? 0)}/1000 characters. Channel Kit generation now targets 900-980 useful characters.
+                {(channelBlueprintDraft.description?.length ?? 0)}/1000 characters. Growth Pack generation now targets 900-980 useful characters.
               </small>
             </Field>
             <Field label="Target Audience">
@@ -8009,30 +7826,30 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             <Field label="Thumbnail Style">
               <textarea className="short-textarea" value={channelBlueprintDraft.thumbnailStyle} onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, thumbnailStyle: event.target.value }))} />
             </Field>
-            <Field label="Sponsor Rules">
+            <Field label="CTA / Compliance Rules">
               <textarea className="short-textarea" value={channelBlueprintDraft.sponsorRules} onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, sponsorRules: event.target.value }))} />
             </Field>
             <Field label="Publishing Rhythm">
               <input value={channelBlueprintDraft.publishingRhythm} onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, publishingRhythm: event.target.value }))} />
             </Field>
             <div className="settings-mini-grid">
-              <Field label="Money Goal">
+              <Field label="Revenue Goal">
                 <textarea
                   className="short-textarea"
                   value={channelBlueprintDraft.moneyGoal ?? ""}
                   onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, moneyGoal: event.target.value }))}
-                  placeholder="Example: reach YouTube monetization first, then monetize with a single affiliate program."
+                  placeholder="Example: generate qualified Texas home and auto quote requests from Houston-area prospects."
                 />
               </Field>
-              <Field label="Risk / Monetization Lane">
+              <Field label="Compliance / Risk Lane">
                 <textarea
                   className="short-textarea"
                   value={channelBlueprintDraft.riskTolerance ?? ""}
                   onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, riskTolerance: event.target.value }))}
-                  placeholder="Example: edgy curiosity, but advertiser-safe documentary framing."
+                  placeholder="Example: Texas-only, no guaranteed savings, explain coverage limits plainly, avoid carrier promises."
                 />
               </Field>
-              <Field label="Weekly Video Target">
+              <Field label="Weekly Content Target">
                 <input
                   type="number"
                   min={1}
@@ -8041,7 +7858,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, weeklyVideoTarget: Number(event.target.value) || 1 }))}
                 />
               </Field>
-              <Field label="Affiliate / Sponsor URL">
+              <Field label="Primary Quote URL">
                 <input
                   value={channelBlueprintDraft.affiliateUrl ?? ""}
                   onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, affiliateUrl: event.target.value }))}
@@ -8053,7 +7870,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   className="short-textarea"
                   value={channelBlueprintDraft.offerDescription ?? ""}
                   onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, offerDescription: event.target.value }))}
-                  placeholder="What the viewer gets, who it helps, and when it naturally belongs in an episode."
+                  placeholder="What the prospect gets, who it helps, and when they should call, request a quote, or book a review."
                 />
               </Field>
               <Field label="Email Capture / Lead Magnet">
@@ -8061,7 +7878,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   className="short-textarea"
                   value={channelBlueprintDraft.emailCapturePlan ?? ""}
                   onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, emailCapturePlan: event.target.value }))}
-                  placeholder="Checklist, map, resource guide, episode notes, buyer guide, or free training."
+                  placeholder="Checklist, Texas coverage guide, renewal review, quote checklist, or claims-prep resource."
                 />
               </Field>
               <Field label="Primary CTA">
@@ -8069,7 +7886,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   className="short-textarea"
                   value={channelBlueprintDraft.primaryCta ?? ""}
                   onChange={(event) => setChannelBlueprintDraft((current) => ({ ...current, primaryCta: event.target.value }))}
-                  placeholder="Subscribe, watch the next episode, join the list, or use the affiliate link."
+                  placeholder="Call 281-445-1381, request a quote, schedule a review, leave a review, or ask for a referral."
                 />
               </Field>
             </div>
@@ -8215,7 +8032,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   Test
                 </button>
               </div>
-              <small className="field-hint">Optional keyword metrics for Channel Idea Machine, Publishing Pack descriptions, tags, and search targeting.</small>
+              <small className="field-hint">Optional keyword metrics for Growth Pack Machine, publishing descriptions, tags, and search targeting.</small>
             </Field>
             <Field label="DataForSEO Password">
               <input
@@ -8898,7 +8715,7 @@ function clientJobCopy(label: string) {
   if (label === "auto") return { label: "Fully Auto Workflow", detail: "Running each unlocked production step in order." };
   if (label === "episode-auto") return { label: "Episode Fully Auto", detail: "Building the five-episode series from the saved episode plan." };
   if (label === "monthly-auto") return { label: "Monthly Auto", detail: "Creating projects and assigning calendar slots." };
-  if (label === "channel-machine") return { label: "Channel Kit", detail: "Generating positioning, keywords, visuals, and idea lanes." };
+  if (label === "channel-machine") return { label: "Growth Pack", detail: "Generating positioning, keywords, visuals, and idea lanes." };
   if (label === "thumbnail-batch") return { label: "Batch Thumbnails", detail: "Creating missing packs and thumbnails." };
   if (label.startsWith("research-")) return { label: "Research Mode", detail: "Building source notes and verification targets." };
   if (label.includes("article-images")) return { label: "Article Images", detail: "Generating featured and inline article visuals." };
@@ -9215,7 +9032,7 @@ function workspaceSetupItems(
     { label: "Workspace brand saved", done: Boolean(workspace?.name && workspace?.tagline) },
     { label: "At least one channel exists", done: channels.length > 0 },
     { label: "Text API provider configured", done: hasTextGenerationProvider(settings) },
-    { label: "Buyer/member access ready", done: members.length > 0 },
+    { label: "Team access ready", done: members.length > 0 },
     { label: "Subscription active", done: Boolean(workspace && (workspace.subscriptionStatus === "ACTIVE" || workspace.subscriptionStatus === "TRIALING")) }
   ];
 }
@@ -9240,7 +9057,7 @@ function renderIdeaPowerPack(idea: StoryIdea) {
         <span>{verdict.detail}</span>
       </div>
       <div className="idea-power-metrics">
-        <span className="idea-power-chip market" title="Subscriber/watch-time upside, packaging strength, repeatability, and monetization potential.">Market {formatPowerScore(pack.ideaMarketScore)}</span>
+        <span className="idea-power-chip market" title="Prospect intent, local demand, packaging strength, repeatability, and agency revenue potential.">Market {formatPowerScore(pack.ideaMarketScore)}</span>
         <span className="idea-power-chip visual" title={pack.thumbnailFirstFit?.hardToVisualizeWarning || "How easily this idea can be sold with one clear thumbnail visual."}>Visual {formatPowerScore(pack.thumbnailFirstFit?.visualClarityScore)}</span>
         <span className="idea-power-chip depth" title="Estimated source depth and ability to sustain the selected runtime without padding.">Source {formatPowerScore(pack.sourceDepthPreflight?.depthScore)}</span>
         <span className="idea-power-chip analytics" title="Fit against connected YouTube performance guidance or general retention patterns.">Analytics {formatPowerScore(pack.analyticsFit?.fitScore)}</span>
@@ -9299,14 +9116,14 @@ function renderIdeaPowerPack(idea: StoryIdea) {
             {shorts.length ? <p><strong>Shorts:</strong> {shorts.join("; ")}</p> : null}
           </div>
           <div>
-            <h4>Monetization Risk</h4>
-            <p>{pack.monetizationRisk?.saferFraming || "Frame as educational documentary content."}</p>
+            <h4>Revenue / Compliance Risk</h4>
+            <p>{pack.monetizationRisk?.saferFraming || "Frame as plain-English insurance education with clear limitations."}</p>
             {pack.monetizationRisk?.concerns?.length ? <p><strong>Watch:</strong> {pack.monetizationRisk.concerns.slice(0, 3).join(", ")}</p> : null}
           </div>
           <div>
             <h4>Revenue Strategy</h4>
-            <p>{pack.monetizationStrategy?.primaryRevenuePath || "Use the saved channel money path when this becomes a project."}</p>
-            {pack.monetizationStrategy?.affiliateAngle ? <p><strong>Affiliate:</strong> {pack.monetizationStrategy.affiliateAngle}</p> : null}
+            <p>{pack.monetizationStrategy?.primaryRevenuePath || "Use the saved agency revenue path when this becomes a project."}</p>
+            {pack.monetizationStrategy?.affiliateAngle ? <p><strong>Offer angle:</strong> {pack.monetizationStrategy.affiliateAngle}</p> : null}
             {pack.monetizationStrategy?.cta ? <p><strong>CTA:</strong> {pack.monetizationStrategy.cta}</p> : null}
             {revenueWarnings.length ? <p><strong>Warnings:</strong> {revenueWarnings.join(", ")}</p> : null}
           </div>
@@ -9338,7 +9155,7 @@ function ideaPowerVerdict(pack: IdeaPowerPack) {
       label: "Build Candidate",
       className: "ready",
       detail: "Strong upside, visual clarity, and source depth.",
-      explain: "High market score, useful source depth, clear thumbnail-first fit, and manageable monetization risk."
+      explain: "High market score, useful source depth, clear thumbnail-first fit, and manageable revenue/compliance risk."
     };
   }
   if (visual < 60) {
@@ -9461,8 +9278,8 @@ function copyDraftButtonLabel(passType?: ScriptPassType, format?: StoryProjectFo
 function projectFinalOutputLabel(format?: StoryProjectFormat) {
   if (format === "ARTICLE") return "Final Article";
   if (format === "PODCAST_EPISODE") return "Final Podcast Script";
-  if (format === "SHORT_BOOK") return "Final Short Book";
-  if (format === "LONG_BOOK") return "Final Long Form Book";
+  if (format === "SHORT_BOOK") return "Final Legacy Manuscript";
+  if (format === "LONG_BOOK") return "Final Legacy Manuscript";
   return "Complete Script";
 }
 
@@ -9678,7 +9495,7 @@ function contentModeFormCopy(mode: ContentMode) {
     return {
       nicheLabel: "Offer / Product",
       nichePlaceholder: "Example: $997 course, Gumroad template pack, consulting audit, webinar offer",
-      audienceLabel: "Buyer / Audience",
+      audienceLabel: "Prospect / Audience",
       audiencePlaceholder: "Example: agency owners, new creators, exhausted parents, local contractors",
       locationLabel: "Market / Channel",
       locationPlaceholder: "Example: Gumroad, email list, webinar, cold leads, U.S. market",
@@ -9730,7 +9547,7 @@ function contentModeFormCopy(mode: ContentMode) {
       nicheLabel: "Source Asset / Topic",
       nichePlaceholder: "Example: webinar transcript, long video script, book chapter, article series",
       audienceLabel: "Target Audience",
-      audiencePlaceholder: "Example: LinkedIn buyers, email subscribers, YouTube Shorts viewers, newsletter readers",
+      audiencePlaceholder: "Example: Houston homeowners, Texas drivers, renewal clients, email subscribers",
       locationLabel: "Target Platforms",
       locationPlaceholder: "Example: email, LinkedIn, X, Shorts, blog, podcast notes",
       offerLabel: "Original Asset",
@@ -9750,8 +9567,8 @@ function contentModeFormCopy(mode: ContentMode) {
       audiencePlaceholder: "Example: serious documentary viewers, small business owners, creators, prospects",
       locationLabel: "Market / Platform",
       locationPlaceholder: "Example: YouTube, newsletter, podcast, local market, Kindle ecosystem",
-      offerLabel: "Offer / Monetization",
-      offerPlaceholder: "Example: sponsor slots, course, consulting, affiliate offers, community",
+      offerLabel: "Service / Revenue Goal",
+      offerPlaceholder: "Example: home quote, auto quote, bundle review, commercial policy review",
       goalLabel: "Strategy Goal",
       ctaLabel: "Audience Action",
       ctaPlaceholder: "Example: subscribe, join list, request consult, watch next episode",
@@ -9892,8 +9709,8 @@ function passLabelForProject(passType: ScriptPassType, format?: StoryProjectForm
   if (passType === "FINAL") {
     if (format === "ARTICLE") return "Final Article";
     if (format === "PODCAST_EPISODE") return "Final Podcast Script";
-    if (format === "SHORT_BOOK") return "Final Short Book";
-    if (format === "LONG_BOOK") return "Final Long Form Book";
+  if (format === "SHORT_BOOK") return "Final Legacy Manuscript";
+  if (format === "LONG_BOOK") return "Final Legacy Manuscript";
   }
   if (passType === "OUTRO") {
     if (format === "ARTICLE") return "Closing CTA";
@@ -10059,7 +9876,7 @@ function projectWorkspaceTabs(input: {
       label: "Brief",
       status: input.hasSourceMaterial ? "Ready" : "Needs sources",
       detail: input.hasSourceMaterial ? "Source material is saved." : "Add notes or source links before deeper passes.",
-      explain: "The brief controls source material, sponsor details, and project constraints.",
+      explain: "The brief controls source material, CTA details, and project constraints.",
       state: input.hasSourceMaterial ? "ready" : "needs-review",
       action: () => scrollToWorkspaceTarget("project-brief")
     },
@@ -10205,13 +10022,13 @@ function channelProfitScore(input: {
 
   return {
     score,
-    label: score >= 85 ? "Strong monetization setup" : score >= 70 ? "Promising but tighten the path" : score >= 55 ? "Build foundation first" : "Too early to scale",
+    label: score >= 85 ? "Strong agency revenue setup" : score >= 70 ? "Promising but tighten the path" : score >= 55 ? "Build foundation first" : "Too early to scale",
     summary: score >= 70
       ? "The channel has enough audience promise to keep producing while improving packaging, CTA clarity, and analytics feedback."
       : "The next leverage is strategy clarity, stronger ideas, completed packs, and YouTube data before increasing output volume.",
     factors: [
       { label: "Idea demand", value: powerIdeas.length ? `${avgMarket}/100` : input.ideas.length ? `${avgMarket}/100` : "No ideas" },
-      { label: "Money path", value: isMoneyPathReady(input.blueprint) ? "Saved" : "Incomplete" },
+      { label: "Revenue path", value: isMoneyPathReady(input.blueprint) ? "Saved" : "Incomplete" },
       { label: "Publishable outputs", value: `${completed}/${input.projects.length || 0}` },
       { label: "Publishing packs", value: `${packed}/${input.projects.length || 0}` },
       { label: "Analytics loop", value: input.analytics?.connected ? "Connected" : "Not connected" }
@@ -10235,9 +10052,9 @@ function bestNextMoveItems(input: {
 
   if (!isMoneyPathReady(input.blueprint)) {
     items.push({
-      title: "Complete the channel money path",
-      detail: "Revenue goal, risk lane, production pace, and CTA are not fully saved.",
-      action: "Save the channel money path before scaling new output.",
+      title: "Complete the agency revenue path",
+      detail: "Revenue goal, compliance lane, production pace, and CTA are not fully saved.",
+      action: "Save the agency revenue path before scaling new output.",
       priority: "high",
       section: "settings"
     });
@@ -10254,9 +10071,9 @@ function bestNextMoveItems(input: {
     });
   } else {
     items.push({
-      title: "Generate the next revenue-aware idea batch",
-      detail: "The production queue needs new ideas scored against the saved money path.",
-      action: "Use the Idea Factory with the active insurance lane and saved channel strategy.",
+      title: "Generate the next lead-aware idea batch",
+      detail: "The production queue needs new ideas scored against the saved agency revenue path.",
+      action: "Use the Idea Factory with the active insurance lane and saved growth strategy.",
       priority: "medium",
       section: "idea-factory",
       tab: "Generated Ideas"
@@ -10286,7 +10103,7 @@ function bestNextMoveItems(input: {
   if (!input.analytics?.connected) {
     items.push({
       title: "Connect YouTube analytics",
-      detail: "The app can improve weekly once it sees CTR, retention, watch time, likes, and subscribers.",
+      detail: "The app can improve weekly once it sees CTR, retention, views, calls-to-action, and audience growth.",
       action: "Connect the active channel and sync after publishing.",
       priority: "medium",
       section: "analytics"
@@ -10312,12 +10129,12 @@ function thirtyDayLaunchPlan(input: {
     {
       label: "Week 1",
       goal: "Lock the channel promise and first winners.",
-      action: `Save the money path, generate ${Math.max(10, weeklyTarget * 5)} ideas, and choose the top ${weeklyTarget * 2}. Current ready ideas: ${readyIdeas}.`
+      action: `Save the revenue path, generate ${Math.max(10, weeklyTarget * 5)} ideas, and choose the top ${weeklyTarget * 2}. Current ready ideas: ${readyIdeas}.`
     },
     {
       label: "Week 2",
       goal: "Produce the first publishing-ready batch.",
-      action: `Build ${weeklyTarget} full scripts with quality gates, packs, thumbnails, and sponsor-safe CTAs. Publishable now: ${publishable}.`
+      action: `Build ${weeklyTarget} full scripts with quality gates, packs, thumbnails, and compliance-safe CTAs. Publishable now: ${publishable}.`
     },
     {
       label: "Week 3",
@@ -10327,7 +10144,7 @@ function thirtyDayLaunchPlan(input: {
     {
       label: "Week 4",
       goal: "Let data pick the next lane.",
-      action: `Sync YouTube, compare CTR, retention, likes, comments, and subscribers, then clone the winning promise. Scheduled now: ${scheduled}.`
+      action: `Sync YouTube, compare CTR, retention, comments, and CTA fit, then clone the winning promise. Scheduled now: ${scheduled}.`
     }
   ];
 }
@@ -10337,23 +10154,23 @@ function monetizationStrategyItems(blueprint: ChannelBlueprint, projects: StoryP
   return [
     {
       label: "Primary revenue path",
-      detail: blueprint.moneyGoal?.trim() || "Set whether this channel is chasing YouTube Partner Program, affiliate commissions, leads, product sales, or sponsorships first."
+      detail: blueprint.moneyGoal?.trim() || "Set whether this lane is chasing quote requests, calls, policy reviews, referrals, Google reviews, or renewal saves first."
     },
     {
       label: "Offer fit",
-      detail: blueprint.offerDescription?.trim() || "Add the single affiliate or offer so the app can prefer topics where the CTA feels earned, not bolted on."
+      detail: blueprint.offerDescription?.trim() || "Add the insurance service focus so the app can prefer topics where the CTA feels earned, not bolted on."
     },
     {
       label: "CTA system",
-      detail: blueprint.primaryCta?.trim() || "Save the recurring viewer action. Scripts and packs can then keep the CTA consistent across uploads."
+      detail: blueprint.primaryCta?.trim() || "Save the recurring prospect action. Scripts and packs can then keep the CTA consistent across uploads."
     },
     {
       label: "Lead capture",
-      detail: blueprint.emailCapturePlan?.trim() || "Add a lead magnet for viewers who are interested but not ready to click an affiliate link."
+      detail: blueprint.emailCapturePlan?.trim() || "Add a lead magnet for prospects who are interested but not ready to request a quote."
     },
     {
       label: "Current project angle",
-      detail: latestProject ? projectMonetizationHint(latestProject, blueprint) : "Create a project and this panel will show how to monetize the current production."
+      detail: latestProject ? projectMonetizationHint(latestProject, blueprint) : "Create a project and this panel will show the CTA angle for the current production."
     }
   ];
 }
@@ -10371,7 +10188,7 @@ function doNotWasteTimeWarnings(input: {
   const highRiskIdeas = input.ideas.filter((idea) => ideaPowerPackForIdea(idea)?.monetizationRisk?.riskLevel === "High").length;
 
   if (!isMoneyPathReady(input.blueprint)) {
-    warnings.push({ title: "Do not scale without a money path", detail: "More scripts will not fix unclear CTA, offer fit, risk lane, or publishing pace.", level: "high" });
+    warnings.push({ title: "Do not scale without a revenue path", detail: "More scripts will not fix unclear CTA, service fit, compliance lane, or publishing pace.", level: "high" });
   }
   if (readyIdeas > 20 && input.projects.length < 3) {
     warnings.push({ title: "Too much ideation, not enough production", detail: `${readyIdeas} ideas are waiting. Build the best few instead of generating another large batch.`, level: "medium" });
@@ -10380,10 +10197,10 @@ function doNotWasteTimeWarnings(input: {
     warnings.push({ title: "Finish before starting more", detail: `${unfinishedProjects} projects are not publishable yet. Complete the closest one and package it.`, level: "medium" });
   }
   if (scriptsWithoutPacks >= 2) {
-    warnings.push({ title: "Scripts without packs do not monetize", detail: `${scriptsWithoutPacks} finished scripts still need titles, descriptions, tags, thumbnails, and CTA packaging.`, level: "high" });
+    warnings.push({ title: "Scripts without packs do not convert", detail: `${scriptsWithoutPacks} finished scripts still need titles, descriptions, tags, thumbnails, and CTA packaging.`, level: "high" });
   }
   if (highRiskIdeas >= 3) {
-    warnings.push({ title: "Risk is clustering", detail: `${highRiskIdeas} ideas have high monetization risk. Use safer documentary framing before scripting.`, level: "medium" });
+    warnings.push({ title: "Risk is clustering", detail: `${highRiskIdeas} ideas have high revenue or compliance risk. Use safer insurance education framing before scripting.`, level: "medium" });
   }
   if (input.analytics?.connected && (input.analytics.summary.averageRetention || 0) > 0 && input.analytics.summary.averageRetention < 35) {
     warnings.push({ title: "Retention is the bottleneck", detail: "Do not chase more topics until hooks, pacing, and payoff structure improve.", level: "high" });
@@ -10397,9 +10214,6 @@ function moneyFocusedAnalytics(input: {
   projects: StoryProject[];
   blueprint: ChannelBlueprint;
 }) {
-  const summary = input.analytics?.summary;
-  const watchHoursTo4k = summary?.monetization.watchHoursTo4000 ?? 4000;
-  const subsTo1k = summary?.monetization.subscribersTo1000 ?? 1000;
   const publishable = input.projects.filter((project) => hasPublishableScript(project)).length;
   const packed = input.projects.filter((project) => latestDraftForPass(project, "PUBLISHING_PACK")).length;
   const weeklyTarget = Math.max(1, input.blueprint.weeklyVideoTarget || 2);
@@ -10407,14 +10221,14 @@ function moneyFocusedAnalytics(input: {
 
   return [
     {
-      label: "Monetization gap",
-      value: input.analytics?.connected ? `${formatCompact(watchHoursTo4k)} hrs / ${formatCompact(subsTo1k)} subs` : "Connect YouTube",
-      detail: input.analytics?.connected ? "Remaining gap to 4,000 public watch hours and 1,000 subscribers." : "Connect analytics so this becomes a real weekly target."
+      label: "Lead path",
+      value: input.blueprint.primaryCta?.trim() ? "CTA saved" : "CTA missing",
+      detail: input.blueprint.primaryCta?.trim() || "Save the quote, call, review, referral, or renewal action this lane should drive."
     },
     {
       label: "Output runway",
       value: `${publishable} scripts`,
-      detail: `${packed} have publishing packs. Aim for at least 10 packaged uploads before judging the channel.`
+      detail: `${packed} have publishing packs. Aim for at least 10 packaged assets before judging the lane.`
     },
     {
       label: "Pace to 10 uploads",
@@ -10422,9 +10236,9 @@ function moneyFocusedAnalytics(input: {
       detail: `Based on ${weeklyTarget} saved weekly video target${weeklyTarget === 1 ? "" : "s"}.`
     },
     {
-      label: "Affiliate readiness",
+      label: "Quote CTA readiness",
       value: input.blueprint.offerDescription?.trim() || input.blueprint.affiliateUrl?.trim() ? "Ready" : "Missing",
-      detail: input.blueprint.offerDescription?.trim() ? firstSentence(input.blueprint.offerDescription) || "Offer saved." : "Add one offer and CTA before adding affiliate language everywhere."
+      detail: input.blueprint.offerDescription?.trim() ? firstSentence(input.blueprint.offerDescription) || "Service focus saved." : "Add the service focus, quote URL, and CTA before scaling production."
     }
   ];
 }
@@ -10432,10 +10246,10 @@ function moneyFocusedAnalytics(input: {
 function projectMonetizationHint(project: StoryProject, blueprint: ChannelBlueprint) {
   const offer = blueprint.offerDescription?.trim();
   const cta = blueprint.primaryCta?.trim();
-  if (!offer && !cta) return "Save the offer and primary CTA before this project is packaged.";
+  if (!offer && !cta) return "Save the service focus and primary CTA before this project is packaged.";
   if (project.format === "EPISODIC_SERIES") return "Use the CTA lightly in each episode description and make the strongest offer push in the final part.";
-  if (supportsSponsorBlurb(project.format)) return `Use the saved sponsor placement rules and keep the body script value-first. ${cta || offer || ""}`;
-  return "Keep monetization in the description, launch notes, or supporting assets unless this format naturally supports a CTA.";
+  if (supportsSponsorBlurb(project.format)) return `Use the saved CTA/compliance rules and keep the body script value-first. ${cta || offer || ""}`;
+  return "Keep conversion language in the description, notes, or supporting assets unless this format naturally supports a CTA.";
 }
 
 function commandCenterItems(input: {
@@ -10489,7 +10303,7 @@ function commandCenterItems(input: {
     {
       label: "Learning loop",
       title: analyticsConnected ? "Analytics feedback is active" : "Connect YouTube analytics",
-      detail: analyticsConnected ? "Weekly stats can now shape ideas, scripts, and packaging choices." : "Connect YouTube so the app can learn from CTR, retention, watch time, and subscribers.",
+      detail: analyticsConnected ? "Weekly stats can now shape ideas, scripts, and packaging choices." : "Connect YouTube so the app can learn from CTR, retention, views, and audience growth.",
       priority: analyticsConnected ? "low" : "medium",
       section: analyticsConnected ? "analytics" : "settings",
       tab: undefined
@@ -10528,14 +10342,14 @@ function creatorCockpitItems(input: {
     {
       label: "1. Channel",
       title: input.blueprint.channelName || "Lock the channel strategy",
-      detail: isMoneyPathReady(input.blueprint) ? "Money path, CTA, rhythm, and positioning are saved." : "Save the monetization path before scaling content.",
+      detail: isMoneyPathReady(input.blueprint) ? "Revenue path, CTA, rhythm, and positioning are saved." : "Save the agency revenue path before scaling content.",
       level: isMoneyPathReady(input.blueprint) ? "ready" : "warn",
       section: "settings" as const
     },
     {
       label: "2. Ideas",
       title: readyIdeas ? `${readyIdeas} ideas ready` : "Generate a winning batch",
-      detail: readyIdeas ? "Pick from scored ideas with source, thumbnail, and monetization preflight." : "The channel needs fresh candidates before production.",
+      detail: readyIdeas ? "Pick from scored ideas with source, thumbnail, and revenue/compliance preflight." : "The growth lane needs fresh candidates before production.",
       level: readyIdeas ? "ready" : "warn",
       section: "idea-factory" as const,
       tab: readyIdeas ? "Idea Queue" as const : "Generated Ideas" as const
@@ -10640,7 +10454,7 @@ function channelVoiceChecklist(blueprint: ChannelBlueprint) {
     ["Audience", blueprint.targetAudience, "who the channel is for"],
     ["Voice", blueprint.voiceProfile, "narration personality and credibility rules"],
     ["Intro rhythm", blueprint.introStyle, "how openings should feel"],
-    ["CTA style", blueprint.sponsorRules, "sponsor and viewer-action language"],
+    ["CTA style", blueprint.sponsorRules, "CTA and compliance language"],
     ["Thumbnail style", blueprint.thumbnailStyle, "visual system and overlay rules"],
     ["Forbidden phrases", blueprint.bannedPhrases || blueprint.phrasesToAvoid, "phrases and claims to avoid"],
     ["Recurring lanes", blueprint.recurringStoryTypes, "repeatable series formats"],
@@ -10663,7 +10477,7 @@ function learningLoopInsights(input: {
       {
         title: "No connected YouTube stats yet",
         detail: "The idea machine will use general retention and packaging rules until analytics syncs.",
-        action: "Connect YouTube and let the weekly sync collect CTR, retention, watch time, and subscribers."
+        action: "Connect YouTube and let the weekly sync collect CTR, retention, views, and audience growth."
       },
       {
         title: "Use idea scores as baseline",
@@ -10724,6 +10538,10 @@ function formatCurrency(value: number) {
   return new Intl.NumberFormat("en", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(value);
 }
 
+function agencyRevenueTierLabel(value?: string | null) {
+  return (value || "Agency revenue fit").replace(/monetization/gi, "agency revenue");
+}
+
 function formatCompactTokens(value: number) {
   return `${compactNumber(value)} tokens`;
 }
@@ -10770,7 +10588,7 @@ function pipelineBoard(projects: StoryProject[], ideas: StoryIdea[], slots: Publ
   ];
 }
 
-function buyerReadinessItems(projects: StoryProject[], settings: UserSettings, channel: Channel | undefined, blueprint: ChannelBlueprint) {
+function agencyReadinessItems(projects: StoryProject[], settings: UserSettings, channel: Channel | undefined, blueprint: ChannelBlueprint) {
   const completedScript = projects.some((project) => Boolean(latestScriptDraft(project)));
   const publishingPack = projects.some((project) => Boolean(latestDraftForPass(project, "PUBLISHING_PACK")));
   const videoProjects = projects.filter((project) => supportsThumbnails(project));
@@ -10779,13 +10597,13 @@ function buyerReadinessItems(projects: StoryProject[], settings: UserSettings, c
   const blueprintReady = Boolean(channel?.description && blueprint.targetAudience.trim() && blueprint.thumbnailStyle.trim());
 
   return [
-    { label: "Demo content loaded", ready: projects.length >= 3, detail: `${projects.length} project${projects.length === 1 ? "" : "s"} in this channel` },
-    { label: "Final output available", ready: completedScript, detail: completedScript ? "A buyer can copy or export finished content." : "Run Fully Auto on one project." },
+    { label: "Campaign content started", ready: projects.length >= 3, detail: `${projects.length} project${projects.length === 1 ? "" : "s"} in this growth lane` },
+    { label: "Final output available", ready: completedScript, detail: completedScript ? "A producer can copy or export finished content." : "Run Fully Auto on one project." },
     { label: "One-click content pack", ready: publishingPack, detail: publishingPack ? "Publishing metadata is ready to package." : "Run the final pack after Outro or Closing CTA." },
-    { label: "Video thumbnail set", ready: videoProjects.length ? thumbnailSet : true, detail: videoProjects.length ? (thumbnailSet ? "At least one video project has three thumbnails." : "Generate thumbnails or load demo data.") : "No video projects need thumbnails." },
+    { label: "Video thumbnail set", ready: videoProjects.length ? thumbnailSet : true, detail: videoProjects.length ? (thumbnailSet ? "At least one video project has three thumbnails." : "Generate thumbnails for the strongest video project.") : "No video projects need thumbnails." },
     { label: "Quality scorecard", ready: qualityGate, detail: qualityGate ? "Quality gate data is visible." : "Run Quality Gate before Final." },
-    { label: "Channel blueprint", ready: blueprintReady, detail: blueprintReady ? `${channel?.name} has a saved operating strategy.` : "Save audience, style, sponsor, and rhythm rules." },
-    { label: "API setup", ready: hasTextGenerationProvider(settings), detail: hasTextGenerationProvider(settings) ? "At least one text generation provider is configured." : "Demo fallback works, but buyer should add OpenRouter, Anthropic, or OpenAI." }
+    { label: "Growth lane blueprint", ready: blueprintReady, detail: blueprintReady ? `${channel?.name} has a saved operating strategy.` : "Save audience, style, CTA, and rhythm rules." },
+    { label: "API setup", ready: hasTextGenerationProvider(settings), detail: hasTextGenerationProvider(settings) ? "At least one text generation provider is configured." : "Add OpenRouter, Anthropic, or OpenAI before production work." }
   ];
 }
 
@@ -10969,7 +10787,7 @@ function seedFromHotNiche(niche: ChannelHotNiche) {
     niche.description,
     `Viewer promise: ${niche.bestViewerPromise}`,
     typeof niche.monetizationScore === "number"
-      ? `Monetization rank: ${niche.monetizationScore}/10 (${niche.monetizationTier || "Monetization fit"}). ${niche.monetizationRationale || ""}`
+      ? `Revenue rank: ${niche.monetizationScore}/10 (${agencyRevenueTierLabel(niche.monetizationTier)}). ${niche.monetizationRationale || ""}`
       : "",
     `Why now: ${niche.whyHotThisMonth}`,
     `Idea Factory defaults: Niche / Focus ${niche.nicheFocus}; Tone ${niche.tone}; Category ${niche.category}; Source Type ${niche.sourceType}.`,
