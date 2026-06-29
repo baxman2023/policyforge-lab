@@ -9,7 +9,7 @@ import { formatDraftForResponse } from "@/lib/project-response";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { requireActiveWorkspace } from "@/lib/workspaces";
 import { estimatedMinutesFromWords, wordCount } from "@/lib/utils";
-import { formatPublishingPackContent } from "@/lib/youtube-description";
+import { ensureAgencyContactBlocks, formatPublishingPackContent } from "@/lib/youtube-description";
 
 const PublishingDescriptionSchema = z.object({
   sponsorBlurb: z.string().optional(),
@@ -70,7 +70,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       maxTokens: 2200
     });
 
-    const description = cleanDescription(result.content);
+    const description = ensureAgencyContactBlocks(cleanDescription(result.content));
     if (!description) throw new Error("The regenerated video description was empty.");
 
     const content = formatPublishingPackContent(
@@ -162,21 +162,25 @@ Script and story context:
 ${input.scriptContext || "No finished script context provided."}
 
 Required output formula, separated by blank lines:
-1. MAIN KEYWORD: one search-focused phrase for the video. Do not label it. No hashtag.
-2. CTA LINK: if a sponsor link is provided, write a short direct sponsor CTA and include the exact sponsor link. If no sponsor link is provided, use a brief subscribe/comment CTA with no fake URL.
-3. DESCRIPTION PART 1: two to four sentences that hook the viewer and summarize the central story.
-4. TIMESTAMPS: include a "Timestamps:" heading and five to eight estimated timestamps in MM:SS format for major story beats. Base them on the actual finished script length above, not the requested target length.
-5. DESCRIPTION PART 2: two to four sentences with deeper context, stakes, and what the viewer will learn, without unsupported claims.
-6. CTA WITH LINK: if a sponsor link is provided, repeat the exact sponsor link with a clear CTA. If no sponsor link is provided, use a like/subscribe/comment CTA with no fake URL.
-7. HASHTAGS: one final line containing only three to five relevant hashtags.
+1. TOP CONTACT BLOCK: Baxter Insurance Agency URL and phone at the very top.
+2. MAIN KEYWORD: one search-focused phrase for the video. Do not label it. No hashtag.
+3. CTA LINK: if a sponsor link is provided, write a short direct sponsor CTA and include the exact sponsor link. If no sponsor link is provided, use a brief subscribe/comment CTA with no fake URL.
+4. DESCRIPTION PART 1: two to four sentences that hook the viewer and summarize the central story.
+5. TIMESTAMPS: include a "Timestamps:" heading and five to eight estimated timestamps in MM:SS format for major story beats. Base them on the actual finished script length above, not the requested target length.
+6. DESCRIPTION PART 2: two to four sentences with deeper context, stakes, and what the viewer will learn, without unsupported claims.
+7. CTA WITH LINK: if a sponsor link is provided, repeat the exact sponsor link with a clear CTA. If no sponsor link is provided, use a like/subscribe/comment CTA with no fake URL.
+8. HASHTAGS: one line containing only three to five relevant hashtags.
+9. BOTTOM CONTACT BLOCK: repeat Baxter Insurance Agency URL and phone, and include the mailing address.
 
 Rules:
 - Do not add labels such as "MAIN KEYWORD", "DESCRIPTION PART 1", or "CTA WITH LINK"; output the actual YouTube-ready description text.
+- The top contact block must include https://www.baxterinsuranceagency.com and 281-445-1381.
+- The bottom contact block must include https://www.baxterinsuranceagency.com, 281-445-1381, and 450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060.
 - Preserve factual caution. Do not present speculation as fact.
 - Do not create timestamps beyond the actual finished script length.
 - If a sponsor link is provided, include this exact URL twice: ${sponsorLink || "no sponsor link"}.
 - If no sponsor link is provided, do not invent one.
-- The last line must contain only three to five hashtags.`;
+- The hashtag line should appear immediately before the bottom contact block.`;
 }
 
 function publishingDescriptionContext(drafts: ScriptDraft[]) {

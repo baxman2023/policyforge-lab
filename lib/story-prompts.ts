@@ -2010,14 +2010,18 @@ Rules:
 - Each episode description should include a brief value assurance: what the viewer will understand, discover, or feel by watching this part.
 - If an episode has a natural agency CTA, lead magnet, quote request, review request, or referral tie-in, place it in the CTA blocks only after the episode promise is clear. Do not make the whole pack feel like an ad.
 - Each description must follow this exact block order, separated by blank lines:
-  1. MAIN KEYWORD: one search-focused phrase for the episode, no label, no hashtag, title case or natural case.
-  2. CTA LINK: if an agency CTA link is provided, put a short direct CTA plus the exact link; if no CTA link is provided, put a short subscribe/comment CTA with no fake URL.
-  3. DESCRIPTION PART 1: 2-4 sentences that hook the viewer and summarize that episode's central story.
-  4. TIMESTAMPS: include a "Timestamps:" heading and 5-8 estimated timestamps in MM:SS format for that episode's major story beats.
-  5. DESCRIPTION PART 2: 2-4 sentences with deeper context, stakes, and what the viewer will learn in that episode.
-  6. CTA WITH LINK: if an agency CTA link is provided, repeat the exact link with a clear CTA; if no CTA link is provided, use a like/subscribe/comment CTA with no fake URL.
-  7. 3-5 HASHTAGS: one final line containing only 3-5 relevant hashtags.
+  1. TOP CONTACT BLOCK: Baxter Insurance Agency URL and phone at the very top.
+  2. MAIN KEYWORD: one search-focused phrase for the episode, no label, no hashtag, title case or natural case.
+  3. CTA LINK: if an agency CTA link is provided, put a short direct CTA plus the exact link; if no CTA link is provided, put a short subscribe/comment CTA with no fake URL.
+  4. DESCRIPTION PART 1: 2-4 sentences that hook the viewer and summarize that episode's central story.
+  5. TIMESTAMPS: include a "Timestamps:" heading and 5-8 estimated timestamps in MM:SS format for that episode's major story beats.
+  6. DESCRIPTION PART 2: 2-4 sentences with deeper context, stakes, and what the viewer will learn in that episode.
+  7. CTA WITH LINK: if an agency CTA link is provided, repeat the exact link with a clear CTA; if no CTA link is provided, use a like/subscribe/comment CTA with no fake URL.
+  8. 3-5 HASHTAGS: one line containing only 3-5 relevant hashtags.
+  9. BOTTOM CONTACT BLOCK: repeat Baxter Insurance Agency URL and phone, and include the mailing address.
 - Do not add labels like "MAIN KEYWORD" or "DESCRIPTION PART 1"; output the actual YouTube-ready text only.
+- The top contact block must include https://www.baxterinsuranceagency.com and 281-445-1381.
+- The bottom contact block must include https://www.baxterinsuranceagency.com, 281-445-1381, and 450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060.
 - If an agency CTA link is provided, each description must include the exact link string at least twice: ${sponsorLink || "no agency CTA link"}.
 - Thumbnail prompts should produce bold clickbait documentary images, not generic stock art or quiet poster art.
 - Keep all fifteen thumbnail prompts in the same channel family while making each part visually distinct.
@@ -2087,18 +2091,22 @@ Rules:
 - Include a brief value assurance in the description: what the viewer will understand, discover, or feel by watching.
 - If there is a natural agency CTA, lead magnet, quote request, review request, or referral tie-in, place it in the CTA blocks only after the video promise is clear. Do not make the whole pack feel like an ad.
 - Description must follow this exact block order, separated by blank lines:
-  1. MAIN KEYWORD: one search-focused phrase for the video, no label, no hashtag, title case or natural case.
-  2. CTA LINK: if an agency CTA link is provided, put a short direct CTA plus the exact link; if no CTA link is provided, put a short subscribe/comment CTA with no fake URL.
-  3. DESCRIPTION PART 1: 2-4 sentences that hook the viewer and summarize the central story.
-  4. TIMESTAMPS: include a "Timestamps:" heading and 5-8 estimated timestamps in MM:SS format for the major story beats. Base timestamps on the actual completed script word count in the context, not the requested target length.
-  5. DESCRIPTION PART 2: 2-4 sentences with deeper context, stakes, and what the viewer will learn, without unsupported claims.
-  6. CTA WITH LINK: if an agency CTA link is provided, repeat the exact link with a clear CTA; if no CTA link is provided, use a like/subscribe/comment CTA with no fake URL.
-  7. 3-5 HASHTAGS: one final line containing only 3-5 relevant hashtags.
+  1. TOP CONTACT BLOCK: Baxter Insurance Agency URL and phone at the very top.
+  2. MAIN KEYWORD: one search-focused phrase for the video, no label, no hashtag, title case or natural case.
+  3. CTA LINK: if an agency CTA link is provided, put a short direct CTA plus the exact link; if no CTA link is provided, put a short subscribe/comment CTA with no fake URL.
+  4. DESCRIPTION PART 1: 2-4 sentences that hook the viewer and summarize the central story.
+  5. TIMESTAMPS: include a "Timestamps:" heading and 5-8 estimated timestamps in MM:SS format for the major story beats. Base timestamps on the actual completed script word count in the context, not the requested target length.
+  6. DESCRIPTION PART 2: 2-4 sentences with deeper context, stakes, and what the viewer will learn, without unsupported claims.
+  7. CTA WITH LINK: if an agency CTA link is provided, repeat the exact link with a clear CTA; if no CTA link is provided, use a like/subscribe/comment CTA with no fake URL.
+  8. 3-5 HASHTAGS: one line containing only 3-5 relevant hashtags.
+  9. BOTTOM CONTACT BLOCK: repeat Baxter Insurance Agency URL and phone, and include the mailing address.
 - Do not add labels like "MAIN KEYWORD" or "DESCRIPTION PART 1"; output the actual YouTube-ready text only.
+- The top contact block must include https://www.baxterinsuranceagency.com and 281-445-1381.
+- The bottom contact block must include https://www.baxterinsuranceagency.com, 281-445-1381, and 450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060.
 - If an agency CTA link is provided, the description must include the exact link string at least twice: ${sponsorLink || "no agency CTA link"}.
 - If agency CTA instructions are provided, use the agency's requested next step in the two CTA blocks. Do not invent sponsor terms, savings claims, or carrier promises.
 - If no agency CTA link is provided, do not add a fake link.
-- Do not put hashtags in the tags array only; the description itself must end with 3-5 hashtags.
+- Do not put hashtags in the tags array only; the description itself must include 3-5 hashtags immediately before the bottom contact block.
 - Tags are secondary; include 12-20 useful tags when possible: names, places, alternate spellings, categories, historical context, documentary phrases, mystery phrases, and broad topic terms without stuffing.
 - If SEO keyword hints are available, use the most relevant high-volume phrases naturally in the main keyword, description, tags, and hashtags.
 - Provide exactly 3 thumbnail prompts designed for high-CTR 16:9 YouTube thumbnails.

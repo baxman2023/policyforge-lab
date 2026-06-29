@@ -10,10 +10,15 @@ export type YoutubeDescriptionInput = {
   actualLengthMinutes?: number | null;
 };
 
+const AGENCY_NAME = "Baxter Insurance Agency, Inc.";
+const AGENCY_URL = "https://www.baxterinsuranceagency.com";
+const AGENCY_PHONE = "281-445-1381";
+const AGENCY_ADDRESS = "450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060";
+
 export function formatYoutubeDescription(input: YoutubeDescriptionInput) {
   const existing = input.description?.trim() ?? "";
   if (looksLikeFormulaDescription(existing) && timestampRangeFits(existing, input.actualLengthMinutes ?? input.targetLengthMinutes)) {
-    return existing;
+    return ensureAgencyContactBlocks(existing);
   }
 
   const tags = input.tags ?? [];
@@ -31,7 +36,7 @@ export function formatYoutubeDescription(input: YoutubeDescriptionInput) {
     input.title
   );
 
-  return [
+  return ensureAgencyContactBlocks([
     mainKeyword(input.title, tags),
     primaryCta(input.sponsorBlurb, sponsorLink),
     partOne,
@@ -39,14 +44,28 @@ export function formatYoutubeDescription(input: YoutubeDescriptionInput) {
     partTwo,
     finalCta(input.sponsorBlurb, sponsorLink),
     hashtagLine(tags, input.title)
-  ].filter(Boolean).join("\n\n");
+  ].filter(Boolean).join("\n\n"));
 }
 
 export function formatPublishingPackContent(content: string, input: Omit<YoutubeDescriptionInput, "description" | "tags"> = {}) {
   try {
     const parsed = JSON.parse(content) as { description?: unknown; tags?: unknown };
     if (Array.isArray((parsed as { episodePacks?: unknown }).episodePacks)) {
-      return content;
+      const episodePacks = (parsed as { episodePacks: unknown[] }).episodePacks.map((episode) => {
+        if (!isRecord(episode)) return episode;
+        const tags = Array.isArray(episode.tags) ? episode.tags.filter((item): item is string => typeof item === "string") : [];
+        const title = episodePrimaryTitle(episode) || input.title;
+        return {
+          ...episode,
+          description: formatYoutubeDescription({
+            ...input,
+            title,
+            description: typeof episode.description === "string" ? episode.description : "",
+            tags
+          })
+        };
+      });
+      return JSON.stringify({ ...parsed, episodePacks }, null, 2);
     }
     const tags = Array.isArray(parsed.tags) ? parsed.tags.filter((item): item is string => typeof item === "string") : [];
     return JSON.stringify(
@@ -66,15 +85,54 @@ export function formatPublishingPackContent(content: string, input: Omit<Youtube
   }
 }
 
+export function ensureAgencyContactBlocks(description: string) {
+  const body = stripAgencyContactBlocks(description).trim();
+  return [agencyTopContactBlock(), body, agencyBottomContactBlock()].filter(Boolean).join("\n\n");
+}
+
+function agencyTopContactBlock() {
+  return `${AGENCY_NAME}\n${AGENCY_URL}\n${AGENCY_PHONE}`;
+}
+
+function agencyBottomContactBlock() {
+  return `${AGENCY_NAME}\n${AGENCY_URL}\n${AGENCY_PHONE}\n${AGENCY_ADDRESS}`;
+}
+
+function stripAgencyContactBlocks(value: string) {
+  return value
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter((block) => !isAgencyContactBlock(block))
+    .join("\n\n")
+    .trim();
+}
+
+function isAgencyContactBlock(block: string) {
+  return block.includes(AGENCY_URL) && block.includes(AGENCY_PHONE) && /Baxter Insurance Agency/i.test(block);
+}
+
+function episodePrimaryTitle(episode: Record<string, unknown>) {
+  const titles = Array.isArray(episode.titles) ? episode.titles : [];
+  for (const item of titles) {
+    if (typeof item === "string" && item.trim()) return item.trim();
+    if (isRecord(item) && typeof item.title === "string" && item.title.trim()) return item.title.trim();
+  }
+  return "";
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
 function looksLikeFormulaDescription(value: string) {
   if (!value) return false;
-  const blocks = value.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
+  const blocks = stripAgencyContactBlocks(value).split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
   const last = blocks[blocks.length - 1] ?? "";
   return blocks.length >= 6 && /^Timestamps?:/im.test(value) && /^#\w+(?:\s+#\w+){2,4}$/i.test(last);
 }
 
 function stripLegacyMetadataAndSponsor(value: string, sponsorLink: string) {
-  let cleaned = bodyBeforeTimestamps(value);
+  let cleaned = bodyBeforeTimestamps(stripAgencyContactBlocks(value));
   cleaned = cleaned.replace(/#\w+/g, " ");
   cleaned = removeSponsorBlock(cleaned, sponsorLink);
   if (sponsorLink) {
