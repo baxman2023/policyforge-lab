@@ -28,7 +28,7 @@ const BOOK_ILLUSTRATION_NEGATIVE_PROMPT =
 const ARTICLE_IMAGE_NEGATIVE_PROMPT =
   "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, text, typography, label, caption, watermark, logo, UI chrome, meme, advertisement, clickbait arrows, stock-photo cliche";
 const SCENE_BACKGROUND_NEGATIVE_PROMPT =
-  "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, poster, advertisement, text, typography, caption, label, watermark, logo, UI chrome, social media layout, clickbait arrows, cluttered foreground, busy background, readable words, letters, numbers, signage, brand names, title card, lower third, checklist, document, paper sheet, whiteboard, computer screen, phone screen, tablet screen, license plate, fake text, gibberish characters, random characters, large blank white rectangle, empty white panel, blank card";
+  "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, poster, advertisement, text, typography, caption, label, watermark, logo, UI chrome, social media layout, clickbait arrows, cluttered foreground, busy background, readable words, letters, numbers, signage, brand names, title card, lower third, checklist, document, paper sheet, whiteboard, computer screen, phone screen, tablet screen, license plate, fake text, gibberish characters, random characters, large blank white rectangle, empty white panel, blank card, billboard, presentation board, poster board, blank sign, blank screen, white square, white rectangle, empty frame, monitor, laptop, tablet, clipboard";
 
 type RunwareImageResponse = {
   data?: Array<{
@@ -382,7 +382,7 @@ export async function generateSceneBackgrounds(input: {
           storyProjectId: input.storyProjectId,
           scriptDraftId: input.scriptDraftId,
           variant: prompt.variant,
-          title: `HeyGen Scene ${String(prompt.variant).padStart(2, "0")} Background: ${prompt.title}`,
+          title: `Scene ${String(prompt.variant).padStart(2, "0")} Background`,
           prompt: [
             "HeyGen scene background",
             `Scene: ${String(prompt.variant).padStart(2, "0")}`,
@@ -541,20 +541,20 @@ function articleImagePositivePrompt(image: ArticleImagePlan) {
 function sceneBackgroundPositivePrompt(prompt: SceneBackgroundPrompt) {
   const visualBrief = sanitizeSceneBackgroundBrief(prompt.prompt);
   return [
-    "Pure visual 16:9 background image only. Realistic photo-like environment for a presenter video.",
+    "Full-frame realistic environmental photograph, edge-to-edge complete image, no graphic design elements.",
     "No words, no letters, no numbers, no captions, no signs, no labels, no logos, no UI, no overlays, no lower thirds, no arrows, no title-card design.",
-    "No papers, documents, checklists, whiteboards, computer screens, phone screens, tablet screens, road signs, license plates, or large blank white panels.",
-    "Create an actual environmental image with depth, texture, natural light, and real-world context. Avoid empty white space and blank rectangles.",
+    "No papers, documents, checklists, whiteboards, computer screens, phone screens, tablet screens, road signs, license plates, billboards, poster boards, presentation boards, blank signs, blank cards, blank screens, or large white panels.",
+    "Fill the entire frame with a natural location or object scene with depth, texture, natural light, foreground and background detail. Avoid empty white space, blank rectangles, and board-like surfaces.",
     `Visual brief: ${clampText(visualBrief, 1500)}`,
-    "Prefer Houston/Texas lifestyle and location visuals: home exterior, driveway, car interior with no visible dashboard text, family kitchen without papers, living room, insurance office without screens or signs, neighborhood street with no readable signs, stormy sky, garage, keys, house, vehicle, or small business exterior with no signage.",
-    "Keep composition calm, professional, trustworthy, and useful as a backdrop behind a presenter."
+    "Prefer Houston/Texas lifestyle and location visuals: home exterior, driveway, garage, house, vehicle parked in driveway, steering wheel and keys with no dashboard text, family kitchen counter without papers, living room, office interior without screens or signs, neighborhood street with no signs, stormy sky, or small business exterior with no signage.",
+    "Keep composition calm, professional, trustworthy, and visually complete."
   ].join(" ").slice(0, 3200);
 }
 
 function sanitizeSceneBackgroundBrief(value: string) {
   return value
     .replace(/\b(HeyGen|hook|scene|title card|lower third|on-screen text|overlay text|caption|logo|watermark)\b/gi, "")
-    .replace(/\b(policy document|document|paperwork|paper|checklist|permit|license|insurance card|screen|whiteboard|road sign|street sign|license plate)\b/gi, "non-text visual object")
+    .replace(/\b(policy document|document|paperwork|paper|checklist|permit|license|insurance card|screen|whiteboard|road sign|street sign|license plate|poster board|presentation board|blank board|white board|clipboard)\b/gi, "environmental visual detail")
     .replace(/["“”'‘’][^"“”'‘’]{1,80}["“”'‘’]/g, "")
     .replace(/\b\d{2,}\b/g, "")
     .replace(/\s+/g, " ")

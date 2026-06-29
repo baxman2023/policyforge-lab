@@ -5318,6 +5318,10 @@ button.text-link {
   gap: 3px;
 }
 
+.scene-background-card {
+  gap: 9px;
+}
+
 .media-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(220px, 1fr));

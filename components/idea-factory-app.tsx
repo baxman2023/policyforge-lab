@@ -7000,13 +7000,9 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                     {sceneBackgroundAssets.length ? (
                       <div className="thumbnail-results scene-background-results">
                         {sceneBackgroundAssets.map((background) => (
-                          <div className="thumbnail-card" key={background.id}>
+                          <div className="thumbnail-card scene-background-card" key={background.id}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={background.imageUrl} alt={background.title || `HeyGen Scene Background ${background.variant}`} />
-                            <div>
-                              <strong>{background.title || `HeyGen Scene Background ${background.variant}`}</strong>
-                              <span>{background.modelUsed}</span>
-                            </div>
                             <a className="secondary-button compact" href={background.imageUrl} target="_blank" rel="noreferrer">
                               <Download size={15} />
                               Open
