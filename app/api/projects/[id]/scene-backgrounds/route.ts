@@ -57,25 +57,55 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
 
 function parseSceneBackgroundPrompts(content: string): SceneBackgroundPrompt[] {
   const rows: SceneBackgroundPrompt[] = [];
-  const seen = new Set<number>();
   const pattern = /Scene\s+(\d{1,2})\s+Background\s+Prompt\s*:\s*([\s\S]+?)(?=\n\s*Scene\s+\d{1,2}\s+Background\s+Prompt\s*:|\n\s*(?:On-Screen Text Moments|B-Roll And Evidence Visuals|Sound And Music Cues|Thumbnail Moment Candidates|Shorts Clip Candidates|Risk And Sensitivity Notes|Asset Checklist)\b|$)/gi;
   let match: RegExpExecArray | null;
 
   while ((match = pattern.exec(content))) {
     const sceneNumber = Number(match[1]);
     const prompt = (match[2] || "").replace(/\s+/g, " ").trim();
-    if (!Number.isFinite(sceneNumber) || !prompt || seen.has(sceneNumber)) continue;
-    seen.add(sceneNumber);
+    if (!Number.isFinite(sceneNumber) || !prompt) continue;
     rows.push({
-      sceneNumber,
+      sceneNumber: rows.length + 1,
       title: firstPromptPhrase(prompt) || `Background`,
       prompt
     });
   }
 
+  if (!rows.length) {
+    parseSceneBackgroundVisualIdeas(content).forEach((item) => rows.push(item));
+  }
+
   return rows
     .sort((a, b) => a.sceneNumber - b.sceneNumber)
     .slice(0, 40);
+}
+
+function parseSceneBackgroundVisualIdeas(content: string): SceneBackgroundPrompt[] {
+  const rows: SceneBackgroundPrompt[] = [];
+  const normalized = content.replace(/\r\n/g, "\n");
+  const scenePattern = /(?:^|\n)\s*(?:\*\*)?Scene\s+(\d{1,2})(?:\*\*)?[^\n]*\n([\s\S]*?)(?=\n\s*(?:\*\*)?Scene\s+\d{1,2}(?:\*\*)?|\n\s*###\s+PART\b|\n\s*##\s+(?:HeyGen Scene Background Prompts|On-Screen Text Moments|B-Roll And Evidence Visuals|Sound And Music Cues|Thumbnail Moment Candidates|Shorts Clip Candidates|Risk And Sensitivity Notes|Asset Checklist)\b|$)/gi;
+  let match: RegExpExecArray | null;
+
+  while ((match = scenePattern.exec(normalized))) {
+    const block = match[2] || "";
+    const idea = firstField(block, "Background visual idea") || firstField(block, "Background image prompt");
+    if (!idea || /^see\s+heygen\s+scene\s+background\s+prompts/i.test(idea)) continue;
+    const beat = firstField(block, "Narration beat");
+    const title = beat || firstPromptPhrase(idea) || `Scene ${rows.length + 1}`;
+    rows.push({
+      sceneNumber: rows.length + 1,
+      title,
+      prompt: idea
+    });
+  }
+
+  return rows;
+}
+
+function firstField(block: string, label: string) {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(String.raw`(?:\*\*)?${escaped}(?:\*\*)?\s*:\s*([^\n]+)`, "i");
+  return block.match(pattern)?.[1]?.trim();
 }
 
 function firstPromptPhrase(value: string) {

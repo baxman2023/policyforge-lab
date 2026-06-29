@@ -5264,6 +5264,26 @@ button.text-link {
   margin-top: 12px;
 }
 
+.asset-results-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.asset-results-heading span,
+.asset-empty-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.asset-empty-note {
+  border: 1px dashed var(--line-strong);
+  border-radius: 7px;
+  padding: 12px;
+  background: #f7faf9;
+}
+
 .thumbnail-results {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

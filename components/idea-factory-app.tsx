@@ -5592,6 +5592,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const articleImagePlanCount = latestPublishingPack?.seoPack?.imagePlan.length ?? 0;
     const articleImageCount = isArticleProject ? selectedProject?.thumbnails?.filter(isArticleImageAsset).length ?? 0 : 0;
     const outputAssets = selectedProject ? displayAssetsForProject(selectedProject) : [];
+    const sceneBackgroundAssets = selectedProject ? sceneBackgroundAssetsForProject(selectedProject) : [];
     const selectedEpisodeCount = selectedProject ? episodeCountForProject(selectedProject) : 1;
     const outputAssetLimit = selectedProject && projectHasEpisodePlan(selectedProject) ? selectedEpisodeCount * 3 : canCreateBookIllustrations ? 12 : isArticleProject ? 8 : 6;
     const outputAssetLabel = assetResultsLabel(selectedProject);
@@ -6988,6 +6989,38 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                         </div>
                       ))}
                     </div>
+                  </div>
+                ) : null}
+                {selectedProject && supportsSceneBackgrounds(selectedProject) ? (
+                  <div className="asset-results-block">
+                    <div className="asset-results-heading">
+                      <strong>HeyGen Scene Backgrounds</strong>
+                      <span>{sceneBackgroundAssets.length}/{requiredSceneBackgroundCount || "?"} generated</span>
+                    </div>
+                    {sceneBackgroundAssets.length ? (
+                      <div className="thumbnail-results scene-background-results">
+                        {sceneBackgroundAssets.map((background) => (
+                          <div className="thumbnail-card" key={background.id}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={background.imageUrl} alt={background.title || `HeyGen Scene Background ${background.variant}`} />
+                            <div>
+                              <strong>{background.title || `HeyGen Scene Background ${background.variant}`}</strong>
+                              <span>{background.modelUsed}</span>
+                            </div>
+                            <a className="secondary-button compact" href={background.imageUrl} target="_blank" rel="noreferrer">
+                              <Download size={15} />
+                              Open
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="asset-empty-note">
+                        {requiredSceneBackgroundCount
+                          ? "Scene Cards are ready. Run HeyGen Backgrounds to generate one background per scene."
+                          : "Scene Cards do not have parseable background prompts yet. Rerun Scene Cards, then run HeyGen Backgrounds."}
+                      </div>
+                    )}
                   </div>
                 ) : null}
               </>
@@ -10108,20 +10141,22 @@ function sceneBackgroundAssetsForProject(project?: StoryProject | null) {
 function sceneBackgroundPromptCount(project?: StoryProject | null) {
   const sceneCards = latestDraftForPass(project || undefined, "SCENE_CARDS")?.content || "";
   const matches = sceneCards.match(/Scene\s+\d{1,2}\s+Background\s+Prompt\s*:/gi);
-  return matches?.length ?? 0;
+  if (matches?.length) return matches.length;
+  const sceneBlocks = sceneCards.match(/(?:^|\n)\s*(?:\*\*)?Scene\s+\d{1,2}(?:\*\*)?[\s\S]*?(?:\*\*)?Background visual idea(?:\*\*)?\s*:/gi);
+  return sceneBlocks?.length ?? 0;
 }
 
 function displayAssetsForProject(project: StoryProject) {
   const assets = project.thumbnails ?? [];
   if (project.format === "ARTICLE") return assets.filter(isArticleImageAsset);
   if (supportsBookIllustrations(project)) return assets.filter(isBookIllustrationAsset);
-  return assets.filter((asset) => !isArticleImageAsset(asset) && !isBookIllustrationAsset(asset));
+  return assets.filter((asset) => !isArticleImageAsset(asset) && !isBookIllustrationAsset(asset) && !isSceneBackgroundAsset(asset));
 }
 
 function assetResultsLabel(project?: StoryProject | null) {
   if (project?.format === "ARTICLE") return "Article Images";
   if (supportsBookIllustrations(project)) return "Book Illustrations";
-  return "HeyGen Video Assets";
+  return "Thumbnails";
 }
 
 function defaultBookIllustrationMax(format: StoryProjectFormat, mode: BookIllustrationMode) {

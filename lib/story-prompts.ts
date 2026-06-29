@@ -1813,6 +1813,8 @@ Rules:
 - For each scene card include: scene number, approximate timestamp range, narration beat, HeyGen presenter direction, background visual idea, on-screen text if any, SFX/music cue if useful, and one background image prompt.
 - In the "HeyGen Scene Background Prompts" section, list every background in this exact parseable format:
 Scene 01 Background Prompt: [single 16:9 background image prompt, no text, no typography, no logos, no watermark, no fake UI, no FLUX, suitable behind a HeyGen presenter]
+- Do not write "see HeyGen Scene Background Prompts" inside a scene card unless the matching prompt line actually exists in the HeyGen Scene Background Prompts section.
+- The HeyGen Scene Background Prompts section is required. It must contain the actual prompt text for every scene, not references, placeholders, summaries, or instructions to create prompts later.
 - Provide exactly one Scene XX Background Prompt for every scene card. Use leading zeroes for scenes 01-09.
 - Background prompts must be clean 16:9 scene backdrops, not YouTube thumbnails, posters, ads, infographics, or text-heavy images. They should leave safe negative space for a HeyGen presenter.
 - For a ${seriesLabel}, separate Scene Cards by ${episodePartLabels}.
