@@ -1,6 +1,7 @@
 import { PublishingSlotStatus, StoryIdeaStatus, StoryProjectFormat, StoryProjectStatus } from "@prisma/client";
 import { z } from "zod";
 import { auditLog } from "@/lib/audit";
+import { episodeCountForProject } from "@/lib/episodes";
 import { jsonError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { normalizeSponsorBlurbForFormat, supportsSponsorBlurb } from "@/lib/project-formats";
@@ -54,7 +55,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
           ...(input.targetLengthMinutes !== undefined
             ? {
                 targetLengthMinutes: input.targetLengthMinutes,
-                targetWordCount: targetWordsForProject(project.format, input.targetLengthMinutes)
+                targetWordCount: targetWordsForProject(project.format, input.targetLengthMinutes, episodeCountForProject(project))
               }
             : {})
         },

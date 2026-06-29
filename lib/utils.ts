@@ -27,7 +27,7 @@ export function targetWordsForMinutes(minutes: number) {
   return Math.round(Math.max(1, minutes) * 160);
 }
 
-export function targetWordsForProject(format: string, minutes: number) {
+export function targetWordsForProject(format: string, minutes: number, episodeCount = 5) {
   if (format === "ARTICLE") {
     if (minutes <= 30) return 1200;
     if (minutes >= 60) return 3000;
@@ -51,7 +51,7 @@ export function targetWordsForProject(format: string, minutes: number) {
   }
 
   if (format === "EPISODIC_SERIES") {
-    return targetWordsForMinutes(minutes) * 5;
+    return targetWordsForMinutes(minutes) * Math.min(5, Math.max(1, Math.round(episodeCount)));
   }
 
   return targetWordsForMinutes(minutes);

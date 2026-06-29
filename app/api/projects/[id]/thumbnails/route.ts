@@ -32,7 +32,7 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
     const thumbnailPrompts = pack.episodePacks?.length
       ? pack.episodePacks.flatMap((episode) => episode.thumbnailPrompts)
       : pack.thumbnailPrompts;
-    const expectedPromptCount = pack.episodePacks?.length ? 15 : 3;
+    const expectedPromptCount = pack.episodePacks?.length ? pack.episodePacks.length * 3 : 3;
     if (thumbnailPrompts.length !== expectedPromptCount) {
       return Response.json({ error: `Publishing Pack must include exactly ${expectedPromptCount} thumbnail prompts.` }, { status: 400 });
     }

@@ -56,6 +56,7 @@ import {
   getBookIllustrationModelOption
 } from "@/lib/book-illustration-models";
 import { apiPath } from "@/lib/client-api";
+import { episodeCountForProject } from "@/lib/episodes";
 import { formatHeyGenSceneScript, shouldFormatAsHeyGenScenes } from "@/lib/heygen-scenes";
 import { normalizeSponsorBlurbForFormat, normalizeSponsorLanguageForFormat, supportsSponsorBlurb } from "@/lib/project-formats";
 import { ensureIntroSponsorPlacement, ensureOutroSponsorPlacement, stripSponsorCopyFromBody } from "@/lib/sponsor-placement";
@@ -3478,7 +3479,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
     if (!projectHasCompletedEpisodePlan(selectedProject)) {
-      setMessage("Run Episodes first, then Episode Fully Auto can build the five-part series.");
+      setMessage("Run Episodes first, then Episode Fully Auto can build the planned series.");
       return;
     }
 
@@ -3489,7 +3490,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
     const confirmed = window.confirm(
-      `Run Episode Fully Auto for "${selectedProject.title}"?\n\nBaxter Growth Lab will keep the completed five-episode plan and run: ${sequence.length ? sequence.map((passType) => passLabelForProject(passType, "EPISODIC_SERIES")).join(", ") : "Thumbnails"}. This can take several minutes and will use your configured models.`
+      `Run Episode Fully Auto for "${selectedProject.title}"?\n\nBaxter Growth Lab will keep the completed ${episodeCountForProject(selectedProject)}-episode plan and run: ${sequence.length ? sequence.map((passType) => passLabelForProject(passType, "EPISODIC_SERIES")).join(", ") : "Thumbnails"}. This can take several minutes and will use your configured models.`
     );
     if (!confirmed) return;
 
@@ -5591,7 +5592,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const articleImagePlanCount = latestPublishingPack?.seoPack?.imagePlan.length ?? 0;
     const articleImageCount = isArticleProject ? selectedProject?.thumbnails?.filter(isArticleImageAsset).length ?? 0 : 0;
     const outputAssets = selectedProject ? displayAssetsForProject(selectedProject) : [];
-    const outputAssetLimit = selectedProject && projectHasEpisodePlan(selectedProject) ? 15 : canCreateBookIllustrations ? 12 : isArticleProject ? 8 : 6;
+    const selectedEpisodeCount = selectedProject ? episodeCountForProject(selectedProject) : 1;
+    const outputAssetLimit = selectedProject && projectHasEpisodePlan(selectedProject) ? selectedEpisodeCount * 3 : canCreateBookIllustrations ? 12 : isArticleProject ? 8 : 6;
     const outputAssetLabel = assetResultsLabel(selectedProject);
     const qualityScorecard = selectedProject ? qualityScorecardForProject(selectedProject) : null;
     const claimLedger = selectedProject ? claimLedgerForProject(selectedProject) : null;
@@ -5600,7 +5602,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       id: "episodes",
       number: 4,
       title: "Episodes",
-      description: `Plans five deep ${selectedProject?.targetLengthMinutes ?? 30}-minute episodes and under-covered angles.`,
+      description: `Plans ${selectedEpisodeCount} deep ${selectedProject?.targetLengthMinutes ?? 30}-minute episodes and under-covered angles.`,
       complete: hasPass("EPISODES"),
       enabled: Boolean(selectedProject),
       busyKey: "pass-EPISODES",
@@ -5894,7 +5896,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         id: "thumbnails",
         number: 18 + workflowNumberOffset,
         title: "Thumbnails",
-        description: selectedProject && projectHasEpisodePlan(selectedProject) ? "Generate fifteen 16:9 Runware thumbnails from the five episode packs." : "Generate three 16:9 Runware thumbnails from the pack prompts.",
+        description: selectedProject && projectHasEpisodePlan(selectedProject) ? `Generate ${selectedEpisodeCount * 3} 16:9 Runware thumbnails from the ${selectedEpisodeCount} episode packs.` : "Generate three 16:9 Runware thumbnails from the pack prompts.",
         complete: thumbnailCount >= requiredThumbnailCount,
         enabled: hasPass("PUBLISHING_PACK"),
         busyKey: selectedProject ? `thumbnails-${selectedProject.id}` : "thumbnails",
@@ -9354,7 +9356,7 @@ function shouldTrackClientJob(label: string) {
 
 function clientJobCopy(label: string) {
   if (label === "auto") return { label: "Fully Auto Workflow", detail: "Running each unlocked production step in order." };
-  if (label === "episode-auto") return { label: "Episode Fully Auto", detail: "Building the five-episode series from the saved episode plan." };
+  if (label === "episode-auto") return { label: "Episode Fully Auto", detail: "Building the episode series from the saved episode plan." };
   if (label === "monthly-auto") return { label: "Monthly Auto", detail: "Creating projects and assigning calendar slots." };
   if (label === "channel-machine") return { label: "Growth Pack", detail: "Generating positioning, keywords, visuals, and idea lanes." };
   if (label === "thumbnail-batch") return { label: "Batch Thumbnails", detail: "Creating missing packs and thumbnails." };
@@ -9502,14 +9504,14 @@ function projectHasEpisodePublishingPack(project?: StoryProject | null) {
   const packDraft = latestDraftForPass(project || undefined, "PUBLISHING_PACK");
   if (!packDraft) return false;
   try {
-    return (parsePublishingPack(packDraft.content).episodePacks?.length ?? 0) === 5;
+    return (parsePublishingPack(packDraft.content).episodePacks?.length ?? 0) === episodeCountForProject(project);
   } catch {
     return false;
   }
 }
 
 function requiredThumbnailCountForProject(project?: StoryProject | null) {
-  return projectHasEpisodePlan(project) ? 15 : 3;
+  return projectHasEpisodePlan(project) ? episodeCountForProject(project) * 3 : 3;
 }
 
 function isUsedStatus(status: IdeaStatus) {
@@ -10570,7 +10572,8 @@ function assembleEpisodeReviewContent(
   }
 
   const sections: string[] = [];
-  for (let episodeNumber = 1; episodeNumber <= 5; episodeNumber += 1) {
+  const episodeCount = episodeCountForProject(project);
+  for (let episodeNumber = 1; episodeNumber <= episodeCount; episodeNumber += 1) {
     const intro = introSections.find((section) => section.episodeNumber === episodeNumber);
     const body = bodySections.find((section) => section.episodeNumber === episodeNumber);
     const outro = outroSections.find((section) => section.episodeNumber === episodeNumber);
@@ -10667,6 +10670,7 @@ function projectWorkspaceTabs(input: {
   const thumbnailsNeeded = supportsThumbnails(input.project);
   const thumbnailsReady = !thumbnailsNeeded || input.thumbnailCount >= input.requiredThumbnailCount;
   const exportReady = hasPublishableScript(input.project);
+  const episodeCount = episodeCountForProject(input.project);
   return [
     {
       label: "Brief",
@@ -10679,7 +10683,7 @@ function projectWorkspaceTabs(input: {
     {
       label: "Episodes",
       status: projectHasEpisodePlan(input.project) ? "Planned" : supportsEpisodePlanning(input.project) ? "Available" : "N/A",
-      detail: projectHasEpisodePlan(input.project) ? "Five-part series plan is present." : supportsEpisodePlanning(input.project) ? "Turn this project into a five-part series." : "This format does not use episodes.",
+      detail: projectHasEpisodePlan(input.project) ? `${episodeCount}-part series plan is present.` : supportsEpisodePlanning(input.project) ? "Turn this project into a series." : "This format does not use episodes.",
       explain: "Episode cards track each part's script, pack, thumbnail, and export readiness.",
       state: projectHasEpisodePlan(input.project) ? "ready" : supportsEpisodePlanning(input.project) ? "needs-review" : "muted",
       action: () => scrollToWorkspaceTarget("episode-board")
@@ -10757,7 +10761,8 @@ function projectReadinessState(project: StoryProject, slots: PublishingSlot[]) {
 function episodeBoardItems(project: StoryProject, publishingPack: ClientPublishingPack | null, sections: EpisodeOutputSection[]) {
   const packs = publishingPack?.episodePacks ?? [];
   const thumbnails = project.thumbnails ?? [];
-  return Array.from({ length: 5 }, (_, index) => {
+  const episodeCount = episodeCountForProject(project);
+  return Array.from({ length: episodeCount }, (_, index) => {
     const episodeNumber = index + 1;
     const partLabel = `Part ${episodeNumber}`;
     const section = sections.find((item) => item.episodeNumber === episodeNumber);

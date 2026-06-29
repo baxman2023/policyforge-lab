@@ -1,4 +1,5 @@
 import type { ScriptPassType, StoryProjectFormat, UserSettings } from "@prisma/client";
+import { DEFAULT_EPISODE_COUNT, episodePartList, episodeSeriesLabel } from "@/lib/episodes";
 import { narrationStyleOptions, storyLengthOptions, toneOptions } from "@/lib/story-options";
 
 type IdeaContentMode =
@@ -48,8 +49,40 @@ function projectOutputName(format?: StoryProjectFormat | string | null) {
   if (format === "ARTICLE") return "article";
   if (format === "SHORT_BOOK") return "short book manuscript";
   if (format === "LONG_BOOK") return "long form book manuscript";
-  if (format === "EPISODIC_SERIES") return "five-episode video series";
+  if (format === "EPISODIC_SERIES") return "episodic video series";
   return "standalone video script";
+}
+
+function episodeWord(value: number) {
+  if (value === 1) return "One";
+  if (value === 2) return "Two";
+  if (value === 3) return "Three";
+  if (value === 4) return "Four";
+  if (value === 5) return "Five";
+  return String(value);
+}
+
+function episodeHeadingList(count: number, suffix = "") {
+  return Array.from({ length: Math.min(5, Math.max(1, Math.round(count))) }, (_, index) => `Episode ${episodeWord(index + 1)}${suffix}`).join("\n");
+}
+
+function episodeInlineHeadingList(count: number) {
+  return Array.from({ length: Math.min(5, Math.max(1, Math.round(count))) }, (_, index) => `Episode ${episodeWord(index + 1)}: [title]`).join(", ");
+}
+
+function formatEpisodeArcForPrompt(value: unknown) {
+  if (!Array.isArray(value) || value.length === 0) return "Not provided";
+  return value
+    .map((item, index) => {
+      if (item && typeof item === "object") {
+        const part = "part" in item && typeof item.part === "string" ? item.part : `Part ${index + 1}`;
+        const title = "title" in item && typeof item.title === "string" ? item.title : "";
+        const promise = "promise" in item && typeof item.promise === "string" ? item.promise : "";
+        return `${part}: ${[title, promise].filter(Boolean).join(" - ") || "No details provided"}`;
+      }
+      return `Part ${index + 1}: ${String(item)}`;
+    })
+    .join("\n");
 }
 
 function contentModeLabel(mode?: IdeaContentMode | string | null) {
@@ -67,6 +100,7 @@ function inferProjectContentMode(input: {
   category?: string | null;
   sourceType?: string | null;
   suggestedAngle?: string | null;
+  episodeArc?: unknown;
   location?: string | null;
   eventName?: string | null;
   title?: string | null;
@@ -589,6 +623,7 @@ export function projectGenerationPrompt(passType: ScriptPassType, input: {
   sourceMaterial?: string;
   sponsorBlurb?: string;
   sponsorLink?: string;
+  episodeCount?: number;
   thumbnailStyleGuide?: string;
   seoKeywordHints?: string;
   channelVoiceGuide?: string;
@@ -597,6 +632,7 @@ export function projectGenerationPrompt(passType: ScriptPassType, input: {
   category?: string | null;
   sourceType?: string | null;
   suggestedAngle?: string | null;
+  episodeArc?: unknown;
   location?: string | null;
   eventName?: string | null;
   contentMode?: IdeaContentMode;
@@ -605,15 +641,19 @@ export function projectGenerationPrompt(passType: ScriptPassType, input: {
   const isArticle = format === "ARTICLE";
   const isPodcast = format === "PODCAST_EPISODE";
   const isEpisodicSeries = format === "EPISODIC_SERIES";
-  const hasEpisodePlan = /Five-episode series plan/i.test(input.passContext || "");
+  const hasEpisodePlan = /Episode series plan|Five-episode series plan/i.test(input.passContext || "");
   const isSeriesWorkflow = isEpisodicSeries || hasEpisodePlan;
+  const episodeCount = Math.min(5, Math.max(1, Math.round(input.episodeCount || DEFAULT_EPISODE_COUNT)));
+  const seriesLabel = episodeSeriesLabel(episodeCount);
+  const episodeHeadings = episodeHeadingList(episodeCount);
+  const episodePartLabels = episodePartList(episodeCount);
   const isShortBook = format === "SHORT_BOOK";
   const isLongBook = format === "LONG_BOOK";
   const isBook = isShortBook || isLongBook;
   const contentMode = input.contentMode ?? inferProjectContentMode(input);
   const isStrategicProject = contentMode !== "STORY_DOCUMENTARY";
   const formatLabel = projectFormatLabel(format);
-  const outputName = isSeriesWorkflow ? "five-episode video series" : projectOutputName(format);
+  const outputName = isSeriesWorkflow ? seriesLabel : projectOutputName(format);
   const seriesTargetWordCount = input.targetWordCount;
   const policyForgeEngineBrief = policyForgeScriptEngineBrief(input);
   const targetLine = isArticle
@@ -621,7 +661,7 @@ export function projectGenerationPrompt(passType: ScriptPassType, input: {
     : isBook
       ? `Target output: ${input.targetWordCount.toLocaleString()}-word ${isLongBook ? "long form" : "short"} book manuscript`
       : isSeriesWorkflow
-        ? `Series target: five episodes, each about ${input.targetLengthMinutes} minutes\nTotal series target word count: ${seriesTargetWordCount.toLocaleString()} words`
+        ? `Series target: exactly ${episodeCount} episodes, each about ${input.targetLengthMinutes} minutes\nTotal series target word count: ${seriesTargetWordCount.toLocaleString()} words`
         : `Target length: ${input.targetLengthMinutes} minutes\nTarget word count: ${input.targetWordCount}`;
   const shared = `${isStrategicProject ? "Content title" : "Story title"}: ${input.title}
 Content mode: ${contentModeLabel(contentMode)}
@@ -633,6 +673,8 @@ Source type: ${input.sourceType || "Not provided"}
 Suggested angle: ${input.suggestedAngle || "Not provided"}
 Location or market: ${input.location || "Not provided"}
 Event, service problem, or buyer moment: ${input.eventName || "Not provided"}
+Idea episode arc, if already recommended:
+${formatEpisodeArcForPrompt(input.episodeArc)}
 ${targetLine}
 Tone: ${input.tone}
 Narration style: ${input.narrationStyle}
@@ -722,7 +764,7 @@ ${sponsorLinkText}`;
       if (isSeriesWorkflow) {
         return `${shared}
 
-Create opening narration for all five episodes in the series.
+Create opening narration for all ${episodeCount} episodes in the series.
 
 Agency CTA instructions provided by the user:
 ${sponsorText}
@@ -731,11 +773,7 @@ Agency CTA link saved for the YouTube description:
 ${sponsorLinkText}
 
 Output plain text with these exact sections:
-Episode One Intro
-Episode Two Intro
-Episode Three Intro
-Episode Four Intro
-Episode Five Intro
+${episodeHeadingList(episodeCount, " Intro")}
 
 Rules:
 - Each intro should be a distinct cold open for that specific episode, not a generic series trailer.
@@ -890,18 +928,14 @@ Rules:
     case "EPISODES":
       return `${shared}
 
-Create an episode plan for a deep five-part series from this idea.
+Create an episode plan for a deep ${episodeCount}-part series from this idea.
 
-Assume the topic can support five ${input.targetLengthMinutes}-minute videos if researched deeply. Your job is to find the strongest way to split the story into episodes without padding, repetition, or fake certainty.
+The idea has already been judged as best suited to exactly ${episodeCount} episodes. Your job is to plan those ${episodeCount} ${input.targetLengthMinutes}-minute videos without adding extra parts, padding, repetition, or fake certainty.
 
 Output plain text with these exact sections:
 Series Thesis
-Why This Deserves Five Episodes
-Episode One
-Episode Two
-Episode Three
-Episode Four
-Episode Five
+Why This Deserves ${episodeCount} Episodes
+${episodeHeadings}
 Under-Covered Angles
 Original Research Leads
 What Everyone Else Usually Misses
@@ -914,21 +948,17 @@ Rules:
 - Include angles that may be under-covered, overlooked, locally reported, buried in timelines, or usually skipped by summary videos.
 - Do not invent facts. If an episode depends on research that is not yet confirmed, label it as a research lead.
 - Do not turn one thin story into five padded recaps. If an episode is risky or evidence-thin, say exactly what research would make it viable.
-- In "Best First Episode To Draft Now," choose the strongest episode, but the full series workflow must still draft all five episodes. Do not ask the user to choose.`;
+- In "Best First Episode To Draft Now," choose the strongest episode, but the full series workflow must still draft all ${episodeCount} episodes. Do not ask the user to choose.`;
     case "SERIES_BIBLE":
       return `${shared}
 
-Create the Series Bible for this five-episode project.
+Create the Series Bible for this ${seriesLabel} project.
 
 Output plain text with these exact sections:
 Series Thesis
 Audience Promise
 Season Arc
-Episode One Promise And Boundary
-Episode Two Promise And Boundary
-Episode Three Promise And Boundary
-Episode Four Promise And Boundary
-Episode Five Promise And Boundary
+${episodeHeadingList(episodeCount, " Promise And Boundary")}
 Recurring Mystery Thread
 Continuity Rules
 Spoiler Rules
@@ -938,28 +968,19 @@ Title Thumbnail Promise
 Final Draft Instructions
 
 Rules:
-- Treat this as the source of truth for all five episodes.
+- Treat this as the source of truth for all ${episodeCount} episodes.
 - Each episode needs its own promise, reveal arc, payoff, and boundary so the series never feels like one script chopped into pieces.
 - Define what can be repeated, what must not be repeated, and what must be held back until later parts.
 - Do not invent facts. Label uncertain leads as research leads.
-- Make Part One through Part Five feel connected but individually satisfying.`;
+- Make ${episodePartLabels} feel connected but individually satisfying.`;
     case "HOOK_LAB":
       if (isSeriesWorkflow) {
         return `${shared}
 
-Create a Hook Lab for this five-episode series. If an episode plan exists, create hooks for each planned episode.
+Create a Hook Lab for this ${seriesLabel}. If an episode plan exists, create hooks for each planned episode.
 
 Output plain text with these exact sections:
-Episode One Hook Candidates
-Episode One Selected Hook
-Episode Two Hook Candidates
-Episode Two Selected Hook
-Episode Three Hook Candidates
-Episode Three Selected Hook
-Episode Four Hook Candidates
-Episode Four Selected Hook
-Episode Five Hook Candidates
-Episode Five Selected Hook
+${Array.from({ length: episodeCount }, (_, index) => `Episode ${episodeWord(index + 1)} Hook Candidates\nEpisode ${episodeWord(index + 1)} Selected Hook`).join("\n")}
 Series Hook Continuity Notes
 
 Rules:
@@ -1118,7 +1139,7 @@ Draft Instructions
 Rules:
 - Use the target length and target word count exactly as the controlling constraint.
 - Give a realistic acceptable word range: minimum, ideal, and hard ceiling.
-- For a five-episode series, create separate word budgets for Episode One through Episode Five and a total series budget.
+- For a ${seriesLabel}, create separate word budgets for ${episodePartLabels} and a total series budget.
 - For each major section or episode, say what belongs there and what must not spill over.
 - Prevent padding, repetition, fake certainty, overlong context, and bloated endings.
 - This is a control document, not a script.`;
@@ -1142,26 +1163,22 @@ Draft Instructions
 Rules:
 - Track what question is opened, when it is opened, how it keeps attention, and when it pays off.
 - Make sure the script delivers the promise implied by the title, hook, and thumbnail.
-- For a five-episode series, create separate loop ledgers for each episode and a series-level unanswered thread.
+- For a ${seriesLabel}, create separate loop ledgers for each episode and a series-level unanswered thread.
 - Do not create fake mysteries or unsupported claims.
 - Every loop must either pay off, be clearly framed as unresolved, or be removed.`;
     case "DRAFT":
       if (isSeriesWorkflow) {
         return `${shared}
 
-Write the full spoken narration scripts for all five episodes in this episodic video series. Use the episode plan as the spine. If Hook Lab, Story Spine, Structure, or Retention Map material exists, apply it across the full five-episode series.
+Write the full spoken narration scripts for all ${episodeCount} episodes in this episodic video series. Use the episode plan as the spine. If Hook Lab, Story Spine, Structure, or Retention Map material exists, apply it across the full ${seriesLabel}.
 
 Output plain text with these exact sections:
-Episode One: [episode title]
-Episode Two: [episode title]
-Episode Three: [episode title]
-Episode Four: [episode title]
-Episode Five: [episode title]
+${episodeHeadingList(episodeCount, ": [episode title]")}
 
 Episode rules:
 - Each episode must be a complete standalone narration script with its own hook, middle, payoff, and closing bridge.
 - Each episode should target roughly ${input.targetLengthMinutes} minutes.
-- Total series target is roughly ${seriesTargetWordCount.toLocaleString()} words across all five episodes.
+- Total series target is roughly ${seriesTargetWordCount.toLocaleString()} words across all ${episodeCount} episodes.
 - Do not write one long documentary split by arbitrary labels. Each episode needs its own central question and reveal arc.
 - Do not repeat the same recap at the start of every episode.
 - Preserve series continuity, but make every episode satisfying on its own.
@@ -1257,7 +1274,7 @@ Rules:
 - Score from 0-100 where useful.
 - Compare the draft against the Retention Map, Open Loop Ledger, and Length Governor.
 - Identify exact sections, episode parts, or approximate time ranges where attention may drop.
-- For five-episode series, score each episode separately and then score the series.
+- For a ${seriesLabel}, score each episode separately and then score the series.
 - Do not rewrite the script here. Give direct instructions for Rewrite and Voice Polish.`;
     case "CRITIQUE":
       return `${shared}
@@ -1323,10 +1340,10 @@ Rules:
       if (isSeriesWorkflow) {
         return `${shared}
 
-Rewrite the full five-episode series to apply the critique and fact/continuity check. Improve each episode's hook, pacing, tension, engagement, emotional impact, narration rhythm, clarity, factual safety, and ending.
+Rewrite the full ${seriesLabel} to apply the critique and fact/continuity check. Improve each episode's hook, pacing, tension, engagement, emotional impact, narration rhythm, clarity, factual safety, and ending.
 
 Rules:
-- Preserve all five episode scripts.
+- Preserve all ${episodeCount} episode scripts.
 - Keep clear plain-text episode headings.
 - Do not collapse the series into one episode.
 - Strengthen continuity between episodes without repeating the same recap.
@@ -1383,11 +1400,11 @@ ${ttsScriptRules}`;
       if (isSeriesWorkflow) {
         return `${shared}
 
-Create the Voice Polish version of the full five-episode series.
+Create the Voice Polish version of the full ${seriesLabel}.
 
 Rules:
-- Output all five complete episode scripts.
-- Preserve clear plain-text headings: Episode One: [title], Episode Two: [title], Episode Three: [title], Episode Four: [title], Episode Five: [title].
+- Output all ${episodeCount} complete episode scripts.
+- Preserve clear plain-text headings: ${episodeInlineHeadingList(episodeCount)}.
 - Remove AI-sounding cadence, generic documentary filler, repeated sentence rhythm, stiff transitions, cheap hype, and overused rhetorical questions.
 - Make the narration sound human, specific, grounded, cinematic, and easy to perform.
 - Preserve factual caution, episode boundaries, open-loop payoffs, and the Series Bible.
@@ -1440,11 +1457,7 @@ Run the final quality gate before series polish.
 
 Output plain text with these exact sections:
 Overall Series Score
-Episode One Score
-Episode Two Score
-Episode Three Score
-Episode Four Score
-Episode Five Score
+${episodeHeadingList(episodeCount, " Score")}
 Series Continuity Score
 Retention Score
 Clarity Score
@@ -1462,7 +1475,7 @@ Rules:
 - Score each category from 0-100.
 - Be blunt and specific.
 - Identify weak episodes, repetition, abrupt endings, continuity issues, unsupported claims, or teleprompter problems.
-- Confirm whether all five episodes are present.
+- Confirm whether all ${episodeCount} episodes are present.
 - Check whether each episode meets the title/thumbnail promise immediately, proves effort or credibility early, delivers an early payoff, and bridges naturally to the next section.
 - Flag missing or heavy-handed agency CTA handling, especially if it hurts trust, compliance, or episode continuity.
 - Reject any deliberate factual error, fake engagement bait, or misleading curiosity gap.
@@ -1597,11 +1610,11 @@ Rules:
       if (isSeriesWorkflow) {
         return `${shared}
 
-Create the final teleprompter-ready five-episode series from the strongest previous series draft above. Apply the final quality gate instructions.
+Create the final teleprompter-ready ${seriesLabel} from the strongest previous series draft above. Apply the final quality gate instructions.
 
 Output rules:
-- Output all five final episode scripts.
-- Use clear plain-text headings: Episode One: [title], Episode Two: [title], Episode Three: [title], Episode Four: [title], Episode Five: [title].
+- Output all ${episodeCount} final episode scripts.
+- Use clear plain-text headings: ${episodeInlineHeadingList(episodeCount)}.
 - Do not use Markdown fences, bullet lists, horizontal rules, title cards, stage directions, or production notes.
 - Do not include bracketed pause markers. Never write [pause], [beat], [music], [sfx], or similar cues.
 - Write clean narrator-ready paragraphs under each episode heading.
@@ -1609,7 +1622,7 @@ ${ttsOutputRules}
 ${bodySponsorRules}
 - Preserve the strongest hooks, transitions, tension, factual caution, and emotional endings.
 - Remove AI-sounding phrases, unsupported claims, and production notes.
-- Total series target is roughly ${seriesTargetWordCount.toLocaleString()} words across five ${input.targetLengthMinutes}-minute episodes.
+- Total series target is roughly ${seriesTargetWordCount.toLocaleString()} words across ${episodeCount} ${input.targetLengthMinutes}-minute episodes.
 - Every episode must have a complete final paragraph and must not end abruptly.
 - Do not collapse the series into one summary or one selected episode.`;
       }
@@ -1672,7 +1685,7 @@ ${bodySponsorRules}
       if (isSeriesWorkflow) {
         return `${shared}
 
-Create closing narration for all five episodes in the series.
+Create closing narration for all ${episodeCount} episodes in the series.
 
 Agency CTA instructions provided by the user:
 ${sponsorText}
@@ -1681,16 +1694,12 @@ Agency CTA link saved for the YouTube description:
 ${sponsorLinkText}
 
 Output plain text with these exact sections:
-Episode One Outro
-Episode Two Outro
-Episode Three Outro
-Episode Four Outro
-Episode Five Outro
+${episodeHeadingList(episodeCount, " Outro")}
 
 Rules:
 - Each outro should be a short human closing paragraph for that specific episode.
-- Episodes one through four should close the episode and naturally tease the next episode without spoiling it.
-- Episode five should close the full series with a satisfying final note and a standard subscribe, like, comment, and share request.
+- Every episode before the final part should close the episode and naturally tease the next episode without spoiling it.
+- The final episode should close the full series with a satisfying final note and a standard subscribe, like, comment, and share request.
 - If agency CTA instructions are provided, include the agency CTA message exactly once at the very end of each outro.
 - Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
 - If a CTA link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the CTA instructions.
@@ -1806,7 +1815,7 @@ Rules:
 Scene 01 Background Prompt: [single 16:9 background image prompt, no text, no typography, no logos, no watermark, no fake UI, no FLUX, suitable behind a HeyGen presenter]
 - Provide exactly one Scene XX Background Prompt for every scene card. Use leading zeroes for scenes 01-09.
 - Background prompts must be clean 16:9 scene backdrops, not YouTube thumbnails, posters, ads, infographics, or text-heavy images. They should leave safe negative space for a HeyGen presenter.
-- For five-episode series, separate Scene Cards by Episode One through Episode Five.
+- For a ${seriesLabel}, separate Scene Cards by ${episodePartLabels}.
 - Include 5-10 Shorts clip candidates with hook line, source moment, caption angle, and CTA back to the full video.
 - Do not request fake evidence, fake documents, fake real-person confessions, gore, exploitation, or exact copyrighted/celebrity styles.
 - Keep visual prompts aligned with the saved channel thumbnail/style guidance when available.`;
@@ -1971,7 +1980,7 @@ ${nonVideoSponsorRules}
       if (isSeriesWorkflow) {
         return `${shared}
 
-Create the final YouTube Publishing Packs for this completed five-episode series.
+Create the final YouTube Publishing Packs for this completed ${seriesLabel}.
 
 Agency CTA instructions provided by the user:
 ${sponsorText}
@@ -2015,7 +2024,7 @@ Schema:
 }
 
 Rules:
-- Provide exactly five episodePacks: Part 1, Part 2, Part 3, Part 4, and Part 5.
+- Provide exactly ${episodeCount} episodePacks: ${episodePartLabels}.
 - Every title option must include the exact matching part label, such as "Part 1:" or "Part 2:".
 - Every thumbnail prompt title, overlayText, and prompt must include the exact matching part label.
 - Each episode pack must be for that episode only, not the whole series.
@@ -2039,8 +2048,8 @@ Rules:
 - The bottom contact block must include https://www.baxterinsuranceagency.com, 281-445-1381, and 450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060.
 - If an agency CTA link is provided, each description must include the exact link string at least twice: ${sponsorLink || "no agency CTA link"}.
 - Thumbnail prompts should produce bold clickbait documentary images, not generic stock art or quiet poster art.
-- Keep all fifteen thumbnail prompts in the same channel family while making each part visually distinct.
-- For every thumbnail, provide overlayText as exactly 2-4 punchy all-caps words and include PART 1, PART 2, PART 3, PART 4, or PART 5 as appropriate.
+- Keep all ${episodeCount * 3} thumbnail prompts in the same channel family while making each part visually distinct.
+- For every thumbnail, provide overlayText as exactly 2-4 punchy all-caps words and include the matching PART number as appropriate.
 - Every thumbnail prompt must explicitly specify the exact overlay text, where it appears, one or two red arrows/circles, what those arrows/circles point at, the main focal subject, background, color accents, curiosity gap, and matching part label.
 - Every thumbnail prompt must be thumbnail-first: one dominant subject, one mystery/evidence detail, instant readability on mobile, and a visual that can be echoed in the first 5 seconds of the episode.
 - Pinned comments should ask for a genuine viewer interpretation, theory, memory, or next-question response. Do not use intentional typos, fake mistakes, or manipulative engagement bait.
@@ -2224,6 +2233,7 @@ export function scriptExpansionPrompt(input: {
   targetWordCount: number;
   currentWordCount: number;
   minimumWordCount: number;
+  episodeCount?: number;
   tone: string;
   narrationStyle: string;
   sourceMaterial?: string;
@@ -2233,15 +2243,17 @@ export function scriptExpansionPrompt(input: {
 }) {
   const isEpisodicSeries = input.format === "EPISODIC_SERIES";
   const format = input.format === "PODCAST_EPISODE" ? "podcast-ready spoken script" : "teleprompter-ready video script";
+  const episodeCount = Math.min(5, Math.max(1, Math.round(input.episodeCount || DEFAULT_EPISODE_COUNT)));
+  const seriesLabel = episodeSeriesLabel(episodeCount);
   const sponsorRule = input.sponsorBlurb?.trim()
     ? "The user provided sponsor copy, but this body script must not include sponsor, ad, promo, offer, product, or link-in-description language."
     : "No sponsor copy was provided; do not mention sponsors, products, offers, or links.";
 
   if (isEpisodicSeries) {
-    return `The previous five-episode series draft is too short and must be rewritten/expanded before it can be saved.
+    return `The previous ${seriesLabel} draft is too short and must be rewritten/expanded before it can be saved.
 
 Story title: ${input.title}
-Series target: five episodes, each about ${input.targetLengthMinutes} minutes
+Series target: ${episodeCount} episodes, each about ${input.targetLengthMinutes} minutes
 Total target word count: ${input.targetWordCount.toLocaleString()} words
 Current word count: ${input.currentWordCount.toLocaleString()} words
 Minimum acceptable word count: ${input.minimumWordCount.toLocaleString()} words
@@ -2257,13 +2269,13 @@ ${input.passContext || "No previous pass material available."}
 Current under-length series draft:
 ${input.currentContent}
 
-Rewrite and expand the entire five-episode series, not just a continuation.
+Rewrite and expand the entire ${seriesLabel}, not just a continuation.
 
 Rules:
-- Output all five complete episode scripts.
-- Preserve clear plain-text headings: Episode One: [title], Episode Two: [title], Episode Three: [title], Episode Four: [title], Episode Five: [title].
+- Output all ${episodeCount} complete episode scripts.
+- Preserve clear plain-text headings: ${episodeInlineHeadingList(episodeCount)}.
 - Each episode must be a standalone narration script with its own hook, middle, payoff, and closing bridge.
-- Aim for the total target word count across all five episodes. At minimum, exceed the minimum acceptable word count.
+- Aim for the total target word count across all ${episodeCount} episodes. At minimum, exceed the minimum acceptable word count.
 - Keep the same factual caution, but deepen through verified context, timeline reconstruction, source uncertainty, competing explanations, aftermath, emotional stakes, and why the story endured.
 - Do not collapse the series into one long script, one selected episode, a summary, or a list of episode outlines.
 - Do not pad, repeat, ramble, or invent facts.

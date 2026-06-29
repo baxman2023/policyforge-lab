@@ -54,7 +54,13 @@ function assembleEpisodeScriptForExport(
     return normalizeSponsorLanguageForFormat(stripSponsorCopyFromBody(bodyContent, sponsorBlurb), format);
   }
   const sections: string[] = [];
-  for (let episodeNumber = 1; episodeNumber <= 5; episodeNumber += 1) {
+  const episodeCount = Math.max(
+    1,
+    ...introSections.map((section) => section.episodeNumber),
+    ...bodySections.map((section) => section.episodeNumber),
+    ...outroSections.map((section) => section.episodeNumber)
+  );
+  for (let episodeNumber = 1; episodeNumber <= episodeCount; episodeNumber += 1) {
     const intro = introSections.find((section) => section.episodeNumber === episodeNumber);
     const body = bodySections.find((section) => section.episodeNumber === episodeNumber);
     const outro = outroSections.find((section) => section.episodeNumber === episodeNumber);

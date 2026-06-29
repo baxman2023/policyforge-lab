@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auditLog } from "@/lib/audit";
 import { channelIdFromRequest, getUserChannel } from "@/lib/channels";
 import { jsonError } from "@/lib/http";
+import { episodeCountForIdea } from "@/lib/episodes";
 import { prisma } from "@/lib/prisma";
 import { normalizeSponsorBlurbForFormat, supportsSponsorBlurb } from "@/lib/project-formats";
 import { formatProjectForResponse } from "@/lib/project-response";
@@ -107,7 +108,7 @@ export async function POST(request: Request) {
           title: input.title || idea?.title || "Untitled Content Project",
           format: input.format,
           targetLengthMinutes: input.targetLengthMinutes,
-          targetWordCount: targetWordsForProject(input.format, input.targetLengthMinutes),
+          targetWordCount: targetWordsForProject(input.format, input.targetLengthMinutes, input.format === StoryProjectFormat.EPISODIC_SERIES ? episodeCountForIdea(idea) : 1),
           tone: input.tone,
           narrationStyle: input.narrationStyle,
           sponsorBlurb,

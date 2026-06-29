@@ -1,6 +1,7 @@
 import { ScriptPassType, StoryProjectStatus, type ScriptDraft, type StoryProjectFormat } from "@prisma/client";
 import { z } from "zod";
 import { auditLog } from "@/lib/audit";
+import { episodeCountForProject, episodeSeriesLabel } from "@/lib/episodes";
 import { jsonError } from "@/lib/http";
 import { generateJson, generateText } from "@/lib/openrouter";
 import { formatHeyGenSceneScript, shouldFormatAsHeyGenScenes } from "@/lib/heygen-scenes";
@@ -16,7 +17,7 @@ import { getOrCreateUserSettings } from "@/lib/settings";
 import { ensureIntroSponsorPlacement, ensureOutroSponsorPlacement, stripSponsorCopyFromBody } from "@/lib/sponsor-placement";
 import { DEFAULT_THUMBNAIL_STYLE_GUIDE } from "@/lib/thumbnail-style";
 import { formatScriptForTts } from "@/lib/tts-format";
-import { estimatedMinutesFromWords, wordCount } from "@/lib/utils";
+import { estimatedMinutesFromWords, targetWordsForMinutes, wordCount } from "@/lib/utils";
 import { formatPublishingPackContent } from "@/lib/youtube-description";
 
 const GenerateProjectSchema = z.object({
@@ -91,8 +92,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       : "";
     const passContext = buildPassContext(input.passType, project.drafts, project.format, sponsorBlurb);
     const hasEpisodePlan = project.format === "EPISODIC_SERIES" || project.drafts.some((draft) => draft.passType === ScriptPassType.EPISODES);
-    const effectiveTargetWordCount = hasEpisodePlan && project.format !== "EPISODIC_SERIES"
-      ? project.targetWordCount * 5
+    const episodeCount = episodeCountForProject(project);
+    const effectiveTargetWordCount = hasEpisodePlan
+      ? targetWordsForMinutes(project.targetLengthMinutes) * episodeCount
       : project.targetWordCount;
     const generatedEpisodePack = await generateSegmentedEpisodePublishingPackIfNeeded({
       userId: user.id,
@@ -181,6 +183,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             sourceMaterial,
             sponsorBlurb,
             sponsorLink,
+            episodeCount,
             thumbnailStyleGuide: settings.thumbnailStyleGuide || DEFAULT_THUMBNAIL_STYLE_GUIDE,
             seoKeywordHints,
             channelVoiceGuide,
@@ -189,6 +192,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             category: project.storyIdea?.category,
             sourceType: project.storyIdea?.sourceType,
             suggestedAngle: project.storyIdea?.suggestedAngle,
+            episodeArc: project.storyIdea?.episodeArc,
             location: project.storyIdea?.location,
             eventName: project.storyIdea?.eventName
           })
@@ -537,6 +541,7 @@ async function enforceMinimumScriptLength(input: {
           targetWordCount: input.project.targetWordCount,
           currentWordCount,
           minimumWordCount,
+          episodeCount: episodeCountForProject(input.project),
           tone: input.project.tone,
           narrationStyle: input.project.narrationStyle,
           sourceMaterial: input.sourceMaterial,
@@ -547,7 +552,7 @@ async function enforceMinimumScriptLength(input: {
       }
     ],
     temperature: 0.62,
-    maxTokens: maxTokensForPass(input.passType, input.project.format, /Five-episode series plan/i.test(input.passContext))
+    maxTokens: maxTokensForPass(input.passType, input.project.format, /Episode series plan/i.test(input.passContext))
   });
 
   const expandedContent = polishGeneratedContent(input.passType, expansion.content, input.sponsorBlurb, input.project.format);
@@ -621,12 +626,13 @@ async function generateSegmentedEpisodePublishingPackIfNeeded(input: {
   const hasEpisodePlan = input.project.format === "EPISODIC_SERIES" || input.project.drafts.some((draft) => draft.passType === ScriptPassType.EPISODES);
   if (input.passType !== ScriptPassType.PUBLISHING_PACK || !hasEpisodePlan) return null;
 
+  const episodeCount = episodeCountForProject(input.project);
   const finishedScript = latestDraftForTypes(input.project.drafts, [ScriptPassType.FINAL, ScriptPassType.REWRITE, ScriptPassType.DRAFT]);
   const episodeSections = parseServerEpisodeOutputSections(finishedScript?.content || "");
   const packs = [];
   const modelsUsed: string[] = [];
 
-  for (let episodeNumber = 1; episodeNumber <= 5; episodeNumber += 1) {
+  for (let episodeNumber = 1; episodeNumber <= episodeCount; episodeNumber += 1) {
     const episode = episodeSections.find((section) => section.episodeNumber === episodeNumber);
     const result = await generateJson<unknown>({
       userId: input.userId,
@@ -640,6 +646,7 @@ async function generateSegmentedEpisodePublishingPackIfNeeded(input: {
           content: singleEpisodePublishingPackPrompt({
             ...input,
             episodeNumber,
+            episodeCount,
             episodeTitle: episode?.title || `Episode ${episodeNumber}`,
             episodeScript: episode?.content || finishedScript?.content || "No finished script is available yet. Use the episode plan and previous context.",
             episodePlan: latestDraftForTypes(input.project.drafts, [ScriptPassType.EPISODES])?.content || "",
@@ -657,7 +664,7 @@ async function generateSegmentedEpisodePublishingPackIfNeeded(input: {
   const content = normalizePublishingPack(JSON.stringify({ episodePacks: packs }, null, 2));
   return {
     content,
-    modelUsed: `${uniqueModelLabels(modelsUsed).join("; ")}; segmented-episode-publishing-pack:5`
+    modelUsed: `${uniqueModelLabels(modelsUsed).join("; ")}; segmented-episode-publishing-pack:${episodeCount}`
   };
 }
 
@@ -718,6 +725,7 @@ function singleEpisodePublishingPackPrompt(input: {
     } | null;
   };
   episodeNumber: number;
+  episodeCount: number;
   episodeTitle: string;
   episodeScript: string;
   episodePlan: string;
@@ -730,7 +738,7 @@ function singleEpisodePublishingPackPrompt(input: {
   passContext: string;
 }) {
   const partLabel = `Part ${input.episodeNumber}`;
-  return `Create one YouTube Publishing Pack for ${partLabel} of this five-episode series.
+  return `Create one YouTube Publishing Pack for ${partLabel} of this ${episodeSeriesLabel(input.episodeCount)}.
 
 Series title: ${input.project.title}
 Episode title: ${input.episodeTitle}
@@ -835,7 +843,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const hookLab = latest(ScriptPassType.HOOK_LAB);
     const storySpine = latest(ScriptPassType.STORY_SPINE);
     const script = latest(ScriptPassType.FINAL) ?? latest(ScriptPassType.VOICE_POLISH) ?? latest(ScriptPassType.REWRITE) ?? latest(ScriptPassType.DRAFT);
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
     if (hookLab) sections.push(formatDraftContext("Selected hook to align with", hookLab));
     if (storySpine) sections.push(formatDraftContext("Story spine to respect", storySpine));
     if (script) sections.push(formatDraftContext(`Existing ${outputName} to match`, script));
@@ -845,7 +853,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const dossier = latest(ScriptPassType.DOSSIER);
     const episodes = latest(ScriptPassType.EPISODES);
     if (dossier) sections.push(formatDraftContext("Research dossier and fact ledger", dossier));
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
   }
 
   if (passType === ScriptPassType.EPISODES) {
@@ -861,7 +869,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const episodes = latest(ScriptPassType.EPISODES);
     if (dossier) sections.push(formatDraftContext("Research dossier and fact ledger", dossier));
     if (analyticsBrief) sections.push(formatDraftContext("Analytics brief to respect", analyticsBrief));
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
   }
 
   if (passType === ScriptPassType.HOOK_LAB) {
@@ -871,7 +879,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const seriesBible = latest(ScriptPassType.SERIES_BIBLE);
     if (dossier) sections.push(formatDraftContext("Research dossier and fact ledger", dossier));
     if (analyticsBrief) sections.push(formatDraftContext("Analytics brief", analyticsBrief));
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
     if (seriesBible) sections.push(formatDraftContext("Series bible", seriesBible));
   }
 
@@ -883,7 +891,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const hookLab = latest(ScriptPassType.HOOK_LAB);
     if (dossier) sections.push(formatDraftContext("Research dossier and fact ledger", dossier));
     if (analyticsBrief) sections.push(formatDraftContext("Analytics brief", analyticsBrief));
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
     if (seriesBible) sections.push(formatDraftContext("Series bible", seriesBible));
     if (hookLab) sections.push(formatDraftContext("Hook Lab selected hook", hookLab));
   }
@@ -897,7 +905,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const storySpine = latest(ScriptPassType.STORY_SPINE);
     if (dossier) sections.push(formatDraftContext("Research dossier and fact ledger", dossier));
     if (analyticsBrief) sections.push(formatDraftContext("Analytics brief", analyticsBrief));
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
     if (seriesBible) sections.push(formatDraftContext("Series bible", seriesBible));
     if (hookLab) sections.push(formatDraftContext("Hook Lab selected hook", hookLab));
     if (storySpine) sections.push(formatDraftContext("Locked story spine", storySpine));
@@ -913,7 +921,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const structure = latest(ScriptPassType.STRUCTURE);
     if (dossier) sections.push(formatDraftContext("Research dossier and fact ledger", dossier));
     if (analyticsBrief) sections.push(formatDraftContext("Analytics brief", analyticsBrief));
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
     if (seriesBible) sections.push(formatDraftContext("Series bible", seriesBible));
     if (hookLab) sections.push(formatDraftContext("Hook Lab selected hook", hookLab));
     if (storySpine) sections.push(formatDraftContext("Locked story spine", storySpine));
@@ -925,7 +933,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const retentionMap = latest(ScriptPassType.RETENTION_MAP);
     const episodes = latest(ScriptPassType.EPISODES);
     const seriesBible = latest(ScriptPassType.SERIES_BIBLE);
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
     if (seriesBible) sections.push(formatDraftContext("Series bible", seriesBible));
     if (structure) sections.push(formatDraftContext("Approved structure", structure));
     if (retentionMap) sections.push(formatDraftContext("Retention beat map", retentionMap));
@@ -957,7 +965,7 @@ function buildPassContext(passType: ScriptPassType, drafts: ScriptDraft[], forma
     const openLoopLedger = latest(ScriptPassType.OPEN_LOOP_LEDGER);
     if (dossier) sections.push(formatDraftContext("Research dossier and fact ledger", dossier));
     if (analyticsBrief) sections.push(formatDraftContext("Analytics brief", analyticsBrief));
-    if (episodes) sections.push(formatDraftContext("Five-episode series plan", episodes));
+    if (episodes) sections.push(formatDraftContext("Episode series plan", episodes));
     if (seriesBible) sections.push(formatDraftContext("Series bible", seriesBible));
     if (hookLab) sections.push(formatDraftContext("Hook Lab selected hook", hookLab));
     if (storySpine) sections.push(formatDraftContext("Locked story spine", storySpine));

@@ -107,7 +107,7 @@ export type EpisodePublishingPack = {
 export function normalizePublishingPack(content: string, options: { requireThumbnailPrompts?: boolean } = {}) {
   const pack = parsePublishingPack(content);
   if (pack.episodePacks?.length) {
-    if (pack.episodePacks.length !== 5) throw new Error("Episodic Publishing Pack must include exactly 5 episode packs.");
+    if (pack.episodePacks.length < 1 || pack.episodePacks.length > 5) throw new Error("Episodic Publishing Pack must include 1-5 episode packs.");
     for (const episode of pack.episodePacks) {
       if (episode.titles.length !== 3) throw new Error(`${episode.partLabel} must include exactly 3 title options.`);
       if (options.requireThumbnailPrompts !== false && episode.thumbnailPrompts.length !== 3) {
