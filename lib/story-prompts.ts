@@ -658,6 +658,7 @@ ${projectModeRules(contentMode)}
 
   const ttsScriptRules = `TTS formatting rules for spoken script output:
 - Spell out every number as words. Never use Arabic numerals in spoken script copy.
+- Exception: scene labels for HeyGen may use numerals, exactly like "Scene 1" and "Scene 2".
 - Write dates, years, ages, times, ranges, money, percentages, addresses, cabin numbers, flight numbers, route numbers, and counts exactly as they should be read aloud.
 - For difficult, unusual, non-English, or easily mispronounced names and places, use a TTS-friendly phonetic spelling inline on first mention. If the original spelling must remain clear, phrase it naturally once, such as "Curaçao, pronounced KUR-uh-sow," then use the normal name after that.
 - Do not add editor-only pronunciation notes, brackets, footnotes, or stage directions.`;
@@ -1630,11 +1631,12 @@ ${bodySponsorRules}
 Create the final ${isPodcast ? "podcast-ready" : "teleprompter-ready"} script from the strongest previous script above. Apply the final quality gate instructions.
 
 Output rules:
-- Output only the final spoken narration.
-- Do not use Markdown.
-- Do not use headings, title cards, chapter names, "Part One" labels, bullet points, lists, horizontal rules, or separator lines.
+- Output only the final spoken narration broken into simple HeyGen scenes.
+- Use this exact format: Scene 1, then the narration text for that scene; Scene 2, then the narration text for that scene; continue until the script is complete.
+- Do not add scene titles, timestamps, cues, descriptions, background notes, visual notes, presenter directions, title cards, chapter names, "Part One" labels, bullet points, lists, horizontal rules, or separator lines.
 - Do not include bracketed stage directions or pause markers. Never write [pause], [beat], [music], [sfx], or similar cues.
-- Write clean paragraphs for a narrator to read directly from a teleprompter.
+- Write only clean narrator text under each scene label.
+- For 7-10 minute videos, use roughly 8-14 scenes. For longer scripts under 30 minutes, use enough scenes to keep HeyGen manageable without creating tiny fragments.
 ${ttsOutputRules}
 ${bodySponsorRules}
 - Preserve the strongest hook, clear transitions, tension, and emotional ending.
@@ -2265,13 +2267,15 @@ ${input.currentContent}
 Rewrite and expand the entire script, not just a continuation.
 
 Rules:
-- Output only the complete expanded spoken narration.
+- Output only the complete expanded spoken narration broken into simple HeyGen scenes.
+- Use this exact format: Scene 1, then the narration text for that scene; Scene 2, then the narration text for that scene; continue until the script is complete.
+- Do not add scene titles, timestamps, cues, descriptions, background notes, visual notes, presenter directions, bullets, title cards, or separator lines.
 - Aim for the target word count. At minimum, exceed the minimum acceptable word count.
 - Keep the same factual caution, but deepen through verified context, timeline reconstruction, source uncertainty, competing explanations, aftermath, emotional stakes, and why the story endured.
 - Do not pad, repeat, ramble, or invent facts.
 - Keep it natural for TTS and teleprompter reading.
 - Spell out every number as words. Never use Arabic numerals in spoken script copy.
-- Do not use Markdown, headings, bullets, timestamps, title cards, chapter labels, bracketed stage directions, or pause markers.
+- Do not use Markdown, bullets, timestamps, title cards, chapter labels, bracketed stage directions, or pause markers. The only headings allowed are Scene 1, Scene 2, Scene 3, and so on.
 - ${sponsorRule}
 - End with a complete final paragraph.`;
 }

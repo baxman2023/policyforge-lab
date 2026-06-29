@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auditLog } from "@/lib/audit";
 import { jsonError } from "@/lib/http";
 import { generateJson, generateText } from "@/lib/openrouter";
+import { formatHeyGenSceneScript, shouldFormatAsHeyGenScenes } from "@/lib/heygen-scenes";
 import { isBookProjectFormat, normalizeSponsorBlurbForFormat, normalizeSponsorLanguageForFormat, supportsSponsorBlurb } from "@/lib/project-formats";
 import { normalizePublishingPack } from "@/lib/publishing-pack";
 import { prisma } from "@/lib/prisma";
@@ -1695,6 +1696,10 @@ function polishGeneratedContent(
 
   if (!/[.!?]["')\]]?$/.test(polished) && !options.forceSave) {
     throw new Error("Final script output appeared incomplete and was not saved. Please run Final again, or use Force Save Final if the result is acceptable.");
+  }
+
+  if (passType === ScriptPassType.FINAL && shouldFormatAsHeyGenScenes(projectFormat)) {
+    return formatHeyGenSceneScript(polished);
   }
 
   return polished;

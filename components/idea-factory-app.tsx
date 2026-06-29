@@ -56,6 +56,7 @@ import {
   getBookIllustrationModelOption
 } from "@/lib/book-illustration-models";
 import { apiPath } from "@/lib/client-api";
+import { formatHeyGenSceneScript, shouldFormatAsHeyGenScenes } from "@/lib/heygen-scenes";
 import { normalizeSponsorBlurbForFormat, normalizeSponsorLanguageForFormat, supportsSponsorBlurb } from "@/lib/project-formats";
 import { ensureIntroSponsorPlacement, ensureOutroSponsorPlacement, stripSponsorCopyFromBody } from "@/lib/sponsor-placement";
 import { narrationStyleOptions, nicheFocusOptions, storyLengthOptions, toneOptions } from "@/lib/story-options";
@@ -5803,8 +5804,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       {
         id: "final",
         number: 13 + workflowNumberOffset,
-        title: isArticleProject ? "Final Article" : isPodcastProject ? "Final Podcast Script" : isBookProject ? projectFinalOutputLabel(selectedProject?.format) : "Teleprompter Polish",
-        description: isArticleProject ? "Publication-ready article with clean sections and a complete ending." : isBookProject ? "Publication-ready book manuscript with clear chapters and a complete ending." : "Clean final narration with no markdown, headings, or pause markers.",
+        title: isArticleProject ? "Final Article" : isPodcastProject ? "Final Podcast Script" : isBookProject ? projectFinalOutputLabel(selectedProject?.format) : "HeyGen Scene Script",
+        description: isArticleProject ? "Publication-ready article with clean sections and a complete ending." : isBookProject ? "Publication-ready book manuscript with clear chapters and a complete ending." : "Final narration split into Scene 1, Scene 2, and clean script text only.",
         complete: hasPass("FINAL"),
         enabled: hasPass("QUALITY_GATE"),
         busyKey: "pass-FINAL",
@@ -9528,13 +9529,16 @@ function scriptOutputOptionsForProject(project: StoryProject | undefined): Curre
   const outro = latestDraftForPass(project, "OUTRO");
   if (body) {
     const projectSponsorBlurb = supportsSponsorBlurb(project.format) ? normalizeSponsorBlurbForFormat(project.sponsorBlurb, project.format) : null;
-    const content = projectHasEpisodePlan(project)
+    const assembledContent = projectHasEpisodePlan(project)
       ? assembleEpisodeReviewContent(project, intro?.content, body.content, outro?.content, projectSponsorBlurb)
       : [
           intro ? normalizeSponsorLanguageForFormat(ensureIntroSponsorPlacement(intro.content, projectSponsorBlurb), project.format) : undefined,
           normalizeSponsorLanguageForFormat(stripSponsorCopyFromBody(body.content, projectSponsorBlurb), project.format),
           outro ? normalizeSponsorLanguageForFormat(ensureOutroSponsorPlacement(outro.content, projectSponsorBlurb), project.format) : undefined
         ].filter(Boolean).join("\n\n");
+    const content = shouldFormatAsHeyGenScenes(project.format)
+      ? formatHeyGenSceneScript(assembledContent)
+      : assembledContent;
     const words = countWords(content);
     outputs.push({
       ...body,

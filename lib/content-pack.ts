@@ -1,4 +1,5 @@
 import type { ScriptDraft, StoryIdea, StoryProject, ThumbnailAsset } from "@prisma/client";
+import { formatHeyGenSceneScript, shouldFormatAsHeyGenScenes } from "@/lib/heygen-scenes";
 import { parsePublishingPack } from "@/lib/publishing-pack";
 import { normalizeSponsorBlurbForFormat, normalizeSponsorLanguageForFormat, supportsSponsorBlurb } from "@/lib/project-formats";
 import { ensureIntroSponsorPlacement, ensureOutroSponsorPlacement, stripSponsorCopyFromBody } from "@/lib/sponsor-placement";
@@ -26,15 +27,17 @@ export function completeScriptForProject(project: Pick<StoryProject, "format" | 
   const body = latestBodyDraft(project.drafts);
   const outro = latestDraftForPass(project.drafts, "OUTRO");
   const sponsorBlurb = supportsSponsorBlurb(project.format) ? normalizeSponsorBlurbForFormat(project.sponsorBlurb, project.format) : null;
-  if ((project.format === "EPISODIC_SERIES" || latestDraftForPass(project.drafts, "EPISODES")) && body) {
-    return assembleEpisodeScriptForExport(project.format, intro?.content, body.content, outro?.content, sponsorBlurb);
-  }
+  const assembled = (project.format === "EPISODIC_SERIES" || latestDraftForPass(project.drafts, "EPISODES")) && body
+    ? assembleEpisodeScriptForExport(project.format, intro?.content, body.content, outro?.content, sponsorBlurb)
+    : [
+        intro ? normalizeSponsorLanguageForFormat(ensureIntroSponsorPlacement(intro.content, sponsorBlurb), project.format) : undefined,
+        body ? normalizeSponsorLanguageForFormat(stripSponsorCopyFromBody(body.content, sponsorBlurb), project.format) : undefined,
+        outro ? normalizeSponsorLanguageForFormat(ensureOutroSponsorPlacement(outro.content, sponsorBlurb), project.format) : undefined
+      ].filter(Boolean).join("\n\n");
 
-  return [
-    intro ? normalizeSponsorLanguageForFormat(ensureIntroSponsorPlacement(intro.content, sponsorBlurb), project.format) : undefined,
-    body ? normalizeSponsorLanguageForFormat(stripSponsorCopyFromBody(body.content, sponsorBlurb), project.format) : undefined,
-    outro ? normalizeSponsorLanguageForFormat(ensureOutroSponsorPlacement(outro.content, sponsorBlurb), project.format) : undefined
-  ].filter(Boolean).join("\n\n");
+  return shouldFormatAsHeyGenScenes(project.format)
+    ? formatHeyGenSceneScript(assembled)
+    : assembled;
 }
 
 function assembleEpisodeScriptForExport(
