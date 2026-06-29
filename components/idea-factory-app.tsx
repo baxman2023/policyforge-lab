@@ -7003,10 +7003,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                           <div className="thumbnail-card scene-background-card" key={background.id}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={background.imageUrl} alt={background.title || `HeyGen Scene Background ${background.variant}`} />
-                            <a className="secondary-button compact" href={background.imageUrl} target="_blank" rel="noreferrer">
-                              <Download size={15} />
-                              Open
-                            </a>
+                            <div className="scene-background-card-footer">
+                              <strong>Scene {background.variant}</strong>
+                              <a className="secondary-button compact" href={background.imageUrl} target="_blank" rel="noreferrer">
+                                <Download size={15} />
+                                Open
+                              </a>
+                            </div>
                           </div>
                         ))}
                       </div>

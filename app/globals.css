@@ -5322,6 +5322,18 @@ button.text-link {
   gap: 9px;
 }
 
+.scene-background-card-footer {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.scene-background-card-footer strong {
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
 .media-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(220px, 1fr));
