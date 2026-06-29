@@ -28,7 +28,7 @@ const BOOK_ILLUSTRATION_NEGATIVE_PROMPT =
 const ARTICLE_IMAGE_NEGATIVE_PROMPT =
   "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, text, typography, label, caption, watermark, logo, UI chrome, meme, advertisement, clickbait arrows, stock-photo cliche";
 const SCENE_BACKGROUND_NEGATIVE_PROMPT =
-  "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, poster, advertisement, text, typography, caption, label, watermark, logo, UI chrome, social media layout, clickbait arrows, cluttered foreground, busy background";
+  "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, poster, advertisement, text, typography, caption, label, watermark, logo, UI chrome, social media layout, clickbait arrows, cluttered foreground, busy background, readable words, letters, numbers, signage, brand names, HeyGen text, hook text, title card, lower third, checklist text, document text, license plate text, fake text, gibberish characters, random characters";
 
 type RunwareImageResponse = {
   data?: Array<{
@@ -540,12 +540,13 @@ function articleImagePositivePrompt(image: ArticleImagePlan) {
 
 function sceneBackgroundPositivePrompt(prompt: SceneBackgroundPrompt) {
   return [
-    "Clean 16:9 background image for a HeyGen presenter video, professional insurance education, designed to sit behind or beside a talking-head avatar.",
-    "No text, no typography, no labels, no watermarks, no logos, no UI, no arrows, no YouTube thumbnail styling.",
+    "Clean 16:9 wordless background image for a presenter-led insurance education video, designed to sit behind or beside a talking-head avatar.",
+    "Absolutely no words or readable characters anywhere: no text overlays, no signs, no titles, no labels, no logos, no UI, no document text, no captions, no watermarks, no arrows, no lower thirds, no brand names.",
+    "Do not render the words HeyGen, hook, scene, insurance, Baxter, phone numbers, addresses, or any other letters or numbers.",
     "Leave safe negative space on one side for a presenter. Keep the scene visually useful but not busy.",
-    `Scene ${prompt.sceneNumber}: ${prompt.title}.`,
-    `Image prompt: ${clampText(prompt.prompt, 1700)}`,
-    "Use credible Texas/Houston, home, auto, business, policy document, storm, renewal, family, or service-context visuals when relevant. Polished documentary/editorial lighting, realistic, trustworthy, compliance-safe, no sensationalism, no fabricated documents with readable text."
+    `Visual brief: ${clampText(prompt.prompt, 1700)}`,
+    "If documents, screens, permits, checklists, papers, street signs, or license plates appear, they must be blank, abstract, blurred, turned away, or unreadable with no visible letters or numbers.",
+    "Use credible Texas/Houston, home, auto, business, policy document, storm, renewal, family, or service-context visuals when relevant. Polished documentary/editorial lighting, realistic, trustworthy, compliance-safe, no sensationalism."
   ].join(" ").slice(0, 3200);
 }
 

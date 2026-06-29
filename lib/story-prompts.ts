@@ -1816,7 +1816,8 @@ Scene 01 Background Prompt: [single 16:9 background image prompt, no text, no ty
 - Do not write "see HeyGen Scene Background Prompts" inside a scene card unless the matching prompt line actually exists in the HeyGen Scene Background Prompts section.
 - The HeyGen Scene Background Prompts section is required. It must contain the actual prompt text for every scene, not references, placeholders, summaries, or instructions to create prompts later.
 - Provide exactly one Scene XX Background Prompt for every scene card. Use leading zeroes for scenes 01-09.
-- Background prompts must be clean 16:9 scene backdrops, not YouTube thumbnails, posters, ads, infographics, or text-heavy images. They should leave safe negative space for a HeyGen presenter.
+- Background prompts must be clean 16:9 wordless scene backdrops, not YouTube thumbnails, posters, ads, infographics, text-heavy images, title cards, lower thirds, checklists, signs, labels, logos, or UI screens. They should leave safe negative space for a presenter.
+- Background prompts must not ask for any readable words, numbers, letters, phone numbers, addresses, document text, license plate text, brand names, "HeyGen", "hook", or overlay text. If documents, permits, checklists, screens, road signs, or license plates appear, specify that they are blank, abstract, turned away, or unreadable.
 - For a ${seriesLabel}, separate Scene Cards by ${episodePartLabels}.
 - Include 5-10 Shorts clip candidates with hook line, source moment, caption angle, and CTA back to the full video.
 - Do not request fake evidence, fake documents, fake real-person confessions, gore, exploitation, or exact copyrighted/celebrity styles.

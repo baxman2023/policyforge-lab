@@ -35,6 +35,16 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
       return Response.json({ error: "Scene Cards must include lines like: Scene 01 Background Prompt: ..." }, { status: 400 });
     }
 
+    await prisma.thumbnailAsset.deleteMany({
+      where: {
+        storyProjectId: project.id,
+        OR: [
+          { title: { startsWith: "HeyGen Scene" } },
+          { prompt: { startsWith: "HeyGen scene background" } }
+        ]
+      }
+    });
+
     const backgrounds = await generateSceneBackgrounds({
       userId: user.id,
       storyProjectId: project.id,
