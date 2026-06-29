@@ -539,26 +539,37 @@ function articleImagePositivePrompt(image: ArticleImagePlan) {
 }
 
 function sceneBackgroundPositivePrompt(prompt: SceneBackgroundPrompt) {
-  const visualBrief = sanitizeSceneBackgroundBrief(prompt.prompt);
+  const visualBrief = safeSceneEnvironment(prompt.prompt);
   return [
-    "Full-frame realistic environmental photograph, edge-to-edge complete image, no graphic design elements.",
-    "No words, no letters, no numbers, no captions, no signs, no labels, no logos, no UI, no overlays, no lower thirds, no arrows, no title-card design.",
-    "No papers, documents, checklists, whiteboards, computer screens, phone screens, tablet screens, road signs, license plates, billboards, poster boards, presentation boards, blank signs, blank cards, blank screens, or large white panels.",
-    "Fill the entire frame with a natural location or object scene with depth, texture, natural light, foreground and background detail. Avoid empty white space, blank rectangles, and board-like surfaces.",
-    `Visual brief: ${clampText(visualBrief, 1500)}`,
-    "Prefer Houston/Texas lifestyle and location visuals: home exterior, driveway, garage, house, vehicle parked in driveway, steering wheel and keys with no dashboard text, family kitchen counter without papers, living room, office interior without screens or signs, neighborhood street with no signs, stormy sky, or small business exterior with no signage.",
-    "Keep composition calm, professional, trustworthy, and visually complete."
+    "Photorealistic full-frame sixteen by nine environmental image.",
+    "Complete edge-to-edge real-world photo composition with natural depth, foreground detail, background detail, warm professional lighting, and no graphic design layout.",
+    visualBrief,
+    "Use natural textures, real spaces, vehicles, homes, streets, weather, furniture, plants, walls, pavement, wood, brick, glass reflections, and ordinary household or office objects.",
+    "Keep the composition calm, professional, trustworthy, and visually complete."
   ].join(" ").slice(0, 3200);
 }
 
-function sanitizeSceneBackgroundBrief(value: string) {
-  return value
-    .replace(/\b(HeyGen|hook|scene|title card|lower third|on-screen text|overlay text|caption|logo|watermark)\b/gi, "")
-    .replace(/\b(policy document|document|paperwork|paper|checklist|permit|license|insurance card|screen|whiteboard|road sign|street sign|license plate|poster board|presentation board|blank board|white board|clipboard)\b/gi, "environmental visual detail")
-    .replace(/["“”'‘’][^"“”'‘’]{1,80}["“”'‘’]/g, "")
-    .replace(/\b\d{2,}\b/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+function safeSceneEnvironment(value: string) {
+  const text = value.toLowerCase();
+  if (/\b(storm|hail|rain|weather|wind|hurricane|flood)\b/.test(text)) {
+    return "A Houston-area residential street during dramatic stormy weather, wet pavement, parked vehicles, mature trees, brick homes, dark clouds, cinematic natural light, fully detailed environment.";
+  }
+  if (/\b(garage|driveway|parked|vehicle|car shopping|new car|teen driver|license day|driving)\b/.test(text)) {
+    return "A suburban Houston driveway with a parked family vehicle, garage, brick home exterior, trimmed lawn, trees, realistic afternoon light, complete natural environment.";
+  }
+  if (/\b(interior|steering|dashboard|driver|road|freeway|traffic)\b/.test(text)) {
+    return "Interior view from a family car with steering wheel, seats, windshield view of a Houston roadway, natural reflections, realistic light, complete photographic environment.";
+  }
+  if (/\b(kitchen|family|parent|conversation|home)\b/.test(text)) {
+    return "Warm family kitchen in a Houston home, countertop, chairs, soft morning light, house plants, subtle lived-in details, complete real environment.";
+  }
+  if (/\b(office|agent|agency|review|call|quote|limits|coverage)\b/.test(text)) {
+    return "Professional insurance office interior with desk, chairs, warm lighting, plants, neutral walls, subtle Texas decor, complete realistic room environment.";
+  }
+  if (/\b(neighborhood|street|suburb|house|home exterior)\b/.test(text)) {
+    return "Quiet Houston suburban neighborhood street with brick homes, parked vehicles, sidewalks, trees, lawns, natural sky, full-frame realistic environment.";
+  }
+  return "Houston-area residential lifestyle environment with home exterior, driveway, parked vehicle, trees, lawn, warm natural light, full-frame realistic photographic detail.";
 }
 
 function supportsNegativePrompt(model: string) {
