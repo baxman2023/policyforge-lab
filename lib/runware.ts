@@ -28,7 +28,7 @@ const BOOK_ILLUSTRATION_NEGATIVE_PROMPT =
 const ARTICLE_IMAGE_NEGATIVE_PROMPT =
   "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, text, typography, label, caption, watermark, logo, UI chrome, meme, advertisement, clickbait arrows, stock-photo cliche";
 const SCENE_BACKGROUND_NEGATIVE_PROMPT =
-  "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, poster, advertisement, text, typography, caption, label, watermark, logo, UI chrome, social media layout, clickbait arrows, cluttered foreground, busy background, readable words, letters, numbers, signage, brand names, HeyGen text, hook text, title card, lower third, checklist text, document text, license plate text, fake text, gibberish characters, random characters";
+  "low quality, blurry, cropped, distorted anatomy, gore, graphic injury, fake blood, YouTube thumbnail, poster, advertisement, text, typography, caption, label, watermark, logo, UI chrome, social media layout, clickbait arrows, cluttered foreground, busy background, readable words, letters, numbers, signage, brand names, title card, lower third, checklist, document, paper sheet, whiteboard, computer screen, phone screen, tablet screen, license plate, fake text, gibberish characters, random characters, large blank white rectangle, empty white panel, blank card";
 
 type RunwareImageResponse = {
   data?: Array<{
@@ -539,15 +539,26 @@ function articleImagePositivePrompt(image: ArticleImagePlan) {
 }
 
 function sceneBackgroundPositivePrompt(prompt: SceneBackgroundPrompt) {
+  const visualBrief = sanitizeSceneBackgroundBrief(prompt.prompt);
   return [
-    "Clean 16:9 wordless background image for a presenter-led insurance education video, designed to sit behind or beside a talking-head avatar.",
-    "Absolutely no words or readable characters anywhere: no text overlays, no signs, no titles, no labels, no logos, no UI, no document text, no captions, no watermarks, no arrows, no lower thirds, no brand names.",
-    "Do not render the words HeyGen, hook, scene, insurance, Baxter, phone numbers, addresses, or any other letters or numbers.",
-    "Leave safe negative space on one side for a presenter. Keep the scene visually useful but not busy.",
-    `Visual brief: ${clampText(prompt.prompt, 1700)}`,
-    "If documents, screens, permits, checklists, papers, street signs, or license plates appear, they must be blank, abstract, blurred, turned away, or unreadable with no visible letters or numbers.",
-    "Use credible Texas/Houston, home, auto, business, policy document, storm, renewal, family, or service-context visuals when relevant. Polished documentary/editorial lighting, realistic, trustworthy, compliance-safe, no sensationalism."
+    "Pure visual 16:9 background image only. Realistic photo-like environment for a presenter video.",
+    "No words, no letters, no numbers, no captions, no signs, no labels, no logos, no UI, no overlays, no lower thirds, no arrows, no title-card design.",
+    "No papers, documents, checklists, whiteboards, computer screens, phone screens, tablet screens, road signs, license plates, or large blank white panels.",
+    "Create an actual environmental image with depth, texture, natural light, and real-world context. Avoid empty white space and blank rectangles.",
+    `Visual brief: ${clampText(visualBrief, 1500)}`,
+    "Prefer Houston/Texas lifestyle and location visuals: home exterior, driveway, car interior with no visible dashboard text, family kitchen without papers, living room, insurance office without screens or signs, neighborhood street with no readable signs, stormy sky, garage, keys, house, vehicle, or small business exterior with no signage.",
+    "Keep composition calm, professional, trustworthy, and useful as a backdrop behind a presenter."
   ].join(" ").slice(0, 3200);
+}
+
+function sanitizeSceneBackgroundBrief(value: string) {
+  return value
+    .replace(/\b(HeyGen|hook|scene|title card|lower third|on-screen text|overlay text|caption|logo|watermark)\b/gi, "")
+    .replace(/\b(policy document|document|paperwork|paper|checklist|permit|license|insurance card|screen|whiteboard|road sign|street sign|license plate)\b/gi, "non-text visual object")
+    .replace(/["“”'‘’][^"“”'‘’]{1,80}["“”'‘’]/g, "")
+    .replace(/\b\d{2,}\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function supportsNegativePrompt(model: string) {
