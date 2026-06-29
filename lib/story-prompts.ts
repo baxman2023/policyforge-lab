@@ -195,6 +195,13 @@ Return strict JSON with this shape:
       "whyCompelling": "string",
       "estimatedLengthPotential": "${isShortBook ? "Standard short book - about 15,000 words" : isLongBook ? "Standard long form book - about 60,000 words" : "7-10 min"}",
       "recommendedLengthMinutes": 7,
+      "episodeFit": "Low | Medium | High",
+      "bestFormat": "Single Video | 3-Part Series | 5-Part Series",
+      "episodeWhy": "short reason this should be one video or a series",
+      "episodeArc": [
+        { "part": "Part 1", "title": "episode title", "promise": "what this part gives the viewer" }
+      ],
+      "episodeBusinessValue": "how this format helps generate quote calls, renewal reviews, referrals, local SEO, watch time, or subscriber trust",
       "recommendedTone": "${input.tone || "Mysterious & gripping"}",
       "recommendedNarrationStyle": "${isBusinessMode ? "Journalistic" : "Investigative documentary"}",
       "sourceType": "string",
@@ -280,12 +287,20 @@ Rules:
 - Do not stop after one strong idea. Keep going until the requested count is filled.
 - Do not invent confirmed facts${isBusinessMode ? ", credentials, testimonials, local data, case results, or regulatory claims" : ""}.
 - Every idea object must include title, hook, category, summary, all six score fields, productionPriority, and suggestedAngle.
+- Every idea object must include episodeFit, bestFormat, episodeWhy, episodeArc, and episodeBusinessValue.
 - Every idea object must include the full ideaPowerPack object with all nine intelligence sections: market score, title/thumbnail pre-test, thumbnail-first fit, source depth preflight, analytics fit, idea cluster, monetization risk, monetization strategy, and white-space finder.
 - Do not return partial idea objects, commentary, analysis, Markdown, or prose outside the JSON object.
 ${isBusinessMode ? '- Use "people" for audience personas or decision makers, "location" for the market/service area, and "eventName" for the service problem, campaign, or buyer decision moment.' : '- Use "people", "location", and "eventName" for real-world story context when known.'}
 ${modeRules}
 - ${formatFitRule}
 - Pick the best length/time or book size for each individual idea from: ${lengthChoices}.
+- Decide episodeFit independently from raw topic appeal:
+  - High = the topic naturally separates into distinct buyer stages, scenarios, examples, myths, or decision points, and each part can deliver a complete value promise.
+  - Medium = the topic may support a 3-part sequence if research/source depth is strong, but should start as one video unless the arc is obvious.
+  - Low = one focused 7-10 minute video is stronger; stretching it would create repetition, thin sections, or weak CTAs.
+- bestFormat must be "Single Video", "3-Part Series", or "5-Part Series". Prefer Single Video for one-question explainers. Prefer 3-Part Series for short sequences. Use 5-Part Series only when there are five clearly different episodes with separate viewer payoffs.
+- episodeArc must be empty for Single Video. For 3-Part Series return exactly three parts. For 5-Part Series return exactly five parts. Each part must have a title and viewer promise.
+- episodeBusinessValue must explain the money-facing value in plain English, such as quote-readiness, renewal review triggers, referral/email follow-up, local SEO, Shorts cutdowns, or subscriber trust. Never promise revenue, savings, coverage, claim outcomes, or carrier acceptance.
 - Pick recommendedTone exactly from: ${toneChoices}.
 - Pick recommendedNarrationStyle exactly from: ${narrationChoices}.
 - Treat lengthPotentialScore as Depth Strength: ${isBusinessMode ? "how much useful buyer education, search demand, proof, examples, objection handling, and practical substance exists to sustain the chosen output without padding." : "how much verifiable source/story material exists to sustain the chosen length without padding, repetition, or invented facts."}

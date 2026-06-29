@@ -59,6 +59,11 @@ type GeneratedIdea = {
   whyCompelling?: string;
   estimatedLengthPotential?: string;
   recommendedLengthMinutes?: number;
+  episodeFit: "Low" | "Medium" | "High";
+  bestFormat: "Single Video" | "3-Part Series" | "5-Part Series";
+  episodeWhy: string;
+  episodeArc: EpisodeArcItem[];
+  episodeBusinessValue: string;
   recommendedTone?: string;
   recommendedNarrationStyle?: string;
   sourceType?: string;
@@ -74,6 +79,12 @@ type GeneratedIdea = {
   productionPriority: string;
   suggestedAngle: string;
   ideaPowerPack?: IdeaPowerPack;
+};
+
+type EpisodeArcItem = {
+  part: string;
+  title: string;
+  promise: string;
 };
 
 type PowerTitleTest = {
@@ -202,7 +213,7 @@ export async function POST(request: Request) {
       if (!input.demoFallback || !(error instanceof OpenRouterConfigurationError)) {
         throw error;
       }
-      generated = fallbackIdeas(generationInput).slice(0, generationInput.count);
+      generated = normalizeGeneratedIdeas({ ideas: fallbackIdeas(generationInput).slice(0, generationInput.count) }, generationInput, settings.narrationStyle);
       modelUsed.add("demo-fallback");
     }
 
@@ -215,6 +226,7 @@ export async function POST(request: Request) {
         generationInput.projectFormat
       );
       const recommendedLengthMinutes = normalizeLengthMinutes(rawIdea.recommendedLengthMinutes, estimatedLengthPotential, generationInput.projectFormat);
+      const episodeAssessment = normalizeEpisodeAssessment(rawIdea, recommendedLengthMinutes);
       const recommendedTone = rawIdea.recommendedTone || generationInput.tone;
       const recommendedNarrationStyle = rawIdea.recommendedNarrationStyle || settings.narrationStyle;
       const totalScore = ideaTotalScore(rawIdea);
@@ -249,6 +261,11 @@ export async function POST(request: Request) {
             researchDifficultyScore: rawIdea.researchDifficultyScore,
             estimatedLengthPotential,
             recommendedLengthMinutes,
+            episodeFit: episodeAssessment.episodeFit,
+            bestFormat: episodeAssessment.bestFormat,
+            episodeWhy: episodeAssessment.episodeWhy,
+            episodeArc: episodeAssessment.episodeArc,
+            episodeBusinessValue: episodeAssessment.episodeBusinessValue,
             recommendedTone,
             recommendedNarrationStyle,
             totalScore,
@@ -265,6 +282,11 @@ export async function POST(request: Request) {
           id: crypto.randomUUID(),
           estimatedLengthPotential,
           recommendedLengthMinutes,
+          episodeFit: episodeAssessment.episodeFit,
+          bestFormat: episodeAssessment.bestFormat,
+          episodeWhy: episodeAssessment.episodeWhy,
+          episodeArc: episodeAssessment.episodeArc,
+          episodeBusinessValue: episodeAssessment.episodeBusinessValue,
           recommendedTone,
           recommendedNarrationStyle,
           totalScore,
@@ -437,6 +459,90 @@ function lengthLabelMatches(item: { label: string; minutes: number }, label?: st
   return normalized === item.label.toLowerCase() || normalized === item.label.replace("min", "minutes").toLowerCase();
 }
 
+function normalizeEpisodeAssessment(value: Record<string, unknown>, recommendedLengthMinutes?: number) {
+  const lengthScore = Number(value.lengthPotentialScore ?? 0);
+  const escalationScore = Number(value.escalationScore ?? 0);
+  const curiosityScore = Number(value.curiosityScore ?? 0);
+  const fit = normalizeEpisodeFit(String(value.episodeFit ?? ""), lengthScore, escalationScore, curiosityScore);
+  const bestFormat = normalizeBestFormat(String(value.bestFormat ?? ""), fit, recommendedLengthMinutes, lengthScore);
+  const arc = normalizeEpisodeArc(value.episodeArc, bestFormat, String(value.title ?? "This idea"));
+  return {
+    episodeFit: fit,
+    bestFormat,
+    episodeWhy: String(value.episodeWhy || fallbackEpisodeWhy(fit, bestFormat, String(value.category ?? ""), lengthScore)).trim(),
+    episodeArc: arc,
+    episodeBusinessValue: String(value.episodeBusinessValue || fallbackEpisodeBusinessValue(fit, bestFormat)).trim()
+  };
+}
+
+function normalizeEpisodeFit(value: string, lengthScore: number, escalationScore: number, curiosityScore: number): "Low" | "Medium" | "High" {
+  const normalized = value.toLowerCase();
+  if (normalized.includes("high")) return "High";
+  if (normalized.includes("medium") || normalized.includes("moderate")) return "Medium";
+  if (normalized.includes("low")) return "Low";
+  const weighted = (lengthScore * 0.45) + (escalationScore * 0.35) + (curiosityScore * 0.2);
+  if (weighted >= 84) return "High";
+  if (weighted >= 70) return "Medium";
+  return "Low";
+}
+
+function normalizeBestFormat(value: string, fit: "Low" | "Medium" | "High", recommendedLengthMinutes?: number, lengthScore = 0): "Single Video" | "3-Part Series" | "5-Part Series" {
+  const normalized = value.toLowerCase();
+  if (/5|five/.test(normalized)) return "5-Part Series";
+  if (/3|three/.test(normalized)) return "3-Part Series";
+  if (/single|standalone|one/.test(normalized)) return "Single Video";
+  if (fit === "High" && (recommendedLengthMinutes ?? 0) >= 10 && lengthScore >= 88) return "5-Part Series";
+  if (fit === "High" || fit === "Medium") return "3-Part Series";
+  return "Single Video";
+}
+
+function normalizeEpisodeArc(value: unknown, bestFormat: "Single Video" | "3-Part Series" | "5-Part Series", title: string): EpisodeArcItem[] {
+  const targetCount = bestFormat === "5-Part Series" ? 5 : bestFormat === "3-Part Series" ? 3 : 0;
+  if (!targetCount) return [];
+  const items = Array.isArray(value) ? value : [];
+  const normalized = items
+    .map((item, index) => {
+      const record = asRecord(item);
+      if (record) {
+        return {
+          part: readString(record, ["part", "label", "episode"]) ?? `Part ${index + 1}`,
+          title: readString(record, ["title", "episodeTitle", "name"]) ?? `Episode ${index + 1}`,
+          promise: readString(record, ["promise", "angle", "summary", "viewerPromise"]) ?? "Advance the topic with one clear viewer payoff."
+        };
+      }
+      const text = typeof item === "string" ? item.trim() : "";
+      return text ? { part: `Part ${index + 1}`, title: text, promise: "Advance the topic with one clear viewer payoff." } : null;
+    })
+    .filter((item): item is EpisodeArcItem => Boolean(item))
+    .slice(0, targetCount);
+  if (normalized.length === targetCount) return normalized;
+  return fallbackEpisodeArc(bestFormat, title).slice(0, targetCount);
+}
+
+function fallbackEpisodeWhy(fit: "Low" | "Medium" | "High", bestFormat: string, category: string, lengthScore: number) {
+  if (fit === "High") return `Strong episode candidate because the topic appears to have enough separate buyer questions, examples, and escalation points for a ${bestFormat}.`;
+  if (fit === "Medium") return `Possible short series if the dossier finds enough distinct examples; otherwise keep it as one tight video. Depth score signal: ${lengthScore}/100.`;
+  return `Better as one focused video. The topic likely has one main viewer question and should avoid being stretched into a series. Category: ${category || "general"}.`;
+}
+
+function fallbackEpisodeBusinessValue(fit: "Low" | "Medium" | "High", bestFormat: string) {
+  if (fit === "High") return `A ${bestFormat} can create multiple quote/review touchpoints, follow-up emails, Shorts, and local SEO assets from one research pass.`;
+  if (fit === "Medium") return "Could become a small sequence if the first video performs or if each part maps to a distinct buyer decision.";
+  return "Best monetized as a single clear CTA-driven video that answers one question and moves the viewer toward a quote or review.";
+}
+
+function fallbackEpisodeArc(bestFormat: "Single Video" | "3-Part Series" | "5-Part Series", title: string): EpisodeArcItem[] {
+  if (bestFormat === "Single Video") return [];
+  const base = [
+    { part: "Part 1", title: "The Problem", promise: `Open ${title} with the buyer mistake, risk, or question that makes the topic urgent.` },
+    { part: "Part 2", title: "What People Miss", promise: "Explain the overlooked details, exceptions, or decision points that change the conversation." },
+    { part: "Part 3", title: "What To Review Next", promise: "Turn the education into a practical review checklist and soft agency CTA." },
+    { part: "Part 4", title: "Real-World Scenarios", promise: "Compare realistic Texas household or business situations without promising outcomes." },
+    { part: "Part 5", title: "The Checklist", promise: "Close with a quote-ready checklist, questions to ask, and next-step review path." }
+  ];
+  return bestFormat === "5-Part Series" ? base : base.slice(0, 3);
+}
+
 function normalizeGeneratedIdeas(data: unknown, input: IdeaFactoryInput, fallbackNarrationStyle: string) {
   const rawIdeas = extractIdeaArray(data);
   const normalized = rawIdeas
@@ -506,6 +612,19 @@ function normalizeGeneratedIdea(
   const escalationScore = clampScore(readNumber(raw, ["escalationScore", "escalation_score"]) ?? readNumber(scores, ["escalation"]), 75);
   const lengthPotentialScore = clampScore(readNumber(raw, ["lengthPotentialScore", "length_potential_score"]) ?? readNumber(scores, ["lengthPotential"]), 75);
   const researchDifficultyScore = clampScore(readNumber(raw, ["researchDifficultyScore", "research_difficulty_score"]) ?? readNumber(scores, ["researchDifficulty"]), 50);
+  const episodeAssessment = normalizeEpisodeAssessment({
+    episodeFit: readString(raw, ["episodeFit", "episode_fit", "seriesFit", "series_fit"]),
+    bestFormat: readString(raw, ["bestFormat", "best_format", "recommendedFormat", "recommended_format"]),
+    episodeWhy: readString(raw, ["episodeWhy", "episode_why", "seriesWhy", "series_why"]),
+    episodeArc: raw.episodeArc ?? raw.episode_arc ?? raw.suggestedEpisodeArc ?? raw.suggested_episode_arc,
+    episodeBusinessValue: readString(raw, ["episodeBusinessValue", "episode_business_value", "seriesBusinessValue", "series_business_value"]),
+    title: title ?? `Story idea ${index + 1}`,
+    category: readString(raw, ["category", "storyCategory", "story_category", "genre", "topic"]) ?? input.category,
+    summary: summary ?? hook ?? "",
+    lengthPotentialScore,
+    escalationScore,
+    curiosityScore
+  }, recommendedLengthMinutes);
 
   return {
     title: title ?? `Story idea ${index + 1}`,
@@ -515,6 +634,11 @@ function normalizeGeneratedIdea(
     whyCompelling: readString(raw, ["whyCompelling", "why_compelling", "reason"]),
     estimatedLengthPotential,
     recommendedLengthMinutes,
+    episodeFit: episodeAssessment.episodeFit,
+    bestFormat: episodeAssessment.bestFormat,
+    episodeWhy: episodeAssessment.episodeWhy,
+    episodeArc: episodeAssessment.episodeArc,
+    episodeBusinessValue: episodeAssessment.episodeBusinessValue,
     recommendedTone: readString(raw, ["recommendedTone", "recommended_tone", "tone"]) ?? input.tone,
     recommendedNarrationStyle:
       readString(raw, ["recommendedNarrationStyle", "recommended_narration_style", "narrationStyle", "narration_style"]) ??

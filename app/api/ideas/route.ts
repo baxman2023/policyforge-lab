@@ -27,6 +27,15 @@ const IdeaSchema = z.object({
   researchDifficultyScore: z.number().int().min(0).max(100).default(0),
   estimatedLengthPotential: z.string().optional(),
   recommendedLengthMinutes: z.number().int().min(10).max(60).optional(),
+  episodeFit: z.enum(["Low", "Medium", "High"]).optional(),
+  bestFormat: z.enum(["Single Video", "3-Part Series", "5-Part Series"]).optional(),
+  episodeWhy: z.string().optional(),
+  episodeArc: z.array(z.object({
+    part: z.string(),
+    title: z.string(),
+    promise: z.string()
+  })).optional(),
+  episodeBusinessValue: z.string().optional(),
   recommendedTone: z.string().optional(),
   recommendedNarrationStyle: z.string().optional(),
   productionPriority: z.string().default("Medium"),
@@ -96,6 +105,11 @@ export async function POST(request: Request) {
         researchDifficultyScore: input.researchDifficultyScore,
         estimatedLengthPotential,
         recommendedLengthMinutes: normalizeLengthMinutes(input.recommendedLengthMinutes, estimatedLengthPotential),
+        episodeFit: input.episodeFit,
+        bestFormat: input.bestFormat,
+        episodeWhy: input.episodeWhy,
+        episodeArc: input.episodeArc ?? [],
+        episodeBusinessValue: input.episodeBusinessValue,
         recommendedTone: input.recommendedTone,
         recommendedNarrationStyle: input.recommendedNarrationStyle,
         totalScore: Math.round(

@@ -269,6 +269,11 @@ type StoryIdea = {
   researchDifficultyScore: number;
   estimatedLengthPotential?: string | null;
   recommendedLengthMinutes?: number | null;
+  episodeFit?: "Low" | "Medium" | "High" | string | null;
+  bestFormat?: "Single Video" | "3-Part Series" | "5-Part Series" | string | null;
+  episodeWhy?: string | null;
+  episodeArc?: EpisodeArcItem[] | unknown;
+  episodeBusinessValue?: string | null;
   recommendedTone?: string | null;
   recommendedNarrationStyle?: string | null;
   totalScore: number;
@@ -278,6 +283,12 @@ type StoryIdea = {
   usedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
+};
+
+type EpisodeArcItem = {
+  part?: string;
+  title?: string;
+  promise?: string;
 };
 
 type IdeaPowerPack = {
@@ -2123,7 +2134,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       .filter((idea) => statusFilter === "All Statuses" || displayStatus(idea.status) === statusFilter)
       .filter((idea) => (scoreFilter === "90+" ? idea.totalScore >= 90 : scoreFilter === "80+" ? idea.totalScore >= 80 : true))
       .filter((idea) => {
-        const text = `${idea.title} ${idea.hook} ${idea.summary} ${idea.category} ${idea.location ?? ""} ${idea.eventName ?? ""}`.toLowerCase();
+        const text = `${idea.title} ${idea.hook} ${idea.summary} ${idea.category} ${idea.location ?? ""} ${idea.eventName ?? ""} ${idea.episodeFit ?? ""} ${idea.bestFormat ?? ""} ${idea.episodeWhy ?? ""}`.toLowerCase();
         return text.includes(query.toLowerCase());
       });
   }, [activeTab, filterCategory, ideas, lengthFilter, query, scoreFilter, statusFilter]);
@@ -5153,6 +5164,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                         Depth: {depthStrengthLabel(idea.lengthPotentialScore)}
                       </span>
                     </div>
+                    {renderEpisodeFit(idea)}
                     <div className="business-fit-strip">
                       {businessFitBadgesForIdea(idea).map((badge) => (
                         <span className={cn("business-fit-chip", badge.level)} key={badge.label}>
@@ -5217,6 +5229,19 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                           {busy === `project-${idea.id}-${projectFormat}` ? <Loader2 size={14} className="spin" /> : <Play size={14} fill="currentColor" />}
                           <span>Build</span>
                         </button>
+                        {recommendedSeriesFormat(idea) ? (
+                          <button
+                            className="row-action build-action"
+                            type="button"
+                            onClick={() => void startProject(idea, "EPISODIC_SERIES")}
+                            aria-label="Build episodic series with this idea"
+                            disabled={busy === `project-${idea.id}-EPISODIC_SERIES`}
+                            title={`Build as ${idea.bestFormat || "episodic series"}`}
+                          >
+                            {busy === `project-${idea.id}-EPISODIC_SERIES` ? <Loader2 size={14} className="spin" /> : <CalendarDays size={14} />}
+                            <span>Build Series</span>
+                          </button>
+                        ) : null}
                         <button
                           className="row-action used-action"
                           type="button"
@@ -9763,10 +9788,97 @@ function renderIdeaPowerPack(idea: StoryIdea) {
   );
 }
 
+function renderEpisodeFit(idea: StoryIdea) {
+  const fit = idea.episodeFit ? normalizeEpisodeFitLabel(idea.episodeFit) : deriveEpisodeFitForIdea(idea);
+  const bestFormat = idea.bestFormat || fallbackBestFormatForIdea(idea);
+  const arc = episodeArcItems(idea.episodeArc);
+  const why = idea.episodeWhy || fallbackEpisodeWhyForIdea(idea, fit, bestFormat);
+  const businessValue = idea.episodeBusinessValue || fallbackEpisodeBusinessValueForIdea(fit, bestFormat);
+
+  return (
+    <div className={cn("episode-fit-panel", fit.toLowerCase())}>
+      <div className="episode-fit-main">
+        <span className={cn("episode-fit-badge", fit.toLowerCase())}>Episode Fit: {fit}</span>
+        <strong>{bestFormat}</strong>
+        <span>{why}</span>
+      </div>
+      {arc.length || businessValue ? (
+        <details className="episode-fit-details">
+          <summary>Episode strategy</summary>
+          {businessValue ? <p><strong>Business value:</strong> {businessValue}</p> : null}
+          {arc.length ? (
+            <ol>
+              {arc.map((item, index) => (
+                <li key={`${idea.id}-episode-arc-${index}`}>
+                  <strong>{item.part || `Part ${index + 1}`}: {item.title || "Episode angle"}</strong>
+                  {item.promise ? <span>{item.promise}</span> : null}
+                </li>
+              ))}
+            </ol>
+          ) : <p>Keep this as one tight video unless the dossier reveals separate buyer stages or examples.</p>}
+        </details>
+      ) : null}
+    </div>
+  );
+}
+
 function ideaPowerPackForIdea(idea: StoryIdea): IdeaPowerPack | null {
   const sourceUrls = asClientRecord(idea.sourceUrls);
   const pack = asClientRecord(sourceUrls?.ideaPowerPack) ?? asClientRecord(sourceUrls?.idea_power_pack);
   return pack ? (pack as IdeaPowerPack) : null;
+}
+
+function normalizeEpisodeFitLabel(value?: string | null): "Low" | "Medium" | "High" {
+  const normalized = value?.toLowerCase() || "";
+  if (normalized.includes("high")) return "High";
+  if (normalized.includes("medium") || normalized.includes("moderate")) return "Medium";
+  if (normalized.includes("low")) return "Low";
+  return "Low";
+}
+
+function deriveEpisodeFitForIdea(idea: StoryIdea): "Low" | "Medium" | "High" {
+  const weighted = (idea.lengthPotentialScore * 0.45) + (idea.escalationScore * 0.35) + (idea.curiosityScore * 0.2);
+  if (weighted >= 84) return "High";
+  if (weighted >= 70) return "Medium";
+  return "Low";
+}
+
+function fallbackBestFormatForIdea(idea: StoryIdea) {
+  const fit = idea.episodeFit ? normalizeEpisodeFitLabel(idea.episodeFit) : deriveEpisodeFitForIdea(idea);
+  if (fit === "High" && idea.lengthPotentialScore >= 88) return "5-Part Series";
+  if (fit === "High" || fit === "Medium") return "3-Part Series";
+  return "Single Video";
+}
+
+function recommendedSeriesFormat(idea: StoryIdea) {
+  const bestFormat = idea.bestFormat || fallbackBestFormatForIdea(idea);
+  return /series/i.test(bestFormat) && normalizeEpisodeFitLabel(idea.episodeFit || deriveEpisodeFitForIdea(idea)) !== "Low";
+}
+
+function fallbackEpisodeWhyForIdea(idea: StoryIdea, fit: "Low" | "Medium" | "High", bestFormat: string) {
+  if (fit === "High") return `Enough depth and escalation for a ${bestFormat}.`;
+  if (fit === "Medium") return "Possible short series if source depth supports separate parts.";
+  return "Best as one focused video.";
+}
+
+function fallbackEpisodeBusinessValueForIdea(fit: "Low" | "Medium" | "High", bestFormat: string) {
+  if (fit === "High") return `${bestFormat} can create multiple quote/review touchpoints, follow-up emails, Shorts, and local SEO angles.`;
+  if (fit === "Medium") return "Test the first video, then expand if the audience response or source depth supports it.";
+  return "Use one clear CTA-driven video to answer the main question and move viewers toward a quote or review.";
+}
+
+function episodeArcItems(value: unknown): EpisodeArcItem[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => asClientRecord(item))
+    .filter((item): item is Record<string, unknown> => Boolean(item))
+    .map((item, index) => ({
+      part: typeof item.part === "string" ? item.part : `Part ${index + 1}`,
+      title: typeof item.title === "string" ? item.title : "",
+      promise: typeof item.promise === "string" ? item.promise : ""
+    }))
+    .filter((item) => item.title || item.promise)
+    .slice(0, 5);
 }
 
 function ideaPowerVerdict(pack: IdeaPowerPack) {

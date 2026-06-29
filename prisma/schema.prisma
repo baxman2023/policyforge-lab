@@ -317,6 +317,11 @@ model StoryIdea {
   researchDifficultyScore   Int             @default(0)
   estimatedLengthPotential  String?
   recommendedLengthMinutes  Int?
+  episodeFit                String?
+  bestFormat                String?
+  episodeWhy                String?         @db.Text
+  episodeArc                Json?
+  episodeBusinessValue      String?         @db.Text
   recommendedTone           String?
   recommendedNarrationStyle String?
   totalScore                Int             @default(0)
