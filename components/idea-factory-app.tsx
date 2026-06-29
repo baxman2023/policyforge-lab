@@ -10134,7 +10134,7 @@ function thumbnailAssetsForProject(project?: StoryProject | null) {
 }
 
 function sceneBackgroundAssetsForProject(project?: StoryProject | null) {
-  return (project?.thumbnails ?? []).filter(isSceneBackgroundAsset);
+  return (project?.thumbnails ?? []).filter(isSceneBackgroundAsset).sort((a, b) => a.variant - b.variant);
 }
 
 function sceneBackgroundPromptCount(project?: StoryProject | null) {
