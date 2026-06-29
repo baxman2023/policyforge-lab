@@ -605,6 +605,8 @@ export function forgeNicheByChannel(channel: { name?: string | null; slug?: stri
 }
 
 export function forgeChannelDescription(niche: ForgeNiche) {
+  const publicChannelName = publicChannelNameForNiche(niche);
+  const publicTagline = publicTaglineForNiche(niche);
   const keywords = niche.keywords.map((keyword, index) => ({
     keyword,
     intent: index < 2 ? "Core local search and campaign keyword." : "Supporting education, SEO, and content-pack keyword.",
@@ -612,20 +614,21 @@ export function forgeChannelDescription(niche: ForgeNiche) {
   }));
 
   return JSON.stringify({
-    channelName: niche.name,
-    tagline: niche.title,
-    description: `${niche.name} is an insurance growth lane for ${niche.description} The business promise: ${niche.viewerPromise} Direction: ${niche.engineBrief}`,
+    channelName: publicChannelName,
+    internalLaneName: niche.name,
+    tagline: publicTagline,
+    description: `${publicChannelName} is a Baxter Insurance Agency education lane for ${carrierSafePublicDescription(niche.description)} The business promise: ${niche.viewerPromise} Internal lane direction: ${niche.engineBrief}`,
     targetAudience: "Texas insurance prospects, Baxter Insurance Agency clients, homeowners, drivers, families, landlords, and small-business owners who need clear insurance guidance.",
-    toneRules: `Default tone: ${niche.tone}. Stay helpful, local, compliant, and plain-English. Never promise savings, coverage, claims outcomes, underwriting acceptance, or legal advice. Follow this lane direction: ${niche.engineBrief}`,
+    toneRules: `Default tone: ${niche.tone}. Stay helpful, local, compliant, and plain-English. Never promise savings, coverage, claims outcomes, underwriting acceptance, or legal advice. Carrier names are internal targeting context only, not public channel identity. Follow this lane direction: ${niche.engineBrief}`,
     voiceProfile: "Trusted Texas insurance advisor: practical, warm, direct, local, and careful about coverage limitations.",
     introStyle: "Open with a real Texas risk, renewal problem, household question, or business decision, then quickly connect it to a useful insurance review.",
-    formattingRules: "Generate ideas, scripts, SEO pages, emails, social posts, publishing packs, and client education only inside this insurance lane.",
+    formattingRules: "Generate ideas, scripts, SEO pages, emails, social posts, publishing packs, and client education only inside this insurance lane. Public-facing copy must never sound like Baxter works for, speaks for, or is the carrier.",
     phrasesToUse: "coverage depends on policy terms, request a review, quote-ready checklist, Texas homeowners, Houston-area families, talk with a licensed Texas agent",
     recurringStoryTypes: `${niche.starterAngles.join("; ")}. Engine direction: ${niche.engineBrief}`,
     bannedPhrases: "guaranteed savings, fully covered, cheapest, best rate guaranteed, claim will be paid, everyone qualifies, no exclusions.",
     phrasesToAvoid: "secret trick, loophole, one weird hack, guaranteed, always covered, never denied",
     thumbnailStyle: "Clean professional insurance visuals, Texas/Houston cues, home/auto/business subject, readable two-to-five-word overlay, trust-first not fear-first.",
-    sponsorRules: "If a sponsor or offer link is saved, place it naturally as an agency call-to-action once near the beginning and once near the end.",
+    sponsorRules: "If a sponsor or offer link is saved, place it naturally as a Baxter Insurance Agency call-to-action once near the beginning and once near the end. Do not present any carrier as the sponsor unless the user explicitly provides compliant sponsor language.",
     publishingRhythm: "Publish two educational videos or posts weekly, one local SEO asset weekly, and one client email or referral campaign weekly.",
     engineBrief: niche.engineBrief,
     monetizationScore: niche.monetizationScore,
@@ -647,12 +650,12 @@ export function forgeChannelDescription(niche: ForgeNiche) {
         tone: niche.tone,
         desiredLength: "SEO page, 3-8 minute video, short-form clip, email, or client checklist",
         sourceType: niche.sourceType,
-        rationale: `Core ${niche.name} lane for repeatable agency growth assets.`,
+        rationale: `Core internal ${niche.name} lane for repeatable agency growth assets. Public copy should use Baxter/independent-agent framing, not carrier-branded channel identity.`,
         sampleAngles: niche.starterAngles
       }
     ],
-    logoPrompt: `Square premium logo for Baxter Growth Lab ${niche.name}, Texas insurance growth, clean shield or document mark, modern navy teal gold palette, no tiny text.`,
-    bannerPrompt: `YouTube or web banner for Baxter Growth Lab ${niche.name}, tagline "${niche.title}", professional Texas insurance advisor style, readable text in centered safe area.`
+    logoPrompt: `Square premium logo for "${publicChannelName}", Texas insurance education, Baxter/independent agency feel, clean shield or document mark, modern navy teal gold palette, no carrier logos, no tiny text.`,
+    bannerPrompt: `YouTube or web banner for "${publicChannelName}", tagline "${publicTagline}", professional Texas insurance advisor style, readable text in centered safe area, no carrier logos or carrier-branded identity.`
   });
 }
 
@@ -687,4 +690,32 @@ export const POLICY_AGENCY_BRIEF = {
 
 export function policySafeFilename(value: string) {
   return slugify(value || "policyforge-asset") || "policyforge-asset";
+}
+
+function publicChannelNameForNiche(niche: ForgeNiche) {
+  const text = `${niche.name} ${niche.title} ${niche.category}`.toLowerCase();
+  if (/life|family protection/.test(text)) return "Texas Family Protection Guide";
+  if (/business auto|commercial auto|work truck/.test(text)) return "Texas Business Auto Coverage Guide";
+  if (/business|commercial|bop|liability|property|cyber|professional|management/.test(text)) return "Texas Business Coverage Guide";
+  if (/flood/.test(text)) return "Texas Flood Coverage Guide";
+  if (/auto|driver|vehicle/.test(text)) return "Texas Auto Coverage Guide";
+  if (/home|property|roof|wind|hail/.test(text)) return "Texas Home Coverage Guide";
+  return "Texas Coverage Guide";
+}
+
+function publicTaglineForNiche(niche: ForgeNiche) {
+  const text = `${niche.name} ${niche.title} ${niche.category}`.toLowerCase();
+  if (/business|commercial|bop|liability|cyber|professional|management/.test(text)) return "Plain-English insurance education for Texas business owners.";
+  if (/life|family protection/.test(text)) return "Plain-English protection planning for Texas families.";
+  if (/auto|driver|vehicle/.test(text)) return "Plain-English auto insurance education for Texas drivers.";
+  if (/flood/.test(text)) return "Plain-English flood insurance education for Texas property owners.";
+  return "Plain-English home insurance education for Texas homeowners.";
+}
+
+function carrierSafePublicDescription(value: string) {
+  return value
+    .replace(/\b(?:Germania|Travelers|SWYFFT|Swyfft|Progressive|GEICO|Geico)-focused\s*/g, "")
+    .replace(/\b(?:Germania|Travelers|SWYFFT|Swyfft|Progressive|GEICO|Geico)\s+(?:Texas\s+)?/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }

@@ -406,6 +406,8 @@ const POLICYFORGE_AGENCY_PROFILE = `Baxter Growth Lab agency profile:
 - Service area: Texas only, with strongest focus on Houston and surrounding areas.
 - Primary lines: home and auto first; commercial, life, retention, referrals, and reviews as supporting lanes.
 - Preferred carrier lanes: Germania, Travelers, SWYFFT, Progressive, GEICO, and other available markets when appropriate.
+- Carrier names and internal lane codes are planning context only. Never use them as the public channel name, narrator identity, welcome line, logo, or banner identity.
+- Baxter Insurance Agency is an independent Texas insurance agency. Never imply Baxter works for, speaks for, is owned by, or officially represents Germania, Travelers, SWYFFT, Progressive, GEICO, or any carrier.
 - Voice: local, practical, plain-English, consultative, no hype, no scare tactics, no guaranteed outcomes.`;
 
 const POLICYFORGE_SOURCE_MEMORY = `Reusable insurance source memory:
@@ -440,6 +442,7 @@ Required pre-script brief:
 - Script structure: ${scriptType.structure}
 - Primary CTA: ${cta}
 - Compliance boundaries: Texas-only; do not promise savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcomes.
+- Public identity boundaries: do not open with or refer to a carrier-branded channel name or internal lane code. Public-facing scripts should sound like Baxter Insurance Agency / independent Texas insurance education.
 - Proof/source notes: use source material, saved growth strategy, Texas DOI/TDI, FEMA/NFIP where relevant, carrier pages only when supplied, and agency knowledge as general education.
 
 Coverage promise guardrails:
@@ -447,6 +450,7 @@ Coverage promise guardrails:
 - Use careful language: "may", "can depend on", "ask about", "review", "quote", "policy terms", "underwriting", "limits", "exclusions", "deductibles", "endorsements", "carrier appetite", and "Texas regulations".
 - Never give legal, tax, claim, engineering, roofing, medical, financial-planning, or binding coverage advice.
 - Treat Germania, Travelers, SWYFFT, Progressive, and GEICO as carrier lanes or available relationships only. Do not imply endorsement, availability, eligibility, or the lowest rate.
+- Never say or imply "welcome to Germania," "welcome to GERMANIA_HOME," "our Germania policy," or equivalent carrier-owned phrasing. When a carrier is relevant, frame it as one possible market or review context through Baxter Insurance Agency.
 
 Quote-intent structures available:
 - Home Quote: roof age, location, deductibles, replacement cost, wind/hail, water/flood distinction, updates, prior claims, review CTA.
@@ -799,7 +803,9 @@ ${sponsorLinkText}
 
 Output rules:
 - Output one paragraph only.
-- Write a warm, human opening modeled on strong long-form YouTube and narrative podcast intros: welcome them to the channel, establish the high-level story, and create a clean reason to keep listening.
+- Write a warm, human opening modeled on strong long-form YouTube and narrative podcast intros: open on the viewer's real insurance question, risk, renewal issue, claim concern, or decision moment, establish the high-level story, and create a clean reason to keep listening.
+- Do not open with "Welcome to [channel name]" when the active lane is carrier-specific or internal. Never welcome viewers to Germania, Travelers, SWYFFT, Progressive, GEICO, an internal lane code such as GERMANIA_HOME, or anything that sounds carrier-owned.
+- If you name the source of the guidance, use Baxter Insurance Agency or independent Texas insurance education. Never imply the video/channel is owned by, operated by, sponsored by, or speaking for a carrier.
 - Vary the language from video to video. Do not use a stock template.
 - Do not spoil the ending or over-explain the case.
 - If agency CTA instructions are provided, include the CTA message exactly once inside this intro. Work it in briefly and naturally after the opening context and before "Now, let's get into today's topic."

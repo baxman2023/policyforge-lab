@@ -81,6 +81,8 @@ Agency facts to preserve:
 - Serves all of Texas, mainly Houston and surrounding areas.
 - Primary revenue emphasis: home and auto. Also supports commercial P&C and life.
 - Priority carriers to mention carefully when relevant: Germania, Travelers, SWYFFT, Progressive, GEICO, plus other available markets.
+- Carrier names are internal targeting context and search context only. They must not be used as the public channel name, public brand, logo text, banner brand, or intro identity.
+- Never write as if Baxter Insurance Agency works for, speaks for, is owned by, or officially represents a carrier. Use independent Texas agency framing.
 - Never promise savings, coverage, eligibility, underwriting acceptance, or claim outcomes. Coverage depends on policy terms, conditions, limits, exclusions, endorsements, deductibles, underwriting, carrier appetite, and Texas regulations.
 
 Keyword metrics from DataForSEO, when available:
@@ -133,6 +135,7 @@ Rules:
 - The ideaCombinations are the most important output. Provide 12-18 combinations.
 - In Surprise Me mode, make the channel concept specific enough to feel ownable, not a generic insurance content bucket.
 - Generate a fresh channelName for this kit.
+- The channelName must be a public-safe Baxter/independent-agency education brand. Do not name it Germania, Travelers, SWYFFT, Progressive, GEICO, or an internal carrier code such as GERMANIA_HOME.
 - If the creator direction mentions a line such as homeowners, auto, flood, storm, renewal, commercial, contractors, life, local SEO, referrals, or umbrella, the channelName, tagline, description, keywords, and ideaCombinations must clearly match that requested line.
 - Never reuse or lightly reword a previous active channel name.
 - Every idea combination must be designed to repeatedly generate quote-ready videos, local SEO pages, emails, social posts, client checklists, or scripts for this exact channel.
@@ -142,6 +145,7 @@ Rules:
 - Mix evergreen search demand with seasonal Texas moments such as storm season, renewals, home purchases, teen drivers, new businesses, and contract/certificate requests.
 - The description is for a channel About or brand setup field. Write 900-980 useful characters so it is close to the 1000-character limit without exceeding it. Do not pad with generic hype.
 - The description must include the agency promise, recurring asset lanes, education/source approach, audience fit, compliance boundaries, and a concise quote/review reason. Work in natural local SEO phrases without keyword stuffing.
+- The description may mention carrier markets only carefully as available relationships or shopping context when relevant. It must not sound like the channel belongs to or speaks for a carrier.
 - YouTube channel keywords are copied into a 500-character setup field. Return enough compact keyword phrases for the comma-separated keyword string to land between 430 and 500 characters. Prefer 24-36 short phrases. No single keyword should exceed 5 words.
 - If keyword metrics are available, prefer keywords with meaningful volume and defensible topical fit over generic high-volume bait.
 - The banner prompt must explicitly include the channelName and tagline as readable text.
@@ -152,8 +156,8 @@ Rules:
 export function normalizeChannelKit(raw: unknown, metrics: SeoKeywordMetric[] = []): ChannelIdeaMachineKit {
   const source = isRecord(raw) ? raw : {};
   const metricMap = new Map(metrics.map((metric) => [metric.keyword.toLowerCase(), metric]));
-  const channelName = readString(source.channelName) || "Baxter Coverage Lab";
-  const tagline = readString(source.tagline) || "Texas insurance made easier to understand.";
+  const channelName = publicSafeChannelName(readString(source.channelName) || "Baxter Coverage Lab", readString(source.description));
+  const tagline = publicSafeTagline(readString(source.tagline), channelName, readString(source.description)) || "Texas insurance made easier to understand.";
   const targetAudience = readString(source.targetAudience) || "Texas homeowners, drivers, families, landlords, and small-business owners who need practical insurance guidance.";
   const recurringStoryTypes = readString(source.recurringStoryTypes) || "Home and auto reviews, Houston homeowners questions, storm readiness, flood education, renewal rescue, commercial coverage explainers, referral campaigns, and cross-sell prompts.";
   const ideaCombinations = normalizeCombinations(source.ideaCombinations);
@@ -196,8 +200,8 @@ export function normalizeChannelKit(raw: unknown, metrics: SeoKeywordMetric[] = 
     publishingRhythm: readString(source.publishingRhythm) || "Two weekly education assets, one weekly local SEO asset, and one weekly client/referral campaign.",
     keywords: fitChannelKeywords(keywords, { channelName, tagline, description, targetAudience, recurringStoryTypes, ideaCombinations }),
     ideaCombinations,
-    logoPrompt: readString(source.logoPrompt) || `Square premium insurance brand logo for "${channelName}", clean shield or document emblem, Texas professional feel, no tiny text.`,
-    bannerPrompt: readString(source.bannerPrompt) || safeAreaBannerPrompt(channelName, tagline)
+    logoPrompt: sanitizeCarrierBranding(readString(source.logoPrompt)) || `Square premium insurance brand logo for "${channelName}", clean shield or document emblem, Texas professional feel, no carrier logos, no tiny text.`,
+    bannerPrompt: sanitizeCarrierBranding(readString(source.bannerPrompt)) || safeAreaBannerPrompt(channelName, tagline)
   };
 }
 
@@ -299,7 +303,49 @@ export function repairChannelKitForNewTopic(kit: ChannelIdeaMachineKit, input: {
 }
 
 function safeAreaBannerPrompt(channelName: string, tagline: string) {
-  return `YouTube or web banner, exact full canvas 2560 x 1440. Centered mobile safe area is 1546 x 423 pixels from x=507 to x=2053 and y=508 to y=931. Put readable text "${channelName}" and subtitle "${tagline}" entirely inside that safe area only, centered with generous padding. Do not place any text, letters, logo, initials, numbers, watermark, or important subject outside the safe area. Outer desktop/tablet areas should be professional Texas insurance background only: subtle Houston/Texas cues, home, auto, business, policy documents, premium consistent brand system.`;
+  return `YouTube or web banner, exact full canvas 2560 x 1440. Centered mobile safe area is 1546 x 423 pixels from x=507 to x=2053 and y=508 to y=931. Put readable text "${channelName}" and subtitle "${tagline}" entirely inside that safe area only, centered with generous padding. Do not place any carrier logos, carrier names, letters, words, numbers, signature, watermark, or important subject outside the safe area. Outer desktop/tablet areas should be professional Texas insurance background only: subtle Houston/Texas cues, home, auto, business, policy documents, premium consistent brand system.`;
+}
+
+function publicSafeChannelName(value: string, context = "") {
+  const clean = value.replace(/\s+/g, " ").trim();
+  const combined = `${clean} ${context}`.toLowerCase();
+  if (!isCarrierBrandedName(clean)) return clean || "Baxter Coverage Lab";
+  if (/life|family/.test(combined)) return "Texas Family Protection Guide";
+  if (/business auto|commercial auto|work truck|truck/.test(combined)) return "Texas Business Auto Coverage Guide";
+  if (/business|commercial|bop|liability|property|cyber|professional|management/.test(combined)) return "Texas Business Coverage Guide";
+  if (/flood/.test(combined)) return "Texas Flood Coverage Guide";
+  if (/auto|driver|vehicle/.test(combined)) return "Texas Auto Coverage Guide";
+  if (/home|property|roof|wind|hail/.test(combined)) return "Texas Home Coverage Guide";
+  return "Texas Coverage Guide";
+}
+
+function publicSafeTagline(value: string, publicName: string, context = "") {
+  const clean = value.replace(/\s+/g, " ").trim();
+  if (clean && !isCarrierBrandedName(clean)) return clean;
+  const combined = `${publicName} ${clean} ${context}`.toLowerCase();
+  if (/life|family/.test(combined)) return "Plain-English protection guidance for Texas families.";
+  if (/business|commercial|bop|liability|cyber|professional|management|truck/.test(combined)) return "Plain-English coverage guidance for Texas businesses.";
+  if (/flood/.test(combined)) return "Plain-English flood guidance for Texas property owners.";
+  if (/auto|driver|vehicle/.test(combined)) return "Plain-English auto coverage guidance for Texas drivers.";
+  if (/home|property|roof|wind|hail/.test(combined)) return "Plain-English home coverage guidance for Texas homeowners.";
+  return "Plain-English Texas insurance guidance.";
+}
+
+function isCarrierBrandedName(value: string) {
+  const normalized = value.toLowerCase();
+  return /(?:^|[\s_-])(germania|travelers|swyfft|progressive|geico)(?:[\s_-]|$)/i.test(value) ||
+    /^(?:germania|travelers|swyfft|progressive|geico)[\s_-]?[a-z0-9_ -]*$/i.test(value) ||
+    /[A-Z]{3,}_[A-Z0-9_]+/.test(value) ||
+    /\b(?:insurance\s+company|mutual|underwriters?)\b/.test(normalized);
+}
+
+function sanitizeCarrierBranding(value: string) {
+  if (!value) return "";
+  return value
+    .replace(/\b(?:Germania|Travelers|SWYFFT|Swyfft|Progressive|GEICO|Geico)\s+(?:logo|brand|channel|banner|identity)\b/gi, "Texas insurance education brand")
+    .replace(/\b(?:official|carrier-branded|company-branded)\b/gi, "independent-agency")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 type FallbackLane = {

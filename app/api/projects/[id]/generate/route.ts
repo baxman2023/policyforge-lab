@@ -265,16 +265,21 @@ async function channelVoiceGuideForProject(channelId: string | null | undefined,
     where: { id: channelId, workspaceId },
     select: { name: true, description: true }
   });
-  if (!channel?.description) return channel?.name ? `Channel name: ${channel.name}` : "";
+  if (!channel?.description) return channel?.name ? publicChannelIdentityGuide(channel.name) : "";
   return channelVoiceGuideFromDescription(channel.description, channel.name);
 }
 
 function channelVoiceGuideFromDescription(description: string, channelName: string) {
   try {
     const parsed = JSON.parse(description) as Record<string, unknown>;
+    const publicName = publicSafeChannelName(String(parsed.channelName || channelName), String(parsed.description || parsed.internalLaneName || ""));
+    const internalLaneName = String(parsed.internalLaneName || (isCarrierOrInternalChannelName(channelName) ? channelName : "")).trim();
+    const tagline = publicSafeTagline(String(parsed.tagline || ""), publicName, String(parsed.description || parsed.internalLaneName || ""));
     return [
-      `Channel name: ${String(parsed.channelName || channelName)}`,
-      parsed.tagline ? `Tagline: ${String(parsed.tagline)}` : "",
+      `Public channel brand: ${publicName}`,
+      internalLaneName ? `Internal growth lane: ${internalLaneName}` : "",
+      "Carrier identity guardrail: Internal carrier lanes may guide topic selection, but public scripts must not welcome viewers to, speak as, or imply affiliation with Germania, Travelers, SWYFFT, Progressive, GEICO, or any carrier. Public voice is Baxter Insurance Agency / independent Texas insurance education.",
+      tagline ? `Tagline: ${tagline}` : "",
       parsed.targetAudience ? `Target audience: ${String(parsed.targetAudience)}` : "",
       parsed.toneRules ? `Tone rules: ${String(parsed.toneRules)}` : "",
       parsed.voiceProfile ? `Brand voice: ${String(parsed.voiceProfile)}` : "",
@@ -294,8 +299,47 @@ function channelVoiceGuideFromDescription(description: string, channelName: stri
       parsed.primaryCta ? `Primary CTA: ${String(parsed.primaryCta)}` : ""
     ].filter(Boolean).join("\n");
   } catch {
-    return `Channel name: ${channelName}\nSaved channel notes: ${description}`;
+    return `${publicChannelIdentityGuide(channelName)}\nSaved channel notes: ${description}`;
   }
+}
+
+function publicChannelIdentityGuide(channelName: string) {
+  const publicName = publicSafeChannelName(channelName);
+  return [
+    `Public channel brand: ${publicName}`,
+    isCarrierOrInternalChannelName(channelName) ? `Internal growth lane: ${channelName}` : "",
+    "Carrier identity guardrail: Public scripts must not welcome viewers to, speak as, or imply affiliation with a carrier. Use Baxter Insurance Agency / independent Texas insurance education framing."
+  ].filter(Boolean).join("\n");
+}
+
+function publicSafeChannelName(value: string, context = "") {
+  const clean = value.replace(/\s+/g, " ").trim();
+  if (!isCarrierOrInternalChannelName(clean)) return clean || "Texas Coverage Guide";
+  const combined = `${clean} ${context}`.toLowerCase();
+  if (/life|family/.test(combined)) return "Texas Family Protection Guide";
+  if (/business auto|commercial auto|work truck|truck/.test(combined)) return "Texas Business Auto Coverage Guide";
+  if (/business|commercial|bop|liability|property|cyber|professional|management/.test(combined)) return "Texas Business Coverage Guide";
+  if (/flood/.test(combined)) return "Texas Flood Coverage Guide";
+  if (/auto|driver|vehicle/.test(combined)) return "Texas Auto Coverage Guide";
+  if (/home|property|roof|wind|hail/.test(combined)) return "Texas Home Coverage Guide";
+  return "Texas Coverage Guide";
+}
+
+function publicSafeTagline(value: string, publicName: string, context = "") {
+  const clean = value.replace(/\s+/g, " ").trim();
+  if (clean && !isCarrierOrInternalChannelName(clean)) return clean;
+  const combined = `${publicName} ${clean} ${context}`.toLowerCase();
+  if (/life|family/.test(combined)) return "Plain-English protection guidance for Texas families.";
+  if (/business|commercial|bop|liability|cyber|professional|management|truck/.test(combined)) return "Plain-English coverage guidance for Texas businesses.";
+  if (/flood/.test(combined)) return "Plain-English flood guidance for Texas property owners.";
+  if (/auto|driver|vehicle/.test(combined)) return "Plain-English auto coverage guidance for Texas drivers.";
+  if (/home|property|roof|wind|hail/.test(combined)) return "Plain-English home coverage guidance for Texas homeowners.";
+  return "Plain-English Texas insurance guidance.";
+}
+
+function isCarrierOrInternalChannelName(value: string) {
+  return /(?:^|[\s_-])(germania|travelers|swyfft|progressive|geico)(?:[\s_-]|$)/i.test(value) ||
+    /[A-Z]{3,}_[A-Z0-9_]+/.test(value);
 }
 
 async function channelAnalyticsGuideForProject(channelId: string | null | undefined, workspaceId: string) {
