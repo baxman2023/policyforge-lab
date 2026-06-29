@@ -9486,10 +9486,21 @@ function autoScriptSequenceForProject(project: StoryProject) {
 }
 
 function episodeAutoSequenceForProject(project: StoryProject) {
+  const episodePlan = latestDraftForPass(project, "EPISODES");
+  let rerunFromHere = false;
   return EPISODE_AUTO_SEQUENCE.filter((passType) => {
-    if (passType === "PUBLISHING_PACK") return !projectHasEpisodePublishingPack(project);
-    return !latestDraftForPass(project, passType);
+    const draft = latestDraftForPass(project, passType);
+    const missing = passType === "PUBLISHING_PACK" ? !projectHasEpisodePublishingPack(project) : !draft;
+    const stale = Boolean(episodePlan && draft && draftTimestamp(draft) < draftTimestamp(episodePlan));
+    const shouldRun = rerunFromHere || missing || stale;
+    if (shouldRun) rerunFromHere = true;
+    return shouldRun;
   });
+}
+
+function draftTimestamp(draft: ScriptDraft) {
+  const value = new Date(draft.createdAt).getTime();
+  return Number.isFinite(value) ? value : 0;
 }
 
 function projectHasEpisodePlan(project?: StoryProject | null) {
