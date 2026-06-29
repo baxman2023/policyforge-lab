@@ -6643,7 +6643,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                     </div>
                   </div>
                 ) : null}
-                {latestPublishingPack ? (
+                {latestPublishingPack && isPublishingPackOutput(latestDraft) ? (
                   <div className="publishing-pack-view">
                     {latestPublishingPack.episodePacks?.length ? (
                       <div className="episode-output-grid">
@@ -6923,7 +6923,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   ) : (
                     <div className="script-output-box">
                       <div className="script-output-head">
-                        <span>{latestDraft.displayLabel ?? passLabelForProject(latestDraft.passType, selectedProject?.format)}</span>
+                        <span>{latestDraft.displayLabel ? `Script Preview: ${latestDraft.displayLabel}` : passLabelForProject(latestDraft.passType, selectedProject?.format)}</span>
                         <div className="inline-actions">
                           <button className="secondary-button compact" type="button" onClick={() => void copyLatestDraft()}>
                             <Copy size={14} />
@@ -9552,6 +9552,10 @@ function scriptOutputOptionsForProject(project: StoryProject | undefined): Curre
 function outputOptionLabel(output: CurrentScriptOutput) {
   const label = output.displayLabel ?? `${passLabel(output.passType)} v${output.version}`;
   return `${label} - ${output.wordCount.toLocaleString()} words`;
+}
+
+function isPublishingPackOutput(output?: CurrentScriptOutput) {
+  return Boolean(output && output.passType === "PUBLISHING_PACK" && !output.id.startsWith("complete-script-"));
 }
 
 function isThisWeek(value?: string | null) {
