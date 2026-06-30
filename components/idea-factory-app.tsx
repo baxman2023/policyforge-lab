@@ -827,7 +827,7 @@ type UploadReadinessPackage = {
 };
 
 type TabLabel = "Generated Ideas" | "Saved Ideas" | "Idea Queue" | "Used Ideas";
-type GuideTab = "Quick Start" | "User Manual" | "Advanced Protocols";
+type GuideTab = "Start Here" | "Campaign Workflow" | "Video & HeyGen" | "Assets & Publishing" | "Settings & Models" | "Troubleshooting";
 type ModelSettingKey =
   | "defaultModel"
   | "discoveryModel"
@@ -1082,6 +1082,7 @@ const navItems: Array<{ id: AppSection; label: string; icon: LucideIcon }> = [
   { id: "media", label: "Assets", icon: ImageIcon },
   { id: "calendar", label: "Calendar", icon: CalendarDays },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "guides", label: "User Guide", icon: BookOpen },
   { id: "settings", label: "Settings", icon: Settings }
 ];
 
@@ -1511,261 +1512,323 @@ const modelRouteFields: Array<{ key: ModelSettingKey; label: string; hint: strin
   { key: "rewriteModel", label: "Rewrite Model", hint: "Used to strengthen hooks, tension, transitions, and final prose." }
 ];
 
-const guideTabs: GuideTab[] = ["Quick Start", "User Manual", "Advanced Protocols"];
+const guideTabs: GuideTab[] = ["Start Here", "Campaign Workflow", "Video & HeyGen", "Assets & Publishing", "Settings & Models", "Troubleshooting"];
 
 const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items: string[] }>> = {
-  "Quick Start": [
+  "Start Here": [
     {
-      title: "1. Pick a growth lane",
-      body: "Use the top selector before creating anything.",
+      title: "What PolicyForge Is For",
+      body: "PolicyForge is built to turn Texas insurance questions into useful content that creates quote requests, renewal reviews, referrals, calls, local SEO value, and YouTube authority for Baxter Insurance Agency.",
       items: [
-        "Choose the Texas insurance niche pack you want to work inside.",
-        "Ideas, projects, outputs, thumbnails, and calendar slots stay inside the active lane.",
-        "Use separate lanes for carrier products, local SEO campaigns, referral pushes, and renewal campaigns."
+        "Use it for Texas-only insurance education, especially home, auto, life, commercial, carrier-specific education, storm season, renewals, claims questions, and coverage gaps.",
+        "The app should never speak as if Baxter Insurance Agency is a carrier. Public content should use Baxter Insurance Agency as the educator and local independent agency.",
+        "The best outputs answer a real buyer question, reduce confusion, and give the viewer a reason to call, request a quote, review coverage, or share the content."
       ]
     },
     {
-      title: "2. Configure engines",
-      body: "Open Settings once before production work.",
+      title: "The Basic Path",
+      body: "Most work should move through one simple path.",
       items: [
-        "Save the active growth strategy so the app has audience, tone, compliance, CTA, thumbnail, and publishing rules.",
-        "Use the insurance lane catalog when you want to review fixed Texas carrier and product lanes.",
-        "Switch lanes in the top bar to generate ideas inside a specific insurance focus.",
-        "Add or confirm at least one text provider key: OpenRouter primary, with Anthropic and OpenAI available as direct fallbacks.",
-        "Click Test beside each API key to confirm it works before running production jobs.",
-        "Choose Anthropic and OpenAI fallback models from the live provider dropdowns after saving those keys.",
-        "Add Runware only if you want video thumbnails, logos, or banners generated inside Baxter Growth Lab.",
-        "Add DataForSEO if you want keyword metrics to improve local SEO pages, tags, and publishing descriptions.",
-        "Open Model Routing, choose the models for discovery, research, drafting, critique, rewrite, and campaign kits, then click Save Model Routing.",
-        "Save AI Providers saves keys and provider settings. Save Model Routing saves the routing dropdowns."
+        "Pick the correct channel or growth lane in the top bar.",
+        "Open Video Ideas and generate topic ideas for the active lane.",
+        "Save the strongest idea, then start a project from it.",
+        "Open Projects or Content Lab, select the project, and run the workflow.",
+        "Generate the Business Campaign Kit, HeyGen scene script, scene backgrounds, thumbnails, and export pack.",
+        "Schedule the item, produce the video or article, then mark it Produced or Published at the right time."
       ]
     },
     {
-      title: "3. Generate and triage ideas",
+      title: "Use The Right Growth Lane",
+      body: "A lane is the context the AI uses for idea generation, scripting, metadata, assets, and duplicate prevention.",
       items: [
-        "Open Idea Factory and choose Content Mode: Local SEO, Client Education, Quote Campaign, Referral / Review, Social / GBP Post, or Renewal / Cross-Sell.",
-        "Then choose Project Type: Video Script, Podcast Episode, or Article.",
-        "Then choose Niche / Focus, Tone, Category, Target Size, Source Type, and Number of Ideas.",
-        "Use a saved growth-lane combination when you want the dropdowns filled with a proven insurance campaign direction.",
-        "Use the Depth chip to judge whether an idea has enough source material for a useful output. Low depth is better for short social or GBP posts.",
-        "Save strong ideas, reject weak ones, and start projects from ideas that fit the active channel.",
-        "Duplicate prevention compares against ideas in the active channel.",
-        "Delete All clears the active channel's idea list while keeping existing content projects.",
-        "Use the Dashboard Pipeline Board to see ideas move into research, output, metadata, scheduled, and published stages."
+        "Use Germania, Travelers, SWYFFT, Progressive, GEICO, and product lanes for internal targeting only.",
+        "Do not let carrier lane names become public channel names, script greetings, or claims of employment by the carrier.",
+        "Use local lanes for Houston-area and Texas search intent.",
+        "Use renewal, referral, storm, home, auto, life, and commercial lanes when the business goal is more important than the carrier."
       ]
     },
     {
-      title: "4. Build the output",
+      title: "What Good Looks Like",
       items: [
-        "Open Content Lab, select a project, and run Fully Auto for the complete pass sequence.",
-        "Use manual step buttons when you want to inspect or rerun one pass before moving forward.",
-        "Video and podcast projects create spoken scripts; article projects create publication-ready prose.",
-        "Use the saved agency CTA and compliance rules to keep every output pointed toward quote requests, calls, reviews, referrals, or renewal conversations.",
-        "Video and podcast body passes now enforce a minimum useful length. If the model comes back too short, Baxter Growth Lab attempts one automatic expansion before saving.",
-        "If Teleprompter Polish repeatedly says the final output appears incomplete, use Force Save Final only after you are willing to review the saved result manually.",
-        "Use the Quality Scorecard and Compliance Check before considering content production-ready."
-      ]
-    },
-    {
-      title: "5. Package, schedule, export",
-      items: [
-        "Run the final pack for titles, descriptions or show notes, tags, and prospect prompts.",
-        "Video descriptions and timestamps are based on the actual saved script length, not just the requested target length.",
-        "Create thumbnails for video projects when Runware is configured.",
-        "Download the one-click Content Pack for output, metadata, thumbnails when available, scorecard, and compliance notes.",
-        "Schedule before a future release date, mark Produced when the content file is finished, and mark Published only after it is live.",
-        "Use Export Vault when you need older drafts or timestamped downloadable history."
+        "The idea is tied to a buyer moment: moving, renewing, buying a home, adding a teen driver, replacing a roof, starting a business, or shopping after a rate increase.",
+        "The script is plain-English, local, useful, and under 30 minutes.",
+        "The CTA is natural: call Baxter Insurance Agency, request a Texas quote, review coverage, or ask a specific question.",
+        "The asset pack includes a usable YouTube description, titles, tags, thumbnails, scene backgrounds, and a Macaly landing page prompt when relevant."
       ]
     }
   ],
-  "User Manual": [
+  "Campaign Workflow": [
     {
-      title: "Dashboard",
-      body: "Dashboard is the agency production command center.",
+      title: "1. Start With A Business Goal",
+      body: "Before generating ideas, decide what the campaign should produce.",
       items: [
-        "Content Pipeline Board shows where each item sits from ideas through published work.",
-        "Agency Growth Readiness checks whether the workspace has outputs, packs, thumbnails, scorecards, saved strategy, and API setup.",
-        "Saved Growth Strategy preview shows the active lane's audience, rhythm, and thumbnail rules."
+        "Home quote requests: homeowners, roof coverage, wind/hail, replacement cost, deductibles, carrier fit, and renewal reviews.",
+        "Auto quote requests: teen drivers, liability limits, uninsured motorist, bundling, claims, and household changes.",
+        "Retention: renewal checkups, coverage reviews, claim-prevention education, and rate-change explanations.",
+        "Referrals and reviews: client education that is easy to share with friends, family, and neighbors.",
+        "Local SEO: Houston, surrounding cities, Texas insurance questions, storm season, home buying, and coverage explainers."
       ]
     },
     {
-      title: "Settings",
-      body: "Settings has separate save buttons for separate jobs.",
+      title: "2. Generate Ideas",
       items: [
-        "Channels creates, activates, restores, or deletes channel workspaces.",
-        "AI Providers uses Save AI Providers for API keys, fallback models, Runware, DataForSEO, and thumbnail style guide.",
-        "Model Routing uses Save Model Routing for OpenRouter model assignments and Auto Model Routing.",
-        "Story Defaults uses Save Story Defaults for preferred tone, narration style, and default length."
+        "Open Video Ideas.",
+        "Choose the Content Mode that matches the business goal.",
+        "Choose Video Script, Podcast Episode, or Article.",
+        "Use the active lane to keep ideas focused on the correct product, carrier, or Texas insurance situation.",
+        "Save ideas that have strong buyer intent, clear local relevance, and enough depth for a useful script."
       ]
     },
     {
-      title: "Growth Lanes",
-      body: "Growth lanes are separate workspaces under the same user account.",
+      title: "3. Judge Idea Quality",
       items: [
-        "Switch lanes from the top bar.",
-        "Create lanes in Settings > Growth Lanes.",
-        "Every lane has its own idea list, project list, campaign calendar, duplicate pool, thumbnails, and outputs.",
-        "Use Settings > Growth Pack Machine only when you want to experiment beyond the fixed insurance lanes.",
-        "Save Kit creates and activates a new lane from the generated growth pack.",
-        "Saved Growth Strategy is the editable saved result from a generated growth pack; you usually do not fill it manually.",
-        "Use Surprise Me in Growth Pack Machine when you want a fresh insurance campaign strategy generated from scratch."
+        "Prefer urgent, specific topics over generic insurance education.",
+        "Look for ideas that naturally lead to a quote, review, call, or referral.",
+        "Use episode suggestions when one topic is too large for a single video.",
+        "Avoid ideas that require guarantees, legal advice, claim promises, or carrier statements Baxter cannot make.",
+        "Reject topics that are interesting but unlikely to attract Texas insurance buyers."
       ]
     },
     {
-      title: "Idea Factory",
+      title: "4. Start And Track Projects",
       items: [
-        "Choose Content Mode first so the AI knows whether you are making local SEO, client education, quote campaigns, referral/review prompts, social posts, or renewal/cross-sell content.",
-        "Then choose Project Type: Video Script, Podcast Episode, or Article.",
-        "Generated Ideas holds new ideas for the active channel.",
-        "Saved Ideas is your shortlist.",
-        "Idea Queue includes saved, in-progress, and drafted ideas.",
-        "Used Ideas includes produced, published, and archived ideas that should stay out of new batches.",
-        "Depth shows how likely the topic is to support longer outputs without padding.",
-        "Delete removes one idea; Delete All clears the current channel's ideas while keeping projects."
+        "Start a project from the saved idea.",
+        "Use Projects to see what is drafted, produced, published, or archived.",
+        "Use Calendar to assign publishing dates.",
+        "Use Produced when the content file exists but is not live.",
+        "Use Published only after the video, article, or campaign asset is actually live."
       ]
     },
     {
-      title: "Campaign Projects",
+      title: "5. Repeat The Winners",
       items: [
-        "Start a project from an idea or create one through Monthly Auto.",
-        "Project rows show the output type, such as Video script, Podcast episode, or Article.",
-        "Delete removes the project and drafts, but the original idea can return to Saved Ideas if no other project uses it.",
-        "Produced means finished but not live yet; it can still be scheduled. Published means live/final. Produced, Published, and Archived also update the linked idea for duplicate prevention.",
-        "Download Content Pack from a finished project when you need a complete production bundle."
-      ]
-    },
-    {
-      title: "Content Lab",
-      items: [
-        "Research collects source notes and fact-checking targets.",
-        "Video projects create teleprompter scripts, podcast projects create spoken episode scripts, and article projects create publication-ready prose.",
-        "Intro/Outro, Podcast Intro/Outro, and Article Lead/Closing CTA are separate passes so calls to action stay controlled.",
-        "Fully Auto runs the required sequence in order; manual buttons let you rerun individual passes.",
-        "Quality Scorecard appears after a Quality Gate or finished output exists.",
-        "Compliance Check summarizes confirmed facts, verification targets, risky claims, and do-not-say-as-fact notes.",
-        "Teleprompter Polish creates the clean final video script. If the ending guard keeps blocking a result, Force Save Final reruns and saves the pass anyway.",
-        "Copy copies the current output to your clipboard; Download saves the current output as a local text file.",
-        "Content Pack downloads the complete output, scorecard, compliance notes, campaign kit, and video thumbnails when available."
-      ]
-    },
-    {
-      title: "Metadata Packs and Thumbnails",
-      items: [
-        "Business Campaign Kit creates title tests, descriptions, tags, CTAs, thumbnail prompts, and supporting campaign assets.",
-        "Podcast Show Notes Pack creates three episode titles, show notes, tags, and a listener prompt.",
-        "Article SEO Pack creates three headlines, SEO description, tags, and a reader prompt.",
-        "When DataForSEO is configured, Business Campaign Kit can favor stronger keyword phrases in titles, descriptions, tags, and hashtags.",
-        "Description follows this order: main keyword, CTA link, description part one, timestamps, description part two, CTA with link, and 3-5 hashtags.",
-        "Video timestamps are rebuilt around the actual saved script duration when the generated timestamps do not fit.",
-        "Use Regenerate Description in the video Description block when YouTube metadata needs a fresh pass.",
-        "Thumbnail generation creates three 16:9 Runware images from the pack prompts, using Ideogram 4 by default.",
-        "The Thumbnail Style Guide in Settings controls the shared video thumbnail look, headline treatment, arrows, colors, and clickability."
-      ]
-    },
-    {
-      title: "Campaign Calendar, Published, Media, Export Vault",
-      items: [
-        "Campaign Calendar schedules insurance videos, articles, podcast episodes, GBP posts, and seasonal campaigns.",
-        "Production Status separates Produced work that is finished but still schedulable from Published work that is already live/final.",
-        "Media shows project assets and thumbnails.",
-        "Exports downloads Markdown or plain text content for downstream production.",
-        "Export Vault lists downloadable current outputs and previous draft outputs with timestamps."
+        "Use Analytics after YouTube is connected to learn which topics earn views, watch time, comments, and subscriber growth.",
+        "Turn strong videos into follow-up videos, articles, shorts, emails, GBP posts, and Macaly landing pages.",
+        "Create more content around buyer questions that produce calls or quote requests.",
+        "Do not keep making topics that are interesting but produce no business path."
       ]
     }
   ],
-  "Advanced Protocols": [
+  "Video & HeyGen": [
     {
-      title: "Growth Lane Isolation Protocol",
+      title: "Best Video Length",
+      body: "PolicyForge is tuned for HeyGen videos under 30 minutes, with 7-10 minutes usually being the sweet spot.",
       items: [
-        "Switch to the correct growth lane before generating ideas or starting projects.",
-        "Do not reuse one project across lanes; create separate projects so outputs, thumbnails, and calendar slots remain partitioned.",
-        "Save a Growth Pack for each lane so its audience, CTA rules, thumbnail style, and publishing rhythm are explicit.",
-        "Use lane-specific thumbnail style guides when carrier/product campaigns should look different."
+        "Use 7 minutes for simple buyer questions and direct quote-intent topics.",
+        "Use 10 minutes for deeper explainers like roof coverage, teen drivers, flood, liability, or renewal reviews.",
+        "Use episode planning when one idea needs multiple focused videos instead of one long video.",
+        "Avoid 20-30 minute videos unless the topic has enough real depth and a clear business reason."
       ]
     },
     {
-      title: "Model Routing Protocol",
+      title: "Recommended HeyGen Workflow",
       items: [
-        "Use OpenRouter as the primary catalog when you want the widest model selection.",
-        "Use stronger drafting and final-polish models for Draft, Rewrite, and Final; use faster models for Discovery when cost matters.",
-        "After changing any Model Routing dropdown, click Save Model Routing before leaving Settings.",
-        "Use Save AI Providers only for API keys, fallback provider models, Runware, DataForSEO, and thumbnail style guide.",
-        "If a pass repeatedly underperforms, switch only that pass model first instead of changing the whole workflow."
+        "Run the normal script workflow until the final script is complete.",
+        "Run HeyGen Scene Script to split the final narration into Scene 1, Scene 2, Scene 3, and so on.",
+        "Run Scene Cards when you need scene planning and background prompts.",
+        "Run HeyGen Backgrounds to generate one clean background image per scene.",
+        "Use the background cards in scene order: top left is Scene 1, then Scene 2, Scene 3, and so on.",
+        "Use the Open button on each scene background card to download or inspect the full image."
       ]
     },
     {
-      title: "Idea Quality Protocol",
+      title: "Scene Script Rules",
       items: [
-        "Generate broad batches first, then narrow with Category and Tone once patterns emerge.",
-        "Prefer ideas with urgent insurance intent, local relevance, clear CTA fit, compliance-safe framing, and enough source depth.",
-        "Use Depth as an early warning. Low-depth ideas can still be useful, but they are better for short posts, GBP updates, or simple FAQ pages.",
-        "Reject ideas that lack a real prospect question, seasonal trigger, coverage gap, quote intent, or enough source material."
+        "The final HeyGen scene script should contain only the scene label and the spoken script text.",
+        "Do not include camera cues, production notes, sound effects, visual notes, or directions in the final HeyGen script.",
+        "Scene text should stay natural for a human presenter.",
+        "Each scene should be short enough to paste into HeyGen without becoming hard to edit.",
+        "If the scene split feels awkward, rerun HeyGen Scene Script before generating backgrounds."
       ]
     },
     {
-      title: "Research Protocol",
+      title: "Background Image Rules",
       items: [
-        "Paste known facts, source links, contradictions, and unanswered questions into Source Material / Notes.",
-        "Run Research before structure when the story depends on chronology, disputed facts, or named people.",
-        "Keep uncertainty visible in notes rather than forcing the output to overclaim."
+        "Backgrounds should be complete images only.",
+        "They should not contain words, captions, white boards, white billboards, fake UI, speech bubbles, or text panels.",
+        "The image should support the scene topic without distracting from the presenter.",
+        "If one image is wrong, rerun backgrounds after confirming the Scene Cards are clean.",
+        "The scene card label in the app tells you which image belongs to which HeyGen scene; the image itself stays text-free."
       ]
     },
     {
-      title: "Script Quality Protocol",
+      title: "Episode Projects",
       items: [
-        "Run Hook Lab before drafting so the best opening angle is chosen automatically.",
-        "Use Critique and Fact Check before Rewrite for high-risk coverage, carrier, claims, legal, or savings language.",
-        "Use Quality Gate before Final so the scorecard can identify hook, retention, clarity, emotional payoff, factual safety, and teleprompter risk.",
-        "Final should remove production markers and produce clean formatting for the selected project type.",
-        "If Final is rejected as incomplete, first rerun it normally. Use Force Save Final only when repeated attempts fail and you are prepared to review the saved output yourself.",
-        "Check the Scorecard and Compliance Check before exporting a Content Pack."
+        "Use episodes when one idea naturally breaks into multiple buyer questions or coverage moments.",
+        "Use the planned episode count from the idea instead of forcing every series into five parts.",
+        "Each episode should get its own script, Business Campaign Kit, thumbnails, and HeyGen scene backgrounds.",
+        "Episode titles and thumbnails should clearly include Part 1, Part 2, Part 3, and so on.",
+        "Run episode automation only after the episode plan matches the series you actually want to produce."
+      ]
+    }
+  ],
+  "Assets & Publishing": [
+    {
+      title: "Business Campaign Kit",
+      body: "The campaign kit turns a finished script into YouTube and campaign assets.",
+      items: [
+        "Use it for titles, descriptions, tags, CTAs, pinned comments, thumbnail prompts, shorts ideas, and supporting campaign notes.",
+        "Descriptions should include the Baxter Insurance Agency URL and phone number at the top and bottom.",
+        "Descriptions should include the agency mailing address at the bottom.",
+        "Descriptions should avoid implying Baxter works for or speaks on behalf of a carrier.",
+        "Regenerate the description if the CTA, carrier wording, or local angle is not strong enough."
       ]
     },
     {
-      title: "Publishing Protocol",
+      title: "Thumbnails",
       items: [
-        "Use Monthly Auto only when the channel has at least seven unused or saved ideas.",
-        "Schedule one-offs after the final output or campaign kit is ready.",
-        "Download a Content Pack before sending content to production.",
-        "Mark Published only after the content is live; Produced is for finished content waiting to publish."
+        "Use thumbnails to make the buyer problem obvious at a glance.",
+        "For YouTube thumbnails, short text is acceptable when it improves click-through.",
+        "For HeyGen scene backgrounds, text is not acceptable.",
+        "Use carrier or policy visuals carefully so the image does not imply official carrier ownership.",
+        "Keep the thumbnail tied to the viewer's problem: roof, car, storm, teen driver, claim, bill, deductible, or coverage gap."
       ]
     },
     {
-      title: "Content Mode Protocol",
+      title: "Macaly Landing Page Prompt",
       items: [
-        "Content Mode tells the AI what kind of insurance growth asset this is: Local SEO, Client Education, Quote Campaign, Referral / Review, Social / GBP Post, or Renewal / Cross-Sell.",
-        "Project Type tells the AI what format to produce: Video Script, Podcast Episode, or Article.",
-        "Use Quote Campaign for quote pages, email promos, renewal outreach, call scripts, proposals, and follow-up sequences.",
-        "Use Referral / Review for client prompts, review requests, referral asks, testimonial workflows, and relationship nurturing.",
-        "Use Social / GBP Post when one insurance topic needs to become GBP updates, social posts, emails, short scripts, or platform-specific campaigns.",
-        "Use Renewal / Cross-Sell when the output should identify coverage gaps, companion policies, annual review prompts, and retention opportunities."
+        "Use the Macaly prompt when a video or article should send viewers to a focused quote or education page.",
+        "The landing page should match the exact campaign goal, not become a generic agency homepage.",
+        "Include space for lead forms, phone CTA, trust signals, service areas, FAQ, and next-step copy.",
+        "For high-intent topics, send viewers to one action: call, quote request, policy review, or question submission.",
+        "For education topics, use the page to answer objections and make the next step feel easy."
       ]
     },
     {
-      title: "Thumbnail Protocol",
+      title: "Exporting",
       items: [
-        "Use one dominant visual question: face, evidence, map mark, photo, or object that makes the viewer wonder what happened.",
-        "Keep image text to 2-4 huge all-caps words and make it readable at phone size.",
-        "Use red arrows or circles only to point at the key mystery detail; more cues make the image feel noisy."
+        "Use Copy when you need the selected output quickly.",
+        "Use Download for a plain text file of the selected output.",
+        "Use Content Pack when you want the complete production bundle.",
+        "Use Export Vault to recover prior drafts and saved workflow outputs.",
+        "Before sending anything to production, confirm the final output, campaign kit, and assets all point to the same business goal."
       ]
     },
     {
-      title: "Export Vault Protocol",
+      title: "Publishing Status",
       items: [
-        "Use Content Pack for the clean current production bundle.",
-        "Use Markdown or plain text export for a lightweight content-only handoff.",
-        "Use Export Vault History when you need to recover an older draft, earlier campaign kit, or previous workflow output.",
-        "Avoid copying raw Draft, Rewrite, or Final when an assembled final output exists, because it includes the opening, cleaned body, and closing."
+        "Scheduled means the item has a planned date.",
+        "Produced means the content is finished but not live.",
+        "Published means the content is live.",
+        "Archived means the idea or project should be protected from accidental reuse.",
+        "Keeping status accurate helps duplicate prevention and the dashboard stay useful."
+      ]
+    }
+  ],
+  "Settings & Models": [
+    {
+      title: "AI Provider Setup",
+      items: [
+        "Open Settings before serious production work.",
+        "Save OpenRouter for the broadest model catalog.",
+        "Save Anthropic and OpenAI as fallback providers when available.",
+        "Save Runware for thumbnails and HeyGen scene background images.",
+        "Save DataForSEO if you want stronger keyword data for local SEO, descriptions, tags, and article planning.",
+        "Use the Test button beside keys before running expensive production passes."
       ]
     },
     {
-      title: "Recovery Protocol",
+      title: "Model Routing",
+      body: "Model Routing controls which AI handles each job.",
       items: [
-        "If a model returns invalid output, rerun the same pass, click Test beside each configured API key, then choose a different OpenRouter or fallback model.",
-        "If a pass stalls, refresh and check whether the previous output was saved before rerunning.",
-        "If generated thumbnails fail, confirm the Runware key and model, then rerun Create Thumbnails.",
-        "If Teleprompter Polish keeps failing with an incomplete-output warning, use Force Save Final from the Final step, then inspect the saved script before creating the Business Campaign Kit.",
-        "If model choices appear to revert, return to Settings > Model Routing, choose the models again, and click Save Model Routing."
+        "Use Discovery Model for idea generation, niche expansion, and research angles.",
+        "For current data and web-grounded discovery, Perplexity Sonar Pro Search is usually the best fit when available through OpenRouter.",
+        "Use stronger reasoning and writing models for research, structure, drafting, critique, rewrite, final polish, and campaign kits.",
+        "After changing model dropdowns, click Save Model Routing.",
+        "If one pass performs poorly, change that pass model first instead of changing the whole system."
+      ]
+    },
+    {
+      title: "PolicyForge Defaults",
+      items: [
+        "Keep public voice tied to Baxter Insurance Agency, not the carrier lane.",
+        "Use helpful, local, plain-English education.",
+        "Avoid promising savings, claim outcomes, coverage approval, underwriting results, or carrier decisions.",
+        "Keep content Texas-only unless you intentionally create a broader educational asset.",
+        "Use the default length and tone settings as a starting point, then adjust per project."
+      ]
+    },
+    {
+      title: "YouTube Analytics",
+      items: [
+        "Connect YouTube when you want PolicyForge to pull performance data.",
+        "Use analytics to identify topics with strong watch time, views, engagement, and subscriber conversion.",
+        "Review weekly suggestions before building the next batch of ideas.",
+        "Let the strongest categories influence future idea generation and campaign planning.",
+        "Use analytics as a business signal, not just a vanity metric."
+      ]
+    },
+    {
+      title: "Channel And Lane Hygiene",
+      items: [
+        "Keep only useful lanes active.",
+        "Archive lanes you are not using, but do not delete anything you may want to restore later.",
+        "Keep lane names internal when they are carrier or product labels.",
+        "Use user-friendly public titles, descriptions, and scripts even when the internal lane is technical.",
+        "Clear test data before starting a real campaign if you want clean analytics and duplicate prevention."
+      ]
+    }
+  ],
+  "Troubleshooting": [
+    {
+      title: "No Guide Or Section Appears",
+      items: [
+        "Use the User Guide link in the sidebar.",
+        "The Help icon in the top bar also opens the guide.",
+        "If the page looks stale after deployment, refresh the browser.",
+        "If the sidebar is collapsed on a small screen, widen the browser or use the visible icon navigation."
+      ]
+    },
+    {
+      title: "Idea Output Feels Wrong",
+      items: [
+        "Confirm the active channel or lane in the top bar before generating.",
+        "Check Content Mode and Project Type.",
+        "Use more specific source notes if the AI is guessing.",
+        "Reject weak ideas instead of trying to force them into scripts.",
+        "Switch Discovery Model if ideas lack current data or local specificity."
+      ]
+    },
+    {
+      title: "Script Output Feels Wrong",
+      items: [
+        "Check that the project title and idea match the desired campaign.",
+        "Rerun Research, Structure, or Hook Lab before rerunning the full workflow.",
+        "Use Critique and Fact Check for carrier, claims, legal, savings, or coverage-risk topics.",
+        "If the script sounds like a carrier channel, rerun the pass and reinforce Baxter Insurance Agency as the public educator.",
+        "If the script is too long, choose a shorter target length or split it into episodes."
+      ]
+    },
+    {
+      title: "HeyGen Assets Are Wrong",
+      items: [
+        "If the scene script has cues or notes, rerun HeyGen Scene Script.",
+        "If backgrounds contain text, white boards, or UI panels, rerun HeyGen Backgrounds after confirming the scene cards are clean.",
+        "If images are out of order, the card labels show the intended scene number.",
+        "If a background does not match the scene, inspect the Scene Cards output and rerun backgrounds.",
+        "Use Open on the card to confirm the full image before importing into HeyGen."
+      ]
+    },
+    {
+      title: "Generation Fails",
+      items: [
+        "Click Test beside the configured provider keys in Settings.",
+        "Confirm OpenRouter and fallback models are saved.",
+        "Try a different model for the failing pass.",
+        "If an image generation fails, confirm the Runware key is saved and active.",
+        "If a long workflow times out, rerun the next incomplete step manually."
+      ]
+    },
+    {
+      title: "Before Publishing Checklist",
+      items: [
+        "The script is under 30 minutes and sounds natural out loud.",
+        "The public voice is Baxter Insurance Agency, not a carrier.",
+        "No content promises savings, claim outcomes, or guaranteed coverage.",
+        "The YouTube description has URL and phone at the top and bottom, plus the address at the bottom.",
+        "The scene backgrounds match the scene labels.",
+        "The CTA matches the campaign goal.",
+        "The project status is updated after production or publishing."
       ]
     }
   ]
@@ -1813,8 +1876,8 @@ const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
     subtitle: "Understand category mix, scoring, queue health, and production status."
   },
   guides: {
-    title: "Guides",
-    subtitle: "Quick start, user manual, and advanced operating protocols."
+    title: "User Guide",
+    subtitle: "How to turn PolicyForge ideas into scripts, assets, publishing packs, and agency growth campaigns."
   },
   settings: {
     title: "Settings",
@@ -1875,7 +1938,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
   const [modelQuery, setModelQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabLabel>("Generated Ideas");
   const [experienceMode, setExperienceMode] = useState<ExperienceMode>("GUIDED");
-  const [activeGuide, setActiveGuide] = useState<GuideTab>("Quick Start");
+  const [activeGuide, setActiveGuide] = useState<GuideTab>("Start Here");
   const [filterCategory, setFilterCategory] = useState("All Categories");
   const [scoreFilter, setScoreFilter] = useState("All Scores");
   const [lengthFilter, setLengthFilter] = useState("All Lengths");
@@ -7866,7 +7929,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             <div>
               <h2 className="panel-title">
                 <BookOpen size={18} />
-                Baxter Growth Lab Guides
+                PolicyForge User Guide
               </h2>
               <p className="settings-note">Current channel: {currentChannel?.name || "Main Channel"}</p>
             </div>
