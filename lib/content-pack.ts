@@ -27,10 +27,17 @@ export function completeScriptForProject(project: Pick<StoryProject, "format" | 
   const body = latestBodyDraft(project.drafts);
   const outro = latestDraftForPass(project.drafts, "OUTRO");
   const sponsorBlurb = supportsSponsorBlurb(project.format) ? normalizeSponsorBlurbForFormat(project.sponsorBlurb, project.format) : null;
+  const openingContent = intro
+    ? shouldFormatAsHeyGenScenes(project.format)
+      ? undefined
+      : project.format === "ARTICLE"
+      ? ensureIntroSponsorPlacement(intro.content, sponsorBlurb)
+      : stripSponsorCopyFromBody(intro.content, sponsorBlurb)
+    : undefined;
   const assembled = (project.format === "EPISODIC_SERIES" || latestDraftForPass(project.drafts, "EPISODES")) && body
     ? assembleEpisodeScriptForExport(project.format, intro?.content, body.content, outro?.content, sponsorBlurb)
     : [
-        intro ? normalizeSponsorLanguageForFormat(ensureIntroSponsorPlacement(intro.content, sponsorBlurb), project.format) : undefined,
+        openingContent ? normalizeSponsorLanguageForFormat(openingContent, project.format) : undefined,
         body ? normalizeSponsorLanguageForFormat(stripSponsorCopyFromBody(body.content, sponsorBlurb), project.format) : undefined,
         outro ? normalizeSponsorLanguageForFormat(ensureOutroSponsorPlacement(outro.content, sponsorBlurb), project.format) : undefined
       ].filter(Boolean).join("\n\n");
@@ -65,7 +72,6 @@ function assembleEpisodeScriptForExport(
     const body = bodySections.find((section) => section.episodeNumber === episodeNumber);
     const outro = outroSections.find((section) => section.episodeNumber === episodeNumber);
     const pieces = [
-      intro?.content ? ensureIntroSponsorPlacement(intro.content, sponsorBlurb) : undefined,
       body?.content ? stripSponsorCopyFromBody(body.content, sponsorBlurb) : undefined,
       outro?.content ? ensureOutroSponsorPlacement(outro.content, sponsorBlurb) : undefined
     ].filter(Boolean).map((piece) => normalizeSponsorLanguageForFormat(piece || "", format));

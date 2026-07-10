@@ -11,10 +11,10 @@ import { prisma } from "@/lib/prisma";
 import { formatKeywordMetricsForPrompt, optionalSeoKeywordMetrics } from "@/lib/dataforseo";
 import { formatDraftForResponse } from "@/lib/project-response";
 import { requireActiveWorkspace } from "@/lib/workspaces";
-import { projectGenerationPrompt, scriptExpansionPrompt } from "@/lib/story-prompts";
+import { hookTournamentJudgePrompt, projectGenerationPrompt, scriptExpansionPrompt } from "@/lib/story-prompts";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getOrCreateUserSettings } from "@/lib/settings";
-import { ensureIntroSponsorPlacement, ensureOutroSponsorPlacement, stripSponsorCopyFromBody } from "@/lib/sponsor-placement";
+import { ensureOutroSponsorPlacement, stripSponsorCopyFromBody } from "@/lib/sponsor-placement";
 import { DEFAULT_THUMBNAIL_STYLE_GUIDE } from "@/lib/thumbnail-style";
 import { formatScriptForTts } from "@/lib/tts-format";
 import { estimatedMinutesFromWords, targetWordsForMinutes, wordCount } from "@/lib/utils";
@@ -218,13 +218,38 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       temperature: temperatureForPass(input.passType),
       maxTokens: maxTokensForPass(input.passType, project.format, hasEpisodePlan)
     });
+    let generatedContent = result.content;
+    let generatedModel = result.model;
+    if (input.passType === ScriptPassType.HOOK_LAB && project.format !== "ARTICLE" && !isBookProjectFormat(project.format)) {
+      const judge = await generateText({
+        userId: user.id,
+        workspaceId: workspace.id,
+        storyProjectId: project.id,
+        passType: input.passType,
+        model: input.model,
+        messages: [{
+          role: "user",
+          content: hookTournamentJudgePrompt({
+            title: project.title,
+            targetLengthMinutes: project.targetLengthMinutes,
+            sourceMaterial: shortenContext(sourceMaterial, 12_000),
+            analyticsGuide,
+            candidateOutput: shortenContext(result.content, 24_000)
+          })
+        }],
+        temperature: 0.25,
+        maxTokens: 4_500
+      });
+      generatedContent = `${result.content.trim()}\n\nIndependent Tournament Decision\n\n${judge.content.trim()}`;
+      generatedModel = `${result.model}; judge:${judge.model}`;
+    }
 
     const latest = await prisma.scriptDraft.findFirst({
       where: { storyProjectId: project.id, passType: input.passType },
       orderBy: { version: "desc" }
     });
     const effectiveProjectFormat = hasEpisodePlan ? "EPISODIC_SERIES" : project.format;
-    const polishedContent = polishGeneratedContent(input.passType, result.content, sponsorBlurb, effectiveProjectFormat, {
+    const polishedContent = polishGeneratedContent(input.passType, generatedContent, sponsorBlurb, effectiveProjectFormat, {
       forceSave: Boolean(input.forceSave)
     });
     const enforced = await enforceMinimumScriptLength({
@@ -234,7 +259,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       passType: input.passType,
       model: input.model,
       content: polishedContent,
-      modelUsed: result.model,
+      modelUsed: generatedModel,
       sourceMaterial,
       sponsorBlurb,
       passContext
@@ -367,13 +392,28 @@ function isCarrierOrInternalChannelName(value: string) {
 
 async function channelAnalyticsGuideForProject(channelId: string | null | undefined, workspaceId: string) {
   if (!channelId) return "";
+  const conversionCampaigns = await prisma.conversionCampaign.findMany({
+    where: { channelId, workspaceId },
+    include: {
+      storyProject: { select: { title: true } },
+      leads: { select: { status: true, boundPremium: true } },
+      events: { where: { eventType: "LINK_CLICK" }, select: { id: true }, take: 5000 }
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 30
+  });
   const connection = await prisma.youtubeConnection.findFirst({
     where: { channelId, workspaceId },
     include: {
       recommendations: { where: { status: "OPEN" }, orderBy: { createdAt: "desc" }, take: 6 }
     }
   });
-  if (!connection) return "No connected YouTube analytics for this channel yet. Do not invent performance data; use general retention best practices.";
+  if (!connection) {
+    return [
+      "No connected YouTube analytics for this channel yet. Do not invent performance data; use general retention best practices.",
+      conversionOutcomeGuide(conversionCampaigns)
+    ].filter(Boolean).join("\n\n");
+  }
 
   const latestPeriod = await prisma.youtubeVideoMetric.findFirst({
     where: { youtubeConnectionId: connection.id },
@@ -391,7 +431,6 @@ async function channelAnalyticsGuideForProject(channelId: string | null | undefi
         take: 8
       })
     : [];
-
   const totals = latestMetrics.reduce((acc, metric) => ({
     views: acc.views + metric.views,
     watchMinutes: acc.watchMinutes + metric.estimatedMinutesWatched,
@@ -413,11 +452,12 @@ async function channelAnalyticsGuideForProject(channelId: string | null | undefi
   const averageRetention = totals.views ? totals.weightedRetention / totals.views : 0;
   const averageViewDuration = totals.views ? totals.weightedDuration / totals.views : 0;
   const metricLines = latestMetrics.map((metric) =>
-    `- ${metric.title}: ${metric.views.toLocaleString()} views, ${(metric.estimatedMinutesWatched / 60).toFixed(1)} watch hours, ${metric.averageViewPercentage.toFixed(1)}% avg viewed, ${metric.impressionCtr.toFixed(1)}% CTR, ${metric.subscribersGained - metric.subscribersLost} net subs`
+    `- ${metric.title}: ${metric.views.toLocaleString()} views, ${(metric.estimatedMinutesWatched / 60).toFixed(1)} watch hours, ${metric.averageViewPercentage.toFixed(1)}% avg viewed, ${metric.impressionCtr.toFixed(1)}% CTR, ${metric.subscribersGained - metric.subscribersLost} net subs, ${metric.cardClicks} card clicks`
   );
   const recommendationLines = connection.recommendations.map((item) =>
     `- [${item.priority}] ${item.category}: ${item.recommendation}`
   );
+  const conversionGuide = conversionOutcomeGuide(conversionCampaigns);
 
   return [
     `Connected YouTube channel: ${connection.youtubeChannelTitle}`,
@@ -427,8 +467,42 @@ async function channelAnalyticsGuideForProject(channelId: string | null | undefi
       : "",
     latestMetrics.length ? `Top recent videos:\n${metricLines.join("\n")}` : "",
     recommendationLines.length ? `Open analytics recommendations:\n${recommendationLines.join("\n")}` : "",
+    conversionGuide,
+    "Use views, CTR, and retention to improve delivery, but do not copy a high-view pattern that produced weak business outcomes.",
     "Use this as directional channel guidance only. Do not claim these stats in public script copy unless the user explicitly asks."
   ].filter(Boolean).join("\n");
+}
+
+function conversionOutcomeGuide(campaigns: Array<{
+  storyProject: { title: string };
+  leads: Array<{ status: string; boundPremium: { toString(): string } | null }>;
+  events: Array<{ id: string }>;
+}>) {
+  if (!campaigns.length) return "No measured quote or bound-policy outcomes exist yet. Do not invent conversion performance.";
+  const rows = campaigns.map((campaign) => {
+    const quoted = campaign.leads.filter((lead) => lead.status === "QUOTED" || lead.status === "BOUND").length;
+    const boundLeads = campaign.leads.filter((lead) => lead.status === "BOUND");
+    return {
+      title: campaign.storyProject.title,
+      clicks: campaign.events.length,
+      leads: campaign.leads.length,
+      quoted,
+      bound: boundLeads.length,
+      boundPremium: boundLeads.reduce((sum, lead) => sum + Number(lead.boundPremium || 0), 0)
+    };
+  });
+  const totals = rows.reduce((sum, row) => ({
+    clicks: sum.clicks + row.clicks,
+    leads: sum.leads + row.leads,
+    quoted: sum.quoted + row.quoted,
+    bound: sum.bound + row.bound,
+    boundPremium: sum.boundPremium + row.boundPremium
+  }), { clicks: 0, leads: 0, quoted: 0, bound: 0, boundPremium: 0 });
+  const top = rows
+    .sort((first, second) => second.bound - first.bound || second.boundPremium - first.boundPremium || second.quoted - first.quoted || second.leads - first.leads)
+    .slice(0, 10)
+    .map((row) => `- ${row.title}: ${row.clicks} tracked clicks, ${row.leads} leads, ${row.quoted} quoted, ${row.bound} bound, $${row.boundPremium.toFixed(2)} bound premium`);
+  return `Measured agency outcomes: ${totals.clicks} tracked clicks, ${totals.leads} leads, ${totals.quoted} quoted, ${totals.bound} bound, $${totals.boundPremium.toFixed(2)} bound premium.\nTop conversion campaigns:\n${top.join("\n")}\nLearning priority: qualified leads, quoted accounts, bound policies, and bound premium outweigh raw views.`;
 }
 
 async function publishingPackKeywordHints(userId: string, project: {
@@ -842,6 +916,8 @@ Schema:
 Rules:
 - This pack is for ${partLabel} only, not the whole series.
 - Provide exactly 3 title options. Every title must include "${partLabel}".
+- The first title and first thumbnail must implement this episode's independent Hook Lab Winning Package and Locked Click Contract. The other two must test controlled variants of that same delivered promise.
+- Keep all packaging focused on the episode's Viewer Decision Blueprint and useful Texas prospect outcome.
 - Provide 12-20 useful tags.
 - Provide exactly 3 thumbnail prompts. Every thumbnail title, overlayText, and prompt must include "${partLabel}" or "PART ${input.episodeNumber}".
 - Description must be ready to paste into YouTube and summarize only this episode without unsupported claims.
@@ -1750,7 +1826,7 @@ function polishGeneratedContent(
     if (episodeSections.length) {
       return episodeSections.map((section) => {
         const sectionContent = passType === ScriptPassType.INTRO
-          ? ensureIntroSponsorPlacement(section.content, spokenSponsorBlurb)
+          ? stripSponsorCopyFromBody(section.content, spokenSponsorBlurb)
           : ensureOutroSponsorPlacement(section.content, spokenSponsorBlurb);
         return `${section.heading}\n\n${sectionContent}`;
       }).join("\n\n");
@@ -1758,9 +1834,9 @@ function polishGeneratedContent(
   }
 
   if (passType === ScriptPassType.INTRO) {
-    const oneParagraph = ensureIntroSponsorPlacement(polished.replace(/\s*\n+\s*/g, " ").replace(/\s{2,}/g, " ").trim(), spokenSponsorBlurb);
+    const oneParagraph = stripSponsorCopyFromBody(polished.replace(/\s*\n+\s*/g, " ").replace(/\s{2,}/g, " ").trim(), spokenSponsorBlurb);
     if (!oneParagraph) throw new Error("Intro output was empty and was not saved. Please run Intro again.");
-    if (/Now,\s+let['’]s get into today['’]s story\.?$/i.test(oneParagraph)) return oneParagraph;
+    if (/Now,\s+let['’]s get into today['’]s (?:story|topic)\.?$/i.test(oneParagraph)) return oneParagraph;
     return `${oneParagraph.replace(/[.?!]?$/, ".")} Now, let's get into today's story.`;
   }
 

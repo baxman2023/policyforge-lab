@@ -54,7 +54,7 @@ export function formatHeyGenSceneScript(content: string, options: { wordsPerScen
   const existingScenes = extractExistingScenes(clean);
   const scenes = existingScenes.length >= 2
     ? existingScenes
-    : chunkIntoScenes(clean, options.wordsPerScene ?? 170);
+    : chunkIntoScenes(clean, options.wordsPerScene ?? 95);
 
   return scenes
     .map((scene, index) => `Scene ${index + 1}\n\n${scene.trim()}`)

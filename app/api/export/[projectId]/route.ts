@@ -31,7 +31,9 @@ export async function GET(request: Request, context: { params: Promise<{ project
     const rawBody = scriptDraft?.content ?? fallbackDraft?.content;
     const sponsorBlurb = supportsSponsorBlurb(project.format) ? normalizeSponsorBlurbForFormat(project.sponsorBlurb, project.format) : null;
     const scriptBody = [
-      intro ? normalizeSponsorLanguageForFormat(ensureIntroSponsorPlacement(intro.content, sponsorBlurb), project.format) : undefined,
+      intro && project.format !== "STANDALONE" && project.format !== "EPISODIC_SERIES"
+        ? normalizeSponsorLanguageForFormat(project.format === "ARTICLE" ? ensureIntroSponsorPlacement(intro.content, sponsorBlurb) : stripSponsorCopyFromBody(intro.content, sponsorBlurb), project.format)
+        : undefined,
       rawBody ? normalizeSponsorLanguageForFormat(stripSponsorCopyFromBody(rawBody, sponsorBlurb), project.format) : undefined,
       outro ? normalizeSponsorLanguageForFormat(ensureOutroSponsorPlacement(outro.content, sponsorBlurb), project.format) : undefined
     ].filter(Boolean).join("\n\n");

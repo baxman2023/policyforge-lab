@@ -485,6 +485,7 @@ ${POLICYFORGE_AGENCY_PROFILE}
 
 Required pre-script brief:
 - Target prospect: infer from title, growth lane, category, source material, and saved growth strategy.
+- Viewer decision state: identify the specific situation, urgent question, misconception, desired outcome, and next decision the content should help with.
 - Policy/product focus: ${scriptType.policyFocus}
 - Texas location: ${input.location || "Texas, with Houston-area context when relevant"}
 - Pain point or decision moment: ${input.eventName || input.suggestedAngle || input.title}
@@ -514,7 +515,8 @@ Quote-intent structures available:
 CTA intelligence:
 - Choose one primary CTA per output, not a pile of asks.
 - Best CTAs: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, prepare for renewal, refer a friend, or leave a Google review.
-- Put CTAs after useful value. For spoken scripts, the primary CTA usually belongs in the outro or after the first real value beat; never interrupt the opening promise.
+- Keep spoken openings and body narration free of branded agency promotion. Use a nonpromotional preparation cue after value when useful, then place the primary agency CTA in the outro.
+- Pair the CTA with one topic-matched preparation step so the prospect knows what to have ready without sharing unnecessary sensitive information.
 
 Local trust layer:
 - When relevant, include Houston/Texas realities such as storm season, wind and hail, roof age, hurricane prep, flooding, traffic, teen drivers, landlord/rental exposure, certificates, contractors, lease requirements, renewal shock, and small-business growth.
@@ -687,13 +689,13 @@ YouTube performance guidance:
 ${input.analyticsGuide || "No connected YouTube analytics guidance yet. Use general retention, clarity, and packaging best practices without inventing channel stats."}
 
 Agency revenue and CTA guidance:
-- If the saved growth strategy includes a revenue goal, lead magnet, quote URL, compliance lane, service focus, or primary CTA, honor it in the intro, outro, publishing pack, and final QA.
+- If the saved growth strategy includes a revenue goal, lead magnet, quote URL, compliance lane, service focus, or primary CTA, honor it in the viewer decision blueprint, outro, publishing pack, and final QA. Do not turn the opening into an ad.
 - Keep the main script prospect-first. Do not force quote language into the body unless the project format explicitly calls for quote, renewal, referral, or sales outreach.
 - A revenue-focused output should preserve trust, retention, usefulness, and factual safety before it asks for a call, quote, review, referral, or policy review.
 - For YouTube video projects, use the retention-script framework without becoming formulaic: match the title/thumbnail promise immediately, prove effort or credibility, create a clear curiosity gap, show the viewer they will get what they clicked for, and tease one extra payoff.
 - Thumbnail-first rule: the first 5 seconds should say or show the same subject, object, map, document, person, event, or mystery promised by the title and thumbnail.
 - Input-bias rule: make the viewer feel the work behind the video through verified effort, such as timeline reconstruction, source comparison, document review, map tracing, expert context, or evidence sorting. Never invent effort.
-- Timing targets for video scripts: intro ideally under 30 seconds; first real story/value beat by 30-40 seconds; first strong payoff, reveal, practical warning, or useful epiphany by 75 seconds; a soft quote/review/referral/policy-review CTA may appear after the first real value beat, roughly around 90 seconds, only if it feels earned.
+- Timing targets for video scripts: intro ideally under 25 seconds; first real story/value beat by 30 seconds; first strong payoff, practical warning, useful contrast, or epiphany by 60-75 seconds. Keep the body free of branded agency promotion. Around 90 seconds, a nonpromotional preparation cue may help the viewer act; reserve the primary agency CTA for the earned ending.
 - Transition rule: every section should make the next section feel necessary. Avoid mechanical "Point two" transitions when a curiosity bridge can do the work.
 - End-screen rule: the outro should quickly point to the next video by making it feel like the natural next question in the viewer's watch session.
 - Do not use fake engagement bait, intentional mistakes, misleading claims, or deliberate factual errors to farm comments.
@@ -779,10 +781,7 @@ Rules:
 - Each intro should be a distinct cold open for that specific episode, not a generic series trailer.
 - Each intro should be roughly one strong opening paragraph.
 - Use the episode plan if available.
-- If agency CTA instructions are provided, include them exactly once inside each episode intro, briefly and naturally after the cold open.
-- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
-- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the CTA instructions.
-- If no agency CTA instructions are provided, do not mention sponsors, products, or the description.
+- Do not include an agency CTA, phone number, quote request, sponsor message, product pitch, or description-link instruction in any episode intro. The viewer must receive value before being asked to act.
 - Do not draft the full episodes yet.
 - Do not use Markdown bullets, stage directions, or production notes.
 - End each intro with a natural bridge into that episode's story.
@@ -823,10 +822,7 @@ Output rules:
 - Output one paragraph only.
 - Welcome the listener to the show, set up the story, and give one clear reason to keep listening.
 - Vary the language from episode to episode. Do not use a stock template.
-- If agency CTA instructions are provided, include them exactly once inside this intro. Work them in briefly and naturally before "Now, let's get into today's topic."
-- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
-- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the show notes only if that fits the CTA instructions.
-- If no agency CTA instructions are provided, do not mention sponsors, products, or show notes.
+- Do not include an agency CTA, phone number, quote request, sponsor message, product pitch, or show-notes instruction in the podcast intro. Earn attention and trust first.
 - End with this exact sentence: Now, let's get into today's topic.
 ${ttsOutputRules}
 - Do not use Markdown, headings, bullets, bracketed stage directions, or pause markers.`;
@@ -861,11 +857,7 @@ Output rules:
 - If you name the source of the guidance, use Baxter Insurance Agency or independent Texas insurance education. Never imply the video/channel is owned by, operated by, sponsored by, or speaking for a carrier.
 - Vary the language from video to video. Do not use a stock template.
 - Do not spoil the ending or over-explain the case.
-- If agency CTA instructions are provided, include the CTA message exactly once inside this intro. Work it in briefly and naturally after the opening context and before "Now, let's get into today's topic."
-- Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
-- Preserve the CTA's phone number, link, and description-link instruction when provided. Condense lightly only if needed for flow.
-- If a CTA link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the CTA instructions.
-- If no agency CTA instructions are provided, do not mention sponsors, products, or the description.
+- Do not include an agency CTA, phone number, quote request, sponsor message, product pitch, or description-link instruction in the intro. The opening exists only to confirm the click promise, establish relevance, and earn the next minute.
 - End with this exact sentence: Now, let's get into today's topic.
 ${ttsOutputRules}
 - Do not use Markdown, headings, bullets, bracketed stage directions, or pause markers.`;
@@ -911,6 +903,7 @@ Create a script-facing Analytics Brief for this project.
 
 Output plain text with these exact sections:
 Channel Performance Signals
+Measured Business Outcome Signals
 Script Implications
 Hook Instructions
 Pacing Instructions
@@ -921,7 +914,8 @@ Avoid This
 Draft Instructions
 
 Rules:
-- Use only the YouTube performance guidance provided above. If no connected analytics exists, say that clearly and fall back to general best practices.
+- Use only the YouTube and measured conversion guidance provided above. If either source is unavailable, say that clearly and do not invent results.
+- Prioritize qualified leads, quoted accounts, bound policies, and bound premium over raw views. Use CTR, retention, watch time, search terms, and traffic sources to improve delivery, not as substitutes for business outcomes.
 - Translate metrics and recommendations into writing instructions, not a public analytics report.
 - Do not invent performance numbers, trends, competitors, or channel history.
 - Make the brief immediately usable by Hook Lab, Structure, Retention Map, Draft, Rewrite, and Publishing Pack.`;
@@ -980,11 +974,14 @@ Rules:
 Create a Hook Lab for this ${seriesLabel}. If an episode plan exists, create hooks for each planned episode.
 
 Output plain text with these exact sections:
-${Array.from({ length: episodeCount }, (_, index) => `Episode ${episodeWord(index + 1)} Hook Candidates\nEpisode ${episodeWord(index + 1)} Selected Hook`).join("\n")}
+Series Viewer Decision Blueprint
+${Array.from({ length: episodeCount }, (_, index) => `Episode ${episodeWord(index + 1)} Packaging Candidates\nEpisode ${episodeWord(index + 1)} Opening Tournament\nEpisode ${episodeWord(index + 1)} Selected Hook\nEpisode ${episodeWord(index + 1)} Locked Click Contract`).join("\n")}
 Series Hook Continuity Notes
 
 Rules:
-- Generate at least three possible cold opens for each episode, score each from 0-100, then choose the strongest hook for that episode.
+- Define the viewer's exact situation, urgent question, current misconception, desired outcome, and appropriate next decision before creating hooks.
+- Generate three title and thumbnail concept pairs for each episode before writing openings. Each pair must state the promise it makes and the proof/payoff the episode must deliver.
+- Generate three complete first-30-second opening candidates for each episode, score each from 0-100, then choose the strongest opening for that episode.
 - Do not choose only one episode. Every episode needs its own selected hook.
 - Score for title/thumbnail promise match, first-frame expectation, curiosity, clarity, emotional charge, factual safety, originality, effort proof, and retention potential.
 - Each selected hook should fit its episode's central question, not a title card or production note.
@@ -999,19 +996,27 @@ Create a Hook Lab for this story. If an episode plan exists, use its selected fi
 Generate 8 possible cold opens, score each from 0-100, then choose the single strongest hook.
 
 Output plain text with these exact sections:
-Hook Candidates
+Viewer Decision Blueprint
+Packaging Candidates
+Opening Tournament
 Scoring Rationale
 Selected Hook
 Why This Hook Wins
+Locked Click Contract
 How To Use It
 
 Rules:
 - You make the decision. Do not ask the user to choose.
-- Score for title/thumbnail promise match, first-frame expectation, curiosity, clarity, emotional charge, factual safety, originality, effort proof, and retention potential.
+- First define one specific viewer state: their situation, urgent question, current misconception, desired outcome, and the next decision this video should help them make.
+- Generate exactly three package candidates before writing openings. Each candidate needs a clickable but factual title, a simple thumbnail concept with optional two-to-four-word overlay, the viewer promise, and the required proof/payoff.
+- Generate three complete first-30-second opening candidates plus five shorter cold-open lines. Score the complete openings and choose one winner.
+- Score for title/thumbnail promise match, first-frame expectation, curiosity, clarity, usefulness, emotional charge, factual safety, originality, effort proof, sales resistance, and retention potential.
 - The selected hook should fit the ${outputName}, not a title card or production note.
 - The selected hook should meet the click expectation within the first 5 seconds and imply the viewer will get the promised payoff.
 - Prefer hooks that combine multiple jobs in one sentence: expectation match, effort/credibility proof, curiosity gap, and value assurance.
-- The selected hook must avoid unsupported claims and cheap sensationalism.`;
+- The selected hook must avoid unsupported claims and cheap sensationalism.
+- Locked Click Contract must name the winning title direction, thumbnail concept, exact five-second expectation match, first useful payoff and deadline, primary proof, final payoff, and claims the script must not make.
+- The Locked Click Contract overrides weaker packaging or hook ideas in earlier sections and becomes binding for Structure, Draft, Rewrite, Final, Scene Cards, and Publishing Pack.`;
     case "STORY_SPINE":
       return `${shared}
 
@@ -1042,6 +1047,8 @@ Include opening hook, main question, secondary mystery, reveal order, emotional 
 
 Add these exact sections to the outline:
 Agency Script Brief Check
+Locked Click Contract Check
+Viewer Decision Journey
 Prospect Decision Moment
 Quote Intent Structure
 Coverage Promise Guardrails
@@ -1052,7 +1059,10 @@ First 5 Seconds Expectation Match
 First 30 Seconds
 First Value Beat
 Effort Proof / Input Bias
+Attention Reset Schedule
+HeyGen Scene Rhythm
 Soft CTA Window
+Conversion Friction Reducer
 Primary Agency CTA
 Supporting Asset Plan
 End-Screen Bridge
@@ -1063,10 +1073,15 @@ Rules:
 - Add one or two natural prospect objections and where they should be answered.
 - The local trust layer must be useful Texas/Houston context, not a tacked-on city mention.
 - Coverage Promise Guardrails must list the exact claims the writer must avoid or hedge.
+- Locked Click Contract Check must quote the binding winning package and payoff requirements from the independent Hook Lab decision. Do not silently switch to a different promise.
+- Viewer Decision Journey must show the viewer's starting situation, misconception, useful realization, practical decision, and appropriate next action.
 - The title/thumbnail promise must be deliverable in the first spoken lines or first visual beat.
-- First 30 Seconds should include the cold open, effort/credibility proof, curiosity gap, and assurance that the viewer will get the promised payoff.
-- First Value Beat should happen by 30-40 seconds when possible.
-- Soft CTA Window should happen only after value, roughly around 90 seconds, and should be skipped if no quote, lead magnet, review, referral, renewal, or service path fits.
+- First 30 Seconds should use the winning opening from the independent tournament and include expectation match, effort/credibility proof, curiosity gap, and value assurance.
+- First Value Beat should happen by 30 seconds when possible, with the first substantial payoff by 60-75 seconds.
+- Attention Reset Schedule should plan a useful change every 30-60 seconds: scenario, contrast, misconception, consequence, evidence, question, example, or visual shift. Do not manufacture drama.
+- HeyGen Scene Rhythm should plan one spoken idea per scene, generally 20-40 seconds per scene, and identify where the visual environment should change.
+- Soft CTA Window should normally be a nonpromotional decision or preparation cue around 90 seconds, never a branded sales interruption. Reserve the primary agency CTA for the ending.
+- Conversion Friction Reducer should give one topic-matched preparation step, such as having a declarations page, renewal notice, closing date, driver list, roof information, or business operations summary available. Do not request unnecessary sensitive information.
 - Supporting Asset Plan should name the downstream GBP post, email, social post, short clip, call script, and website article angle the final pack should create.
 - End-Screen Bridge should make the next video feel like the natural unanswered question.`;
     case "RETENTION_MAP":
@@ -1097,9 +1112,10 @@ Create a retention beat map for the ${outputName}.
 
 Output plain text with these exact sections:
 Retention Strategy
-First 90 Seconds Plan
+First 75 Seconds Plan
 Title Thumbnail Promise Delivery
 Effort Proof / Input Bias
+Thirty To Sixty Second Attention Reset Plan
 Minute By Minute Curiosity Plan
 Open Loops
 Mini Payoffs
@@ -1112,10 +1128,11 @@ Draft Instructions
 
 Rules:
 - Plan the reader's or listener's curiosity across the full target length.
-- The First 90 Seconds Plan must include: expectation match in the first 5 seconds, intro under 30 seconds when possible, first real value/story beat by 30-40 seconds, first payoff or epiphany by 75 seconds, and optional CTA only after value.
-- Add a meaningful question, reveal, contradiction, or emotional turn every 3-5 minutes.
+- The First 75 Seconds Plan must include: expectation match in the first 5 seconds, intro under 25 seconds when possible, first real value/story beat by 30 seconds, and first substantial payoff or epiphany by 60-75 seconds.
+- Add a useful attention reset every 30-60 seconds through a scenario, contrast, misconception, consequence, evidence point, question, example, or visual change. These resets must advance understanding rather than add noise.
+- In a 7-10 minute video, plan at least 8 meaningful value or curiosity beats. Longer videos should scale proportionally without padding.
 - Each major transition should make the viewer need the next section, not merely announce the next section.
-- CTA Timing should identify whether a quote request, policy review, referral request, review request, lead magnet, or subscribe CTA belongs around 90 seconds, in the outro, in the description only, or nowhere.
+- CTA Timing should identify the useful preparation cue that can appear after roughly 90 seconds and place the branded quote, policy review, referral, review, lead magnet, or subscribe CTA in the outro, description only, or nowhere.
 - End-Screen Bridge should name the next natural video/question that keeps the watch session alive.
 - Do not use fake engagement bait, deliberate errors, or misleading curiosity gaps.
 - Do not invent facts to create excitement.
@@ -1182,9 +1199,11 @@ Episode rules:
 - Do not write one long documentary split by arbitrary labels. Each episode needs its own central question and reveal arc.
 - Do not repeat the same recap at the start of every episode.
 - Preserve series continuity, but make every episode satisfying on its own.
-- Use short sentences during tension, longer sentences during setup, natural listener questions, mini payoffs every 3-5 minutes, and emotional resolution.
+- Use short sentences for urgency, longer sentences for explanation, natural viewer questions, and a useful attention reset or mini payoff every 30-60 seconds.
+- Include realistic, explicitly hypothetical Texas micro-scenarios when they clarify a buyer decision. Never invent prices, coverage, eligibility, testimonials, claims outcomes, or carrier decisions.
 - In every episode, meet the title/thumbnail promise immediately, prove effort or credibility early, deliver a first payoff quickly, and use transitions that make the next section feel necessary.
-- If an agency CTA, quote request, referral request, review request, or lead magnet is used, place it only after the viewer has received real value or in the outro. Never interrupt the opening promise.
+- Keep the episode body free of branded agency promotion. After roughly 90 seconds, a nonpromotional preparation cue may help the viewer make the decision; reserve the agency CTA for the outro.
+- Write for one primary idea per 20-40 second HeyGen scene and create a natural visual reset every 30-60 seconds without adding production directions to the narration.
 - Do not invent facts. If source material is thin, deepen through verified context, timeline reconstruction, competing explanations, aftermath, source uncertainty, and why the story endured.
 
 ${bodySponsorRules}
@@ -1231,19 +1250,22 @@ ${bodySponsorRules}`;
       }
       return `${shared}
 
-Write the full spoken narration script. If an episode plan exists, write the selected episode. Otherwise, write a ${outputName}. Start with the selected Hook Lab hook. Obey the story spine, structure, and retention beat map. Use short sentences during tension, longer sentences during setup, natural listener questions, mini payoffs every 3-5 minutes, and emotional resolution.
+Write the full spoken narration script. If an episode plan exists, write the selected episode. Otherwise, write a ${outputName}. Use the independent Hook Lab winner and obey its Locked Click Contract, then follow the story spine, structure, and retention beat map. Use short sentences for urgency, longer sentences for explanation, natural viewer questions, and a useful attention reset or mini payoff every 30-60 seconds.
 
 Length rules:
 - Follow the Agency Script Brief: target prospect, policy/product focus, Texas location, pain point, CTA, and compliance boundaries.
 - Use the best quote-intent structure for the topic, such as Home Quote, Auto Quote, Bundle Review, Renewal Review, Storm Prep, Claims Prep, Commercial Prospect, Referral/Review Ask, or Client Education.
 - Include a useful Texas/Houston local trust layer when relevant: storm season, wind/hail, roof age, flooding, traffic, teen drivers, contractors, lease/certificate needs, renewal changes, or business growth.
 - Answer one or two natural prospect objections in the body without sounding defensive or salesy.
+- Include two or three realistic Texas micro-scenarios when they clarify the decision. Explicitly frame them as hypothetical examples, keep them concise, and never invent prices, coverage, eligibility, testimonials, claims results, or carrier decisions.
 - Use one clear CTA path. Do not stack calls, quotes, reviews, referrals, and subscriptions all at once.
 - Do not promise savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcomes.
 - Meet the title/thumbnail promise in the first spoken lines. The viewer should immediately feel, "this is the video I clicked."
-- Keep the intro tight. Aim for under 30 seconds, start the first real story/value beat by 30-40 seconds, and deliver the first payoff, reveal, shock of context, or useful epiphany by roughly 75 seconds when the facts allow it.
+- Keep the intro under 25 seconds when possible, start the first real value beat by 30 seconds, and deliver the first substantial payoff, practical warning, useful contrast, or epiphany by 60-75 seconds when the facts allow it.
 - Show input bias early: the viewer should feel the verified work behind the script through records, maps, timelines, witness accounts, source comparison, expert context, or reconstruction. Do not fake sources or effort.
-- If a quote, review, referral, renewal, or lead magnet CTA belongs in the script, place it only after real value has been delivered or in the outro. Do not interrupt the cold open.
+- Keep the body free of branded agency promotion. After roughly 90 seconds, use a nonpromotional preparation cue if it helps the viewer make the decision; reserve the agency CTA for the outro.
+- Before the CTA, give one topic-matched preparation step that reduces friction, such as having a declarations page, renewal notice, closing date, driver list, roof information, or business operations summary available. Do not request unnecessary sensitive information.
+- Write with HeyGen production in mind: one primary spoken idea per visual scene, generally 20-40 seconds before a natural visual reset. Do not add scene labels or production directions in the body; the Final pass will format clean scene boundaries.
 - Write transitions that create need for the next section. Avoid mechanical "next" phrasing when a curiosity bridge can make the viewer continue.
 - Do not use fake engagement bait, deliberate mistakes, misleading claims, or manufactured controversy to farm comments.
 - Target roughly ${input.targetWordCount.toLocaleString()} words for about ${input.targetLengthMinutes} minutes.
@@ -1388,9 +1410,12 @@ ${bodySponsorRules}`;
 
 Rewrite the script to apply the critique and fact/continuity check. Improve opening, pacing, tension, engagement, emotional impact, narration rhythm, clarity, factual safety, and ending.
 
+- Enforce the independent Hook Lab Locked Click Contract. The first spoken lines, first payoff, proof, and final payoff must deliver the same package promise.
+- Repair any 60-second stretch that lacks a useful scenario, contrast, misconception, consequence, evidence point, question, example, or visual reset.
+- Keep hypothetical Texas scenarios clearly labeled and factual boundaries intact.
 - Strengthen quote intent, Texas/local relevance, objection handling, and CTA clarity.
 - Remove or hedge any risky coverage, savings, carrier, underwriting, or claim outcome language.
-- Keep one primary CTA and make it feel earned after useful education.
+- Keep one primary CTA, never place it in the first 60 seconds, and make it feel earned after useful education. Pair it with one practical preparation step that reduces friction.
 - Preserve the Baxter voice: local, practical, plain-English, consultative, no hype, no scare tactics, no guaranteed outcomes.
 
 ${bodySponsorRules}
@@ -1446,6 +1471,8 @@ Rules:
 - Remove AI-sounding cadence, generic documentary filler, repeated sentence rhythm, stiff transitions, cheap hype, and overused rhetorical questions.
 - Make the narration sound human, specific, grounded, cinematic, and easy to perform.
 - Preserve factual caution, open-loop payoffs, retention improvements, and the strongest hook.
+- Preserve the Locked Click Contract, realistic hypothetical examples, one clear conversion path, and 20-40 second HeyGen scene rhythm.
+- Remove empty urgency, rhetorical-question chains, generic insurance filler, repetitive caveats, and any CTA that arrives before value.
 - Do not add Markdown, headings, title cards, bullets, pause markers, stage directions, or production notes.
 ${ttsOutputRules}
 ${bodySponsorRules}`;
@@ -1458,13 +1485,15 @@ Run the final quality gate before series polish.
 Output plain text with these exact sections:
 Overall Series Score
 ${episodeHeadingList(episodeCount, " Score")}
+Viewer Performance Gate
+Agency Conversion Gate
 Series Continuity Score
 Retention Score
 Clarity Score
 Emotional Payoff Score
 Factual Safety Score
 Title Thumbnail Match Score
-First 90 Seconds Score
+First 75 Seconds Score
 Input Bias Score
 Transition Strength Score
 Monetization Fit Score
@@ -1473,6 +1502,9 @@ Final Polish Instructions
 
 Rules:
 - Score each category from 0-100.
+- Score Viewer Performance Gate separately for click-promise match, first-minute value, retention, clarity, usefulness, emotional movement, and visual momentum.
+- Score Agency Conversion Gate separately for qualified intent, trust, objection resolution, CTA relevance, preparation-step usefulness, Texas relevance, compliance, and likely quote-conversation fit.
+- Neither gate can be rescued by a high score in the other. Any gate below 80 requires explicit repairs before Final.
 - Be blunt and specific.
 - Identify weak episodes, repetition, abrupt endings, continuity issues, unsupported claims, or teleprompter problems.
 - Confirm whether all ${episodeCount} episodes are present.
@@ -1576,6 +1608,8 @@ Run the final quality gate before teleprompter polish.
 
 Output plain text with these exact sections:
 Overall Score
+Viewer Performance Gate
+Agency Conversion Gate
 Hook Score
 Retention Score
 Clarity Score
@@ -1583,7 +1617,9 @@ Emotional Payoff Score
 Factual Safety Score
 Teleprompter Readiness Score
 Title Thumbnail Match Score
-First 90 Seconds Score
+First 75 Seconds Score
+First Minute Value Score
+Attention Reset Density Score
 Input Bias Score
 Transition Strength Score
 Quote Intent Score
@@ -1592,15 +1628,23 @@ Compliance Safety Score
 Texas Local Relevance Score
 CTA Strength Score
 Objection Handling Score
+Scenario Usefulness Score
+Sales Resistance Score
+Conversion Friction Score
 Coverage Promise Safety Score
 Must Fix Before Final
 Final Polish Instructions
 
 Rules:
 - Score each category from 0-100.
+- Viewer Performance Gate must independently score click-promise match, first-minute value, retention, clarity, usefulness, emotional movement, and visual momentum.
+- Agency Conversion Gate must independently score qualified intent, trust, objection resolution, CTA relevance, preparation-step usefulness, Texas relevance, compliance, and likely quote-conversation fit.
+- Neither gate can compensate for the other. Any gate below 80 requires explicit repairs in Final Polish Instructions.
 - Be blunt and specific.
 - Identify any remaining repetition, abrupt ending risk, awkward phrasing, markdown, section labels, unsupported claims, or teleprompter problems.
 - Check whether the script meets the title/thumbnail promise immediately, proves effort or credibility early, delivers an early payoff, and uses curiosity bridges instead of mechanical transitions.
+- Check whether every 30-60 second stretch earns attention with useful movement and whether hypothetical scenarios are clearly framed, realistic, concise, and decision-relevant.
+- Reject an agency CTA in the first 60 seconds and penalize any CTA that lacks a useful topic-matched preparation step.
 - Flag sponsor, ad, promo, discount, offer, product, or "link in the description" language if it appears in the body script. Sponsor placement belongs only in the Intro and Outro.
 - Flag missing, unclear, or trust-damaging quote/review/referral/renewal CTA language in the intro, outro, and publishing-pack path.
 - Score whether the script is likely to create a qualified agency action without creating compliance risk.
@@ -1621,6 +1665,8 @@ Output rules:
 ${ttsOutputRules}
 ${bodySponsorRules}
 - Preserve the strongest hooks, transitions, tension, factual caution, and emotional endings.
+- Preserve the independent winner and Locked Click Contract for every episode. Repair either quality gate if it scored below 80.
+- Keep each episode CTA-free for the first 60 seconds and preserve one topic-matched preparation step before the primary CTA.
 - Remove AI-sounding phrases, unsupported claims, and production notes.
 - Total series target is roughly ${seriesTargetWordCount.toLocaleString()} words across ${episodeCount} ${input.targetLengthMinutes}-minute episodes.
 - Every episode must have a complete final paragraph and must not end abruptly.
@@ -1670,11 +1716,14 @@ Output rules:
 - Do not add scene titles, timestamps, cues, descriptions, background notes, visual notes, presenter directions, title cards, chapter names, "Part One" labels, bullet points, lists, horizontal rules, or separator lines.
 - Do not include bracketed stage directions or pause markers. Never write [pause], [beat], [music], [sfx], or similar cues.
 - Write only clean narrator text under each scene label.
-- For 7-10 minute videos, use roughly 8-14 scenes. For longer scripts under 30 minutes, use enough scenes to keep HeyGen manageable without creating tiny fragments.
+- For 7-10 minute videos, use roughly 12-22 scenes, generally 20-40 seconds of spoken narration per scene. For longer scripts under 30 minutes, scale the scene count while keeping one primary idea per scene.
 ${ttsOutputRules}
 ${bodySponsorRules}
 - Preserve the strongest hook, clear transitions, tension, and emotional ending.
+- Enforce the independent Hook Lab Locked Click Contract. The opening, first payoff, proof, and final payoff must deliver the winning package promise.
+- Repair Viewer Performance Gate and Agency Conversion Gate weaknesses when either score is below 80.
 - Preserve the selected agency CTA, Texas/local trust layer, and useful objection handling.
+- Keep the first 60 seconds free of agency CTAs. Preserve one topic-matched preparation step before the primary CTA so the next action feels useful and easy.
 - Remove any language that promises savings, coverage, eligibility, underwriting acceptance, carrier appetite, rate availability, or claim outcomes.
 - Keep the Baxter voice local, practical, plain-English, consultative, and calm.
 - Remove AI-sounding phrases, unsupported claims, and production notes.
@@ -1700,6 +1749,7 @@ Rules:
 - Each outro should be a short human closing paragraph for that specific episode.
 - Every episode before the final part should close the episode and naturally tease the next episode without spoiling it.
 - The final episode should close the full series with a satisfying final note and a standard subscribe, like, comment, and share request.
+- Before the agency CTA, give one concise topic-matched preparation step that reduces friction for a quote or policy-review conversation.
 - If agency CTA instructions are provided, include the agency CTA message exactly once at the very end of each outro.
 - Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
 - If a CTA link is provided, do not read the raw URL aloud. Say the link is in the description only if that fits the CTA instructions.
@@ -1741,7 +1791,7 @@ ${sponsorLinkText}
 
 Output rules:
 - Output one short human paragraph only.
-- Thank the listener naturally and ask for one useful next step: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, refer a friend, leave a Google review, or follow the show if this is truly a podcast-first asset. Choose the one that best fits the episode.
+- Thank the listener naturally, give one concise topic-matched preparation step, and ask for one useful next action: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, refer a friend, leave a Google review, or follow the show if this is truly a podcast-first asset. Choose the one that best fits the episode.
 - Keep the CTA educational and low pressure.
 - If agency CTA instructions are provided, include the agency CTA message exactly once at the very end.
 - Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
@@ -1777,7 +1827,8 @@ ${sponsorLinkText}
 
 Output rules:
 - Output one short human paragraph only.
-- Thank the listener naturally and ask for one useful next step: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, refer a friend, leave a Google review, or subscribe only if the asset is clearly a YouTube growth asset. Choose the one that best fits the script.
+- Thank the listener naturally, give one concise topic-matched preparation step, and ask for one useful next action: call 281-445-1381, request a Texas quote, schedule a policy review, ask about bundling, review flood coverage, refer a friend, leave a Google review, or subscribe only if the asset is clearly a YouTube growth asset. Choose the one that best fits the script.
+- Preparation examples include having a declarations page, renewal notice, closing date, driver list, roof information, or business operations summary ready. Use only what fits and do not request unnecessary sensitive information.
 - Keep the CTA educational and low pressure.
 - If agency CTA instructions are provided, include the agency CTA message exactly once at the very end of this outro, after any subscribe, like, comment, or share request.
 - Use only the agency CTA instructions provided by the user. Never invent generic sponsor wording, savings claims, or default sponsor text.
@@ -1809,7 +1860,7 @@ Asset Checklist
 Rules:
 - This is a production file, not narration. Do not rewrite the script.
 - Keep final narration clean; put all visuals, SFX, music, captions, and editing notes here.
-- Break the whole script into practical HeyGen scenes. For 7-10 minute videos, use roughly 8-14 scenes. For longer videos under 30 minutes, use enough scenes to keep visuals fresh without becoming excessive.
+- Break the whole script into practical HeyGen scenes. For 7-10 minute videos, use roughly 12-22 scenes with one primary idea and about 20-40 seconds of narration per scene. For longer videos under 30 minutes, scale proportionally without creating tiny fragments.
 - For each scene card include: scene number, approximate timestamp range, narration beat, HeyGen presenter direction, background visual idea, on-screen text if any, SFX/music cue if useful, and one background image prompt.
 - In the "HeyGen Scene Background Prompts" section, list every background in this exact parseable format:
 Scene 01 Background Prompt: [single 16:9 background image prompt, no text, no typography, no logos, no watermark, no fake UI, no FLUX, suitable behind a HeyGen presenter]
@@ -2113,9 +2164,11 @@ Schema:
 
 Rules:
 - Provide exactly 3 title options. Do not score or choose a winner; YouTube will test them.
+- The first title and first thumbnail must faithfully implement the independent Hook Lab Winning Package and Locked Click Contract. The other two are controlled variants of the same delivered promise, not unrelated angles.
 - Titles should be curiosity-driven, factual, human, and clickable without false claims.
 - Description should be ready to paste into YouTube and accurately summarize the story without unsupported claims.
 - Each title, thumbnail, first description sentence, and pinned comment must sell the same promise. Do not create a title/thumbnail promise the script does not deliver in the first 30 seconds.
+- Use the Viewer Decision Blueprint to keep the package focused on one real Texas prospect situation and useful outcome.
 - Include a brief value assurance in the description: what the viewer will understand, discover, or feel by watching.
 - If there is a natural agency CTA, lead magnet, quote request, review request, or referral tie-in, place it in the CTA blocks only after the video promise is clear. Do not make the whole pack feel like an ad.
 - Description must follow this exact block order, separated by blank lines:
@@ -2146,6 +2199,7 @@ Rules:
 - Keep the composition simple: one dominant subject plus one mystery/evidence detail, with no more than 2-3 major visual elements.
 - Every thumbnail prompt must be thumbnail-first: instant readability on mobile, one clear subject, one evidence/mystery detail, and a visual that can be echoed in the first 5 seconds of the video.
 - Pinned comments should ask for a genuine viewer interpretation, theory, memory, or next-question response. Do not use intentional typos, fake mistakes, or manipulative engagement bait.
+- When a quote or policy-review CTA fits, pair it with the same topic-matched preparation step used in the script so the viewer knows what to have ready.
 - Do not copy any competitor thumbnail, face, layout, logo, or exact framing.
 - Provide one sunoPrompt for background music specific to this video.
 - conversionAssets is required. Adapt the finished script into a GBP post, short email, Facebook/social post, three short-form clip hooks, staff call script, website article angle, Macaly landing page prompt, and review/referral prompt when relevant.
@@ -2156,6 +2210,49 @@ Rules:
 - Do not reference copyrighted songs, bands, composers, celebrity voices, or exact artist styles in the Suno prompt.
 - Do not include Shazi production notes.`;
   }
+}
+
+export function hookTournamentJudgePrompt(input: {
+  title: string;
+  targetLengthMinutes: number;
+  sourceMaterial?: string;
+  analyticsGuide?: string;
+  candidateOutput: string;
+}) {
+  return `Act as an independent senior YouTube packaging, retention, usefulness, and insurance-conversion editor.
+
+Project: ${input.title}
+Target runtime: ${input.targetLengthMinutes} minutes
+
+Verified source context:
+${input.sourceMaterial || "No additional source material. Penalize claims that lack support."}
+
+Measured channel and conversion guidance:
+${input.analyticsGuide || "No measured channel guidance. Do not invent performance data."}
+
+First model's packaging and opening tournament:
+${input.candidateOutput}
+
+Independently judge the candidates. Do not reward sensationalism, fear, carrier impersonation, unsupported certainty, or an early sales pitch. Prefer the option most likely to earn the click, confirm the promise immediately, provide concrete Texas insurance value, retain attention, and create a qualified next step after value.
+
+Output plain text with these exact sections:
+Independent Scorecard
+Winning Package
+Winning First 30 Seconds
+Viewer Decision Blueprint
+Locked Click Contract
+Conversion Path
+Risks To Remove
+Binding Instructions For Structure And Draft
+
+Rules:
+- Score click clarity, five-second promise match, first-minute usefulness, curiosity, trust, factual safety, sales resistance, retention potential, visual potential, and qualified conversion fit from zero to one hundred.
+- Make one decision. Do not ask the user to choose.
+- Winning Package must include the title direction, thumbnail concept, and viewer promise.
+- Winning First 30 Seconds must reproduce the complete selected opening, refined if necessary.
+- Locked Click Contract must identify the first payoff deadline, proof the script must provide, final payoff, and prohibited claims.
+- Conversion Path must define one appropriate viewer action and the useful preparation step that makes the action easier.
+- This independent decision overrides any conflicting winner selected in the first model's output.`;
 }
 
 export type BookIllustrationMode = "CHAPTER_OPENERS" | "KEY_SCENES" | "FULL_ILLUSTRATED";

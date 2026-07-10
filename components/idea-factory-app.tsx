@@ -1701,6 +1701,17 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
   ],
   "Video & HeyGen": [
     {
+      title: "Viral, Useful, And Conversion-Safe Engine",
+      body: "PolicyForge now locks the viewer promise before drafting and judges viewer performance separately from agency conversion performance.",
+      items: [
+        "Packaging & Hook Lab creates title/thumbnail directions and complete first-30-second openings before the script is written.",
+        "An independent model chooses the winner and creates the binding Click Contract used by Structure, Draft, Final, Scene Cards, and the Campaign Kit.",
+        "The opening contains no agency pitch. The script earns attention with value, uses a practical preparation cue after value, and saves the branded CTA for the ending.",
+        "Future scripts learn from views and retention, but quote leads, quoted accounts, bound policies, and bound premium receive more weight.",
+        "Viewer Performance and Agency Conversion are separate quality gates; one high score cannot hide weakness in the other."
+      ]
+    },
+    {
       title: "Best Video Length",
       body: "PolicyForge is tuned for HeyGen videos under 30 minutes, with 7-10 minutes usually being the sweet spot.",
       items: [
@@ -1714,7 +1725,7 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       title: "Recommended HeyGen Workflow",
       items: [
         "Run the normal script workflow until the final script is complete.",
-        "Run HeyGen Scene Script to split the final narration into Scene 1, Scene 2, Scene 3, and so on.",
+        "The Final pass splits narration into Scene 1, Scene 2, Scene 3, and so on, generally using one primary idea and 20-40 seconds per scene.",
         "Run Scene Cards when you need scene planning and background prompts.",
         "Run HeyGen Backgrounds to generate one clean background image per scene.",
         "Use the background cards in scene order: top left is Scene 1, then Scene 2, Scene 3, and so on.",
@@ -3661,11 +3672,14 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     }
 
     const sequence = autoScriptSequenceForProject(selectedProject, experienceMode);
+    const workflowLabels = sequence.flatMap((passType) => passType === "DOSSIER"
+      ? ["Research", passLabelForProject(passType, selectedProject.format)]
+      : [passLabelForProject(passType, selectedProject.format)]);
     const longBookNote = selectedProject.format === "LONG_BOOK"
       ? "\n\nLong form books are drafted in chapter batches to protect the requested word count, so this can take significantly longer than a script or article."
       : "";
     const confirmed = window.confirm(
-      `Run ${experienceMode === "GUIDED" ? "Quote Video Fast Track" : "fully auto"} for "${selectedProject.title}"?\n\nPolicyForge will run the ${projectOutputNoun(selectedProject.format)} workflow in order: ${passLabelForProject("INTRO", selectedProject.format)}, Research, ${sequence.filter((passType) => passType !== "INTRO").map((passType) => passLabelForProject(passType, selectedProject.format)).join(", ")}. This can take several minutes and will use your configured models.${longBookNote}`
+      `Run ${experienceMode === "GUIDED" ? "Quote Video Fast Track" : "fully auto"} for "${selectedProject.title}"?\n\nPolicyForge will run the ${projectOutputNoun(selectedProject.format)} workflow in order: ${workflowLabels.join(", ")}. This can take several minutes and will use your configured models.${longBookNote}`
     );
     if (!confirmed) return;
 
@@ -5781,6 +5795,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const isShortBookProject = selectedProject?.format === "SHORT_BOOK";
     const isLongBookProject = selectedProject?.format === "LONG_BOOK";
     const isBookProject = isShortBookProject || isLongBookProject;
+    const isVideoProject = selectedProject?.format === "STANDALONE" || selectedProject?.format === "EPISODIC_SERIES";
+    const openingReady = isVideoProject || hasIntro;
     const canPlanEpisodes = supportsEpisodePlanning(selectedProject);
     const canCreateThumbnails = supportsThumbnails(selectedProject);
     const canCreateBookIllustrations = supportsBookIllustrations(selectedProject);
@@ -5847,7 +5863,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         id: "intro",
         number: 1,
         title: isArticleProject ? "Lead" : isPodcastProject ? "Podcast Intro" : isBookProject ? "Preface" : "Intro",
-        description: isArticleProject ? "One strong opening paragraph with a clear agency CTA path." : isPodcastProject ? "One human opening paragraph for the listener with a clear agency CTA path." : isBookProject ? "One concise reader-facing preface." : "One human opening paragraph with a clear agency CTA path.",
+        description: isArticleProject ? "One strong opening paragraph aligned to the reader decision." : isPodcastProject ? "A CTA-free opening that confirms the promise and earns the next minute." : isBookProject ? "One concise reader-facing preface." : "A CTA-free opening that confirms the click promise and earns the next minute.",
         complete: hasPass("INTRO"),
         enabled: Boolean(selectedProject),
         busyKey: "pass-INTRO",
@@ -5861,7 +5877,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         title: "Research",
         description: "Source notes, open questions, and fact-checking targets.",
         complete: hasSourceMaterial,
-        enabled: hasIntro,
+        enabled: Boolean(selectedProject) && openingReady,
         busyKey: selectedProject ? `research-${selectedProject.id}` : "research",
         errorKey: "research",
         actionLabel: hasSourceMaterial ? "Update Research" : "Run Research",
@@ -5873,7 +5889,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         title: "Dossier",
         description: "Fact ledger, timeline, source leads, and uncertainty boundaries.",
         complete: hasPass("DOSSIER"),
-        enabled: hasIntro && hasSourceMaterial,
+        enabled: openingReady && hasSourceMaterial,
         busyKey: "pass-DOSSIER",
         errorKey: "pass-DOSSIER",
         actionLabel: hasPass("DOSSIER") ? "Rerun Dossier" : "Create Dossier",
@@ -5907,8 +5923,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       {
         id: "hook-lab",
         number: 4 + workflowNumberOffset,
-        title: "Hook Lab",
-        description: "Scores hooks and automatically selects the strongest cold open.",
+        title: "Packaging & Hook Lab",
+        description: "Locks the viewer decision, title/thumbnail promise, and independently judged first 30 seconds before drafting.",
         complete: hasPass("HOOK_LAB"),
         enabled: isEpisodicProject ? hasPass("SERIES_BIBLE") : hasPass("ANALYTICS_BRIEF"),
         busyKey: "pass-HOOK_LAB",
@@ -6149,9 +6165,10 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         action: () => void generateArticleImagesForProject()
       }] : [])
     ];
+    const formatRelevantWorkflowSteps = isVideoProject ? workflowSteps.filter((step) => step.id !== "intro") : workflowSteps;
     const visibleWorkflowSteps = experienceMode === "GUIDED"
-      ? workflowSteps.filter((step) => !GUIDED_HIDDEN_WORKFLOW_STEPS.has(step.id))
-      : workflowSteps;
+      ? formatRelevantWorkflowSteps.filter((step) => !GUIDED_HIDDEN_WORKFLOW_STEPS.has(step.id))
+      : formatRelevantWorkflowSteps;
     const numberedWorkflowSteps = visibleWorkflowSteps.map((step, index) => ({ ...step, number: index + 1 }));
     const completedStepCount = numberedWorkflowSteps.filter((step) => step.complete).length;
     const nextWorkflowStep = numberedWorkflowSteps.find((step) => step.enabled && !step.complete);
@@ -10019,7 +10036,10 @@ function calendarIntelligence(projects: StoryProject[], slots: PublishingSlot[])
 }
 
 function autoScriptSequenceForProject(project: StoryProject, experienceMode: ExperienceMode = "POWER") {
-  const baseSequence = experienceMode === "GUIDED" ? QUOTE_VIDEO_FAST_TRACK_SEQUENCE : AUTO_SCRIPT_SEQUENCE;
+  const configuredSequence = experienceMode === "GUIDED" ? QUOTE_VIDEO_FAST_TRACK_SEQUENCE : AUTO_SCRIPT_SEQUENCE;
+  const baseSequence = project.format === "STANDALONE" || project.format === "EPISODIC_SERIES"
+    ? configuredSequence.filter((passType) => passType !== "INTRO")
+    : configuredSequence;
   if (!projectHasEpisodePlan(project)) return baseSequence;
   const sequence = [...baseSequence];
   const hookIndex = sequence.indexOf("HOOK_LAB");
@@ -10030,7 +10050,7 @@ function autoScriptSequenceForProject(project: StoryProject, experienceMode: Exp
 function episodeAutoSequenceForProject(project: StoryProject) {
   const episodePlan = latestDraftForPass(project, "EPISODES");
   let rerunFromHere = false;
-  return EPISODE_AUTO_SEQUENCE.filter((passType) => {
+  return EPISODE_AUTO_SEQUENCE.filter((passType) => passType !== "INTRO").filter((passType) => {
     const draft = latestDraftForPass(project, passType);
     const missing = passType === "PUBLISHING_PACK" ? !projectHasEpisodePublishingPack(project) : !draft;
     const stale = Boolean(episodePlan && draft && draftTimestamp(draft) < draftTimestamp(episodePlan));
@@ -10112,7 +10132,7 @@ function scriptOutputOptionsForProject(project: StoryProject | undefined): Curre
     const assembledContent = projectHasEpisodePlan(project)
       ? assembleEpisodeReviewContent(project, intro?.content, body.content, outro?.content, projectSponsorBlurb)
       : [
-          intro ? normalizeSponsorLanguageForFormat(ensureIntroSponsorPlacement(intro.content, projectSponsorBlurb), project.format) : undefined,
+          intro && !shouldFormatAsHeyGenScenes(project.format) ? normalizeSponsorLanguageForFormat(project.format === "ARTICLE" ? ensureIntroSponsorPlacement(intro.content, projectSponsorBlurb) : stripSponsorCopyFromBody(intro.content, projectSponsorBlurb), project.format) : undefined,
           normalizeSponsorLanguageForFormat(stripSponsorCopyFromBody(body.content, projectSponsorBlurb), project.format),
           outro ? normalizeSponsorLanguageForFormat(ensureOutroSponsorPlacement(outro.content, projectSponsorBlurb), project.format) : undefined
         ].filter(Boolean).join("\n\n");
@@ -11026,7 +11046,7 @@ function passLabel(passType: ScriptPassType) {
     ANALYTICS_BRIEF: "Analytics Brief",
     EPISODES: "Episodes",
     SERIES_BIBLE: "Series Bible",
-    HOOK_LAB: "Hook Lab",
+    HOOK_LAB: "Packaging & Hook Lab",
     STORY_SPINE: "Story Spine",
     STRUCTURE: "Structure",
     RETENTION_MAP: "Retention Map",
@@ -11133,7 +11153,6 @@ function assembleEpisodeReviewContent(
     const body = bodySections.find((section) => section.episodeNumber === episodeNumber);
     const outro = outroSections.find((section) => section.episodeNumber === episodeNumber);
     const pieces = [
-      intro?.content ? ensureIntroSponsorPlacement(intro.content, sponsorBlurb) : undefined,
       body?.content ? stripSponsorCopyFromBody(body.content, sponsorBlurb) : undefined,
       outro?.content ? ensureOutroSponsorPlacement(outro.content, sponsorBlurb) : undefined
     ].filter(Boolean).map((piece) => normalizeSponsorLanguageForFormat(piece || "", project.format));
