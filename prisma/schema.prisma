@@ -102,62 +102,68 @@ enum PublishingSlotStatus {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  name            String?
-  email           String?          @unique
-  emailVerified   DateTime?
-  image           String?
-  passwordHash    String?          @db.Text
-  role            UserRole         @default(USER)
-  disabledAt      DateTime?
-  activeWorkspaceId String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  accounts        Account[]
-  sessions        Session[]
-  settings        UserSettings?
-  activeWorkspace Workspace?       @relation("UserActiveWorkspace", fields: [activeWorkspaceId], references: [id], onDelete: SetNull)
-  workspaceMemberships WorkspaceMembership[]
-  workspaceInvitesSent WorkspaceInvite[] @relation("WorkspaceInvitesSent")
-  channels        Channel[]
-  ideas           StoryIdea[]
-  projects        StoryProject[]
-  youtubeConnections YoutubeConnection[]
-  youtubeSyncRuns YoutubeSyncRun[]
-  youtubeVideoMetrics YoutubeVideoMetric[]
+  id                     String                  @id @default(cuid())
+  name                   String?
+  email                  String?                 @unique
+  emailVerified          DateTime?
+  image                  String?
+  passwordHash           String?                 @db.Text
+  role                   UserRole                @default(USER)
+  disabledAt             DateTime?
+  activeWorkspaceId      String?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  accounts               Account[]
+  sessions               Session[]
+  settings               UserSettings?
+  activeWorkspace        Workspace?              @relation("UserActiveWorkspace", fields: [activeWorkspaceId], references: [id], onDelete: SetNull)
+  workspaceMemberships   WorkspaceMembership[]
+  workspaceInvitesSent   WorkspaceInvite[]       @relation("WorkspaceInvitesSent")
+  channels               Channel[]
+  ideas                  StoryIdea[]
+  projects               StoryProject[]
+  youtubeConnections     YoutubeConnection[]
+  youtubeSyncRuns        YoutubeSyncRun[]
+  youtubeVideoMetrics    YoutubeVideoMetric[]
   youtubeRecommendations YoutubeRecommendation[]
-  publishingSlots PublishingSlot[]
-  generationLogs  GenerationLog[]
-  auditLogs       AuditLog[]
+  publishingSlots        PublishingSlot[]
+  conversionCampaigns    ConversionCampaign[]
+  conversionLeads        ConversionLead[]
+  conversionEvents       ConversionEvent[]
+  generationLogs         GenerationLog[]
+  auditLogs              AuditLog[]
 
   @@index([activeWorkspaceId])
 }
 
 model Workspace {
-  id                 String                      @id @default(cuid())
-  name               String
-  slug               String                      @unique
-  tagline            String                      @default("Texas Insurance Growth Engine")
-  logoUrl            String?                     @db.Text
-  customDomain       String?                     @unique
-  subscriptionStatus WorkspaceSubscriptionStatus @default(ACTIVE)
-  subscriptionPlan   String?                     @db.Text
-  setupCompletedAt   DateTime?
-  createdAt          DateTime                    @default(now())
-  updatedAt          DateTime                    @updatedAt
-  activeUsers        User[]                      @relation("UserActiveWorkspace")
-  memberships        WorkspaceMembership[]
-  invites            WorkspaceInvite[]
-  channels           Channel[]
-  ideas              StoryIdea[]
-  projects           StoryProject[]
-  youtubeConnections YoutubeConnection[]
-  youtubeSyncRuns    YoutubeSyncRun[]
-  youtubeVideoMetrics YoutubeVideoMetric[]
+  id                     String                      @id @default(cuid())
+  name                   String
+  slug                   String                      @unique
+  tagline                String                      @default("Texas Insurance Growth Engine")
+  logoUrl                String?                     @db.Text
+  customDomain           String?                     @unique
+  subscriptionStatus     WorkspaceSubscriptionStatus @default(ACTIVE)
+  subscriptionPlan       String?                     @db.Text
+  setupCompletedAt       DateTime?
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+  activeUsers            User[]                      @relation("UserActiveWorkspace")
+  memberships            WorkspaceMembership[]
+  invites                WorkspaceInvite[]
+  channels               Channel[]
+  ideas                  StoryIdea[]
+  projects               StoryProject[]
+  youtubeConnections     YoutubeConnection[]
+  youtubeSyncRuns        YoutubeSyncRun[]
+  youtubeVideoMetrics    YoutubeVideoMetric[]
   youtubeRecommendations YoutubeRecommendation[]
-  publishingSlots    PublishingSlot[]
-  generationLogs     GenerationLog[]
-  auditLogs          AuditLog[]
+  publishingSlots        PublishingSlot[]
+  conversionCampaigns    ConversionCampaign[]
+  conversionLeads        ConversionLead[]
+  conversionEvents       ConversionEvent[]
+  generationLogs         GenerationLog[]
+  auditLogs              AuditLog[]
 
   @@index([subscriptionStatus])
 }
@@ -194,21 +200,24 @@ model WorkspaceInvite {
 }
 
 model Channel {
-  id          String      @id @default(cuid())
-  userId      String
-  workspaceId String?
-  name        String
-  slug        String
-  description String?     @db.Text
-  archivedAt  DateTime?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace   Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  ideas       StoryIdea[]
-  youtubeConnection YoutubeConnection?
-  youtubeVideoMetrics YoutubeVideoMetric[]
+  id                     String                  @id @default(cuid())
+  userId                 String
+  workspaceId            String?
+  name                   String
+  slug                   String
+  description            String?                 @db.Text
+  archivedAt             DateTime?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace              Workspace?              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  ideas                  StoryIdea[]
+  youtubeConnection      YoutubeConnection?
+  youtubeVideoMetrics    YoutubeVideoMetric[]
   youtubeRecommendations YoutubeRecommendation[]
+  conversionCampaigns    ConversionCampaign[]
+  conversionLeads        ConversionLead[]
+  conversionEvents       ConversionEvent[]
 
   @@unique([workspaceId, slug])
   @@index([userId])
@@ -253,44 +262,44 @@ model VerificationToken {
 }
 
 model UserSettings {
-  id                          String   @id @default(cuid())
-  userId                      String   @unique
-  openRouterApiKeyEncrypted   String?  @db.Text
-  anthropicApiKeyEncrypted    String?  @db.Text
-  openAiApiKeyEncrypted       String?  @db.Text
-  defaultModel                String   @default("openai/gpt-4o-mini")
-  discoveryModel              String   @default("openai/gpt-4o-mini")
-  dossierModel                String   @default("anthropic/claude-3.5-sonnet")
-  structureModel              String   @default("anthropic/claude-3.5-sonnet")
-  draftingModel               String   @default("openai/gpt-4o")
-  critiqueModel               String   @default("anthropic/claude-3.5-sonnet")
-  rewriteModel                String   @default("openai/gpt-4o")
-  anthropicModel              String   @default("claude-opus-4-8")
-  openAiModel                 String   @default("gpt-5.4")
-  runwareApiKeyEncrypted      String?  @db.Text
-  runwareModel                String   @default("ideogram:4@0")
-  dataForSeoLoginEncrypted    String?  @db.Text
-  dataForSeoPasswordEncrypted String?  @db.Text
-  wordpressSiteUrl            String?  @db.Text
-  wordpressUsernameEncrypted  String?  @db.Text
-  wordpressPasswordEncrypted  String?  @db.Text
-  youtubeClientId             String?  @db.Text
-  youtubeClientSecretEncrypted String? @db.Text
-  thumbnailStyleGuide         String?  @db.Text
-  workspaceName               String   @default("Baxter Growth Lab")
-  workspaceTagline            String   @default("Texas Insurance Growth Engine")
-  workspaceLogoUrl            String?  @db.Text
-  defaultSponsorCta           String?  @db.Text
-  publishingScheduleNote      String   @default("Mondays and Thursdays; one monthly Monday-Friday episode week.")
-  autoModelRouting            Boolean  @default(true)
-  preferredTone               String   @default("Mysterious & gripping")
-  narrationStyle              String   @default("Calm suspense")
-  defaultLengthMinutes        Int      @default(7)
-  defaultCategories           Json?
-  ttsPauseMarkers             Boolean  @default(false)
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
-  user                        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                           String   @id @default(cuid())
+  userId                       String   @unique
+  openRouterApiKeyEncrypted    String?  @db.Text
+  anthropicApiKeyEncrypted     String?  @db.Text
+  openAiApiKeyEncrypted        String?  @db.Text
+  defaultModel                 String   @default("openai/gpt-4o-mini")
+  discoveryModel               String   @default("openai/gpt-4o-mini")
+  dossierModel                 String   @default("anthropic/claude-3.5-sonnet")
+  structureModel               String   @default("anthropic/claude-3.5-sonnet")
+  draftingModel                String   @default("openai/gpt-4o")
+  critiqueModel                String   @default("anthropic/claude-3.5-sonnet")
+  rewriteModel                 String   @default("openai/gpt-4o")
+  anthropicModel               String   @default("claude-opus-4-8")
+  openAiModel                  String   @default("gpt-5.4")
+  runwareApiKeyEncrypted       String?  @db.Text
+  runwareModel                 String   @default("ideogram:4@0")
+  dataForSeoLoginEncrypted     String?  @db.Text
+  dataForSeoPasswordEncrypted  String?  @db.Text
+  wordpressSiteUrl             String?  @db.Text
+  wordpressUsernameEncrypted   String?  @db.Text
+  wordpressPasswordEncrypted   String?  @db.Text
+  youtubeClientId              String?  @db.Text
+  youtubeClientSecretEncrypted String?  @db.Text
+  thumbnailStyleGuide          String?  @db.Text
+  workspaceName                String   @default("Baxter Growth Lab")
+  workspaceTagline             String   @default("Texas Insurance Growth Engine")
+  workspaceLogoUrl             String?  @db.Text
+  defaultSponsorCta            String?  @db.Text
+  publishingScheduleNote       String   @default("Mondays and Thursdays; one monthly Monday-Friday episode week.")
+  autoModelRouting             Boolean  @default(true)
+  preferredTone                String   @default("Mysterious & gripping")
+  narrationStyle               String   @default("Calm suspense")
+  defaultLengthMinutes         Int      @default(7)
+  defaultCategories            Json?
+  ttsPauseMarkers              Boolean  @default(false)
+  createdAt                    DateTime @default(now())
+  updatedAt                    DateTime @updatedAt
+  user                         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model StoryIdea {
@@ -348,33 +357,40 @@ model StoryIdea {
 }
 
 model StoryProject {
-  id                  String             @id @default(cuid())
-  userId              String
-  workspaceId         String?
-  channelId           String?
-  storyIdeaId         String?
-  title               String
-  format              StoryProjectFormat @default(STANDALONE)
-  targetLengthMinutes Int                @default(7)
-  targetWordCount     Int                @default(1120)
-  tone                String             @default("Mysterious & gripping")
-  narrationStyle      String             @default("Calm suspense")
-  sourceMaterial      String?            @db.LongText
-  sponsorBlurb        String?            @db.Text
-  sponsorLink         String?            @db.Text
-  status              StoryProjectStatus @default(DOSSIER)
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
-  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace           Workspace?         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  storyIdea           StoryIdea?         @relation(fields: [storyIdeaId], references: [id], onDelete: SetNull)
-  dossier             StoryDossier?
-  outline             StoryOutline?
-  drafts              ScriptDraft[]
-  thumbnails          ThumbnailAsset[]
-  publishingSlots     PublishingSlot[]
-  publishedStories    PublishedStory[]
-  generationLogs      GenerationLog[]
+  id                   String              @id @default(cuid())
+  userId               String
+  workspaceId          String?
+  channelId            String?
+  storyIdeaId          String?
+  title                String
+  format               StoryProjectFormat  @default(STANDALONE)
+  targetLengthMinutes  Int                 @default(7)
+  targetWordCount      Int                 @default(1120)
+  tone                 String              @default("Mysterious & gripping")
+  narrationStyle       String              @default("Calm suspense")
+  sourceMaterial       String?             @db.LongText
+  sponsorBlurb         String?             @db.Text
+  sponsorLink          String?             @db.Text
+  youtubeVideoId       String?             @unique
+  youtubeUploadStatus  String?
+  youtubePrivacyStatus String?
+  youtubeScheduledAt   DateTime?
+  status               StoryProjectStatus  @default(DOSSIER)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace            Workspace?          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  storyIdea            StoryIdea?          @relation(fields: [storyIdeaId], references: [id], onDelete: SetNull)
+  dossier              StoryDossier?
+  outline              StoryOutline?
+  drafts               ScriptDraft[]
+  thumbnails           ThumbnailAsset[]
+  publishingSlots      PublishingSlot[]
+  publishedStories     PublishedStory[]
+  generationLogs       GenerationLog[]
+  conversionCampaign   ConversionCampaign?
+  conversionLeads      ConversionLead[]
+  conversionEvents     ConversionEvent[]
 
   @@unique([userId, channelId, storyIdeaId, format])
   @@unique([workspaceId, channelId, storyIdeaId, format])
@@ -489,6 +505,7 @@ model PublishedStory {
   publishedUrl   String?      @db.Text
   publishedAt    DateTime
   notes          String?      @db.Text
+  youtubeVideoId String?      @unique
   createdAt      DateTime     @default(now())
   storyProject   StoryProject @relation(fields: [storyProjectId], references: [id], onDelete: Cascade)
 
@@ -496,25 +513,114 @@ model PublishedStory {
   @@index([publishedAt])
 }
 
+model ConversionCampaign {
+  id             String            @id @default(cuid())
+  userId         String
+  workspaceId    String
+  channelId      String
+  storyProjectId String            @unique
+  name           String
+  slug           String            @unique
+  publicToken    String            @unique
+  destinationUrl String?           @db.Text
+  cta            String            @db.Text
+  phone          String            @default("281-445-1381")
+  status         String            @default("ACTIVE")
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace      Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel        Channel           @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  storyProject   StoryProject      @relation(fields: [storyProjectId], references: [id], onDelete: Cascade)
+  leads          ConversionLead[]
+  events         ConversionEvent[]
+
+  @@index([workspaceId, createdAt])
+  @@index([channelId, createdAt])
+  @@index([status])
+}
+
+model ConversionLead {
+  id             String             @id @default(cuid())
+  userId         String
+  workspaceId    String
+  channelId      String
+  storyProjectId String
+  campaignId     String
+  name           String?
+  email          String?
+  phone          String?
+  zipCode        String?
+  product        String?
+  message        String?            @db.Text
+  status         String             @default("NEW")
+  quotedPremium  Decimal?           @db.Decimal(12, 2)
+  boundPremium   Decimal?           @db.Decimal(12, 2)
+  notes          String?            @db.Text
+  source         String             @default("youtube")
+  medium         String             @default("video")
+  content        String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace      Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel        Channel            @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  storyProject   StoryProject       @relation(fields: [storyProjectId], references: [id], onDelete: Cascade)
+  campaign       ConversionCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  events         ConversionEvent[]
+
+  @@index([workspaceId, status, createdAt])
+  @@index([channelId, createdAt])
+  @@index([storyProjectId])
+  @@index([campaignId])
+}
+
+model ConversionEvent {
+  id             String             @id @default(cuid())
+  userId         String
+  workspaceId    String
+  channelId      String
+  storyProjectId String
+  campaignId     String
+  leadId         String?
+  eventType      String
+  visitorId      String?
+  referrer       String?            @db.Text
+  userAgent      String?            @db.Text
+  metadata       Json?
+  createdAt      DateTime           @default(now())
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace      Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel        Channel            @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  storyProject   StoryProject       @relation(fields: [storyProjectId], references: [id], onDelete: Cascade)
+  campaign       ConversionCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  lead           ConversionLead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, eventType, createdAt])
+  @@index([campaignId, createdAt])
+  @@index([storyProjectId, createdAt])
+  @@index([leadId])
+}
+
 model YoutubeConnection {
-  id                    String    @id @default(cuid())
+  id                    String                  @id @default(cuid())
   userId                String
   workspaceId           String?
-  channelId             String    @unique
+  channelId             String                  @unique
   youtubeChannelId      String
   youtubeChannelTitle   String
-  accessTokenEncrypted  String?   @db.Text
-  refreshTokenEncrypted String?   @db.Text
+  accessTokenEncrypted  String?                 @db.Text
+  refreshTokenEncrypted String?                 @db.Text
   tokenExpiresAt        DateTime?
-  scopes                String?   @db.Text
+  scopes                String?                 @db.Text
   lastSyncedAt          DateTime?
   nextSyncAt            DateTime?
-  syncEnabled           Boolean   @default(true)
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace             Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  channel               Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  syncEnabled           Boolean                 @default(true)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  user                  User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace             Workspace?              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel               Channel                 @relation(fields: [channelId], references: [id], onDelete: Cascade)
   syncRuns              YoutubeSyncRun[]
   videoMetrics          YoutubeVideoMetric[]
   recommendations       YoutubeRecommendation[]
@@ -526,35 +632,41 @@ model YoutubeConnection {
 }
 
 model YoutubeVideoMetric {
-  id                         String   @id @default(cuid())
-  userId                     String
-  workspaceId                String?
-  channelId                  String?
-  youtubeConnectionId        String
-  youtubeVideoId             String
-  title                      String   @db.Text
-  publishedAt                DateTime?
-  thumbnailUrl               String?  @db.Text
-  periodStart                DateTime
-  periodEnd                  DateTime
-  views                      Int      @default(0)
-  estimatedMinutesWatched    Int      @default(0)
-  averageViewDuration        Int      @default(0)
-  averageViewPercentage      Float    @default(0)
-  likes                      Int      @default(0)
-  comments                   Int      @default(0)
-  shares                     Int      @default(0)
-  subscribersGained          Int      @default(0)
-  subscribersLost            Int      @default(0)
-  impressions                Int      @default(0)
-  impressionCtr              Float    @default(0)
-  rawMetrics                 Json?
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
-  user                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace                  Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  channel                    Channel? @relation(fields: [channelId], references: [id], onDelete: SetNull)
-  youtubeConnection          YoutubeConnection @relation(fields: [youtubeConnectionId], references: [id], onDelete: Cascade)
+  id                      String            @id @default(cuid())
+  userId                  String
+  workspaceId             String?
+  channelId               String?
+  youtubeConnectionId     String
+  youtubeVideoId          String
+  title                   String            @db.Text
+  publishedAt             DateTime?
+  thumbnailUrl            String?           @db.Text
+  periodStart             DateTime
+  periodEnd               DateTime
+  views                   Int               @default(0)
+  estimatedMinutesWatched Int               @default(0)
+  averageViewDuration     Int               @default(0)
+  averageViewPercentage   Float             @default(0)
+  likes                   Int               @default(0)
+  comments                Int               @default(0)
+  shares                  Int               @default(0)
+  subscribersGained       Int               @default(0)
+  subscribersLost         Int               @default(0)
+  impressions             Int               @default(0)
+  impressionCtr           Float             @default(0)
+  cardImpressions         Int               @default(0)
+  cardClicks              Int               @default(0)
+  cardClickRate           Float             @default(0)
+  trafficSources          Json?
+  searchTerms             Json?
+  retentionCurve          Json?
+  rawMetrics              Json?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  user                    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace               Workspace?        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel                 Channel?          @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  youtubeConnection       YoutubeConnection @relation(fields: [youtubeConnectionId], references: [id], onDelete: Cascade)
 
   @@unique([youtubeConnectionId, youtubeVideoId, periodStart, periodEnd])
   @@index([userId, periodEnd])
@@ -564,20 +676,20 @@ model YoutubeVideoMetric {
 }
 
 model YoutubeSyncRun {
-  id                  String    @id @default(cuid())
+  id                  String            @id @default(cuid())
   userId              String
   workspaceId         String?
   youtubeConnectionId String
   status              String
-  startedAt           DateTime  @default(now())
+  startedAt           DateTime          @default(now())
   finishedAt          DateTime?
   periodStart         DateTime?
   periodEnd           DateTime?
-  videosSynced        Int       @default(0)
-  recommendationCount Int       @default(0)
-  errorMessage        String?   @db.Text
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace           Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  videosSynced        Int               @default(0)
+  recommendationCount Int               @default(0)
+  errorMessage        String?           @db.Text
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace           Workspace?        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   youtubeConnection   YoutubeConnection @relation(fields: [youtubeConnectionId], references: [id], onDelete: Cascade)
 
   @@index([userId, startedAt])
@@ -587,7 +699,7 @@ model YoutubeSyncRun {
 }
 
 model YoutubeRecommendation {
-  id                  String    @id @default(cuid())
+  id                  String            @id @default(cuid())
   userId              String
   workspaceId         String?
   channelId           String?
@@ -595,16 +707,16 @@ model YoutubeRecommendation {
   syncRunId           String?
   category            String
   priority            String
-  title               String   @db.Text
-  insight             String   @db.Text
-  recommendation      String   @db.Text
+  title               String            @db.Text
+  insight             String            @db.Text
+  recommendation      String            @db.Text
   evidence            Json?
-  status              String   @default("OPEN")
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace           Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  channel             Channel? @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  status              String            @default("OPEN")
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace           Workspace?        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel             Channel?          @relation(fields: [channelId], references: [id], onDelete: SetNull)
   youtubeConnection   YoutubeConnection @relation(fields: [youtubeConnectionId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
@@ -638,15 +750,15 @@ model GenerationLog {
 }
 
 model AuditLog {
-  id        String   @id @default(cuid())
-  userId    String?
+  id          String     @id @default(cuid())
+  userId      String?
   workspaceId String?
-  action    String
-  metadata  Json?
-  ipHash    String?
-  createdAt DateTime @default(now())
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  action      String
+  metadata    Json?
+  ipHash      String?
+  createdAt   DateTime   @default(now())
+  user        User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
   @@index([workspaceId, createdAt])

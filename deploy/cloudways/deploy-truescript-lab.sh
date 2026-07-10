@@ -132,8 +132,9 @@ sshpass -e rsync -rlz \
 echo "Installing Baxter Growth Lab environment and database schema..."
 POLICYFORGE_SECRET="${TSL_NEXTAUTH_SECRET:-$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")}"
 POLICYFORGE_ENCRYPTION_KEY="${TSL_ENCRYPTION_KEY:-$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")}"
+POLICYFORGE_YOUTUBE_SYNC_SECRET="${TSL_YOUTUBE_SYNC_SECRET:-$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")}"
 sshpass -e ssh "${SSH_OPTS[@]}" "$REMOTE" \
-  "TSL_REMOTE_DIR='$TSL_REMOTE_DIR' TSL_DATABASE_URL='$TSL_DATABASE_URL' TSL_PUBLIC_URL='$TSL_PUBLIC_URL' POLICYFORGE_SECRET='$POLICYFORGE_SECRET' POLICYFORGE_ENCRYPTION_KEY='$POLICYFORGE_ENCRYPTION_KEY' bash -s" <<'REMOTE_ENV'
+  "TSL_REMOTE_DIR='$TSL_REMOTE_DIR' TSL_DATABASE_URL='$TSL_DATABASE_URL' TSL_PUBLIC_URL='$TSL_PUBLIC_URL' TSL_PORT='$TSL_PORT' POLICYFORGE_SECRET='$POLICYFORGE_SECRET' POLICYFORGE_ENCRYPTION_KEY='$POLICYFORGE_ENCRYPTION_KEY' POLICYFORGE_YOUTUBE_SYNC_SECRET='$POLICYFORGE_YOUTUBE_SYNC_SECRET' bash -s" <<'REMOTE_ENV'
 set -euo pipefail
 cd "$TSL_REMOTE_DIR"
 if [ ! -f .env ]; then
@@ -143,6 +144,7 @@ NEXTAUTH_SECRET="$POLICYFORGE_SECRET"
 AUTH_SECRET="$POLICYFORGE_SECRET"
 ENCRYPTION_KEY="$POLICYFORGE_ENCRYPTION_KEY"
 NEXT_PUBLIC_APP_URL="$TSL_PUBLIC_URL"
+YOUTUBE_SYNC_SECRET="$POLICYFORGE_YOUTUBE_SYNC_SECRET"
 ENV
 else
   grep -q '^DATABASE_URL=' .env || printf '\nDATABASE_URL="%s"\n' "$TSL_DATABASE_URL" >> .env
@@ -150,6 +152,7 @@ else
   grep -q '^AUTH_SECRET=' .env || printf 'AUTH_SECRET="%s"\n' "$POLICYFORGE_SECRET" >> .env
   grep -q '^ENCRYPTION_KEY=' .env || printf 'ENCRYPTION_KEY="%s"\n' "$POLICYFORGE_ENCRYPTION_KEY" >> .env
   grep -q '^NEXT_PUBLIC_APP_URL=' .env || printf 'NEXT_PUBLIC_APP_URL="%s"\n' "$TSL_PUBLIC_URL" >> .env
+  grep -q '^YOUTUBE_SYNC_SECRET=' .env || printf 'YOUTUBE_SYNC_SECRET="%s"\n' "$POLICYFORGE_YOUTUBE_SYNC_SECRET" >> .env
 fi
 export DATABASE_URL="$TSL_DATABASE_URL"
 export PATH="$HOME/.local/opt/node-v22/bin:$HOME/.local/bin:$HOME/bin:$HOME/.npm-global/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
@@ -157,6 +160,19 @@ if [ ! -x node_modules/.bin/prisma ]; then
   npm ci || npm install
 fi
 npx prisma db push --accept-data-loss
+
+SYNC_SECRET="$(sed -n 's/^YOUTUBE_SYNC_SECRET="\{0,1\}\([^"[:space:]]*\)"\{0,1\}$/\1/p' .env | head -n 1)"
+if [ -n "$SYNC_SECRET" ] && command -v crontab >/dev/null 2>&1; then
+  CRON_MARKER="# policyforge-youtube-weekly-sync"
+  CRON_COMMAND="17 4 * * * curl -fsS -H 'x-cron-secret: $SYNC_SECRET' 'http://127.0.0.1:$TSL_PORT/api/cron/youtube-weekly-sync' >/dev/null 2>&1 $CRON_MARKER"
+  if (crontab -l 2>/dev/null | grep -vF "$CRON_MARKER" || true; printf '%s\n' "$CRON_COMMAND") | crontab -; then
+    echo "Installed daily due-check for weekly YouTube analytics sync."
+  else
+    echo "Warning: Cloudways did not allow cron installation; use the Analytics health panel to run Sync Now."
+  fi
+else
+  echo "Warning: could not install the YouTube sync cron; use the Analytics health panel to run Sync Now."
+fi
 REMOTE_ENV
 
 echo "Restarting the PM2 process serving port ${TSL_PORT} on Cloudways..."

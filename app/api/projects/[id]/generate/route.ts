@@ -19,6 +19,7 @@ import { DEFAULT_THUMBNAIL_STYLE_GUIDE } from "@/lib/thumbnail-style";
 import { formatScriptForTts } from "@/lib/tts-format";
 import { estimatedMinutesFromWords, targetWordsForMinutes, wordCount } from "@/lib/utils";
 import { formatPublishingPackContent } from "@/lib/youtube-description";
+import { ensureConversionCampaign, publicLeadEndpoint, trackedCampaignUrl } from "@/lib/conversions";
 
 const GenerateProjectSchema = z.object({
   passType: z.nativeEnum(ScriptPassType),
@@ -84,6 +85,20 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const sponsorAllowed = supportsSponsorBlurb(project.format);
     const sponsorBlurb = sponsorAllowed ? normalizeSponsorBlurbForFormat(input.sponsorBlurb ?? project.sponsorBlurb ?? "", project.format) : "";
     const sponsorLink = sponsorAllowed ? input.sponsorLink ?? project.sponsorLink ?? "" : "";
+    const conversionCampaign = input.passType === ScriptPassType.PUBLISHING_PACK && project.channelId && !isBookProjectFormat(project.format) && project.format !== "ARTICLE" && project.format !== "PODCAST_EPISODE"
+      ? await ensureConversionCampaign({
+          userId: user.id,
+          workspaceId: workspace.id,
+          channelId: project.channelId,
+          storyProjectId: project.id,
+          projectTitle: project.title,
+          destinationUrl: "https://baxterinsuranceagency.com",
+          cta: "Call Baxter Insurance Agency, Inc. at 281-445-1381 or request a Texas insurance review."
+        })
+      : null;
+    const conversionUrl = conversionCampaign ? trackedCampaignUrl(conversionCampaign.slug) : "";
+    const leadEndpoint = conversionCampaign ? publicLeadEndpoint(conversionCampaign.publicToken) : "";
+    const publishingLink = conversionUrl || sponsorLink;
     const settings = await getOrCreateUserSettings(user.id);
     const channelVoiceGuide = await channelVoiceGuideForProject(project.channelId, workspace.id);
     const analyticsGuide = await channelAnalyticsGuideForProject(project.channelId, workspace.id);
@@ -104,7 +119,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       model: input.model,
       sourceMaterial,
       sponsorBlurb,
-      sponsorLink,
+      sponsorLink: publishingLink,
+      conversionUrl,
+      leadEndpoint,
       channelVoiceGuide,
       seoKeywordHints,
       thumbnailStyleGuide: settings.thumbnailStyleGuide || DEFAULT_THUMBNAIL_STYLE_GUIDE,
@@ -182,7 +199,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
             narrationStyle: project.narrationStyle,
             sourceMaterial,
             sponsorBlurb,
-            sponsorLink,
+            sponsorLink: publishingLink,
             episodeCount,
             thumbnailStyleGuide: settings.thumbnailStyleGuide || DEFAULT_THUMBNAIL_STYLE_GUIDE,
             seoKeywordHints,
@@ -226,7 +243,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       ? formatPublishingPackContent(enforced.content, {
           title: project.title,
           sponsorBlurb,
-          sponsorLink,
+          sponsorLink: publishingLink,
+          conversionUrl,
+          leadEndpoint,
           summary: project.storyIdea?.summary,
           hook: project.storyIdea?.hook,
           targetLengthMinutes: project.targetLengthMinutes,
@@ -618,6 +637,8 @@ async function generateSegmentedEpisodePublishingPackIfNeeded(input: {
   sourceMaterial: string;
   sponsorBlurb: string;
   sponsorLink: string;
+  conversionUrl: string;
+  leadEndpoint: string;
   channelVoiceGuide: string;
   seoKeywordHints: string;
   thumbnailStyleGuide: string;
@@ -661,7 +682,19 @@ async function generateSegmentedEpisodePublishingPackIfNeeded(input: {
     modelsUsed.push(result.model);
   }
 
-  const content = normalizePublishingPack(JSON.stringify({ episodePacks: packs }, null, 2));
+  const content = formatPublishingPackContent(
+    normalizePublishingPack(JSON.stringify({ episodePacks: packs }, null, 2)),
+    {
+      title: input.project.title,
+      sponsorBlurb: input.sponsorBlurb,
+      sponsorLink: input.sponsorLink,
+      conversionUrl: input.conversionUrl,
+      leadEndpoint: input.leadEndpoint,
+      summary: input.project.storyIdea?.summary,
+      hook: input.project.storyIdea?.hook,
+      targetLengthMinutes: input.project.targetLengthMinutes
+    }
+  );
   return {
     content,
     modelUsed: `${uniqueModelLabels(modelsUsed).join("; ")}; segmented-episode-publishing-pack:${episodeCount}`

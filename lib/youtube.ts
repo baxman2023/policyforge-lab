@@ -7,6 +7,7 @@ import { getYoutubeOAuthCredentials } from "@/lib/settings";
 
 const YOUTUBE_SCOPES = [
   "https://www.googleapis.com/auth/youtube.readonly",
+  "https://www.googleapis.com/auth/youtube.upload",
   "https://www.googleapis.com/auth/yt-analytics.readonly"
 ];
 
@@ -74,6 +75,12 @@ type VideoMetricInput = VideoMetadata & {
   subscribersLost: number;
   impressions: number;
   impressionCtr: number;
+  cardImpressions: number;
+  cardClicks: number;
+  cardClickRate: number;
+  trafficSources: Prisma.InputJsonValue;
+  searchTerms: Prisma.InputJsonValue;
+  retentionCurve: Prisma.InputJsonValue;
   rawMetrics: Prisma.InputJsonObject;
 };
 
@@ -272,6 +279,12 @@ export async function syncYoutubeConnection(connectionId: string) {
           subscribersLost: metric.subscribersLost,
           impressions: metric.impressions,
           impressionCtr: metric.impressionCtr,
+          cardImpressions: metric.cardImpressions,
+          cardClicks: metric.cardClicks,
+          cardClickRate: metric.cardClickRate,
+          trafficSources: metric.trafficSources,
+          searchTerms: metric.searchTerms,
+          retentionCurve: metric.retentionCurve,
           rawMetrics: metric.rawMetrics
         }
       });
@@ -372,6 +385,89 @@ export async function validAccessToken(connection: {
   return refreshed.access_token;
 }
 
+export async function createYoutubeUploadSession(input: {
+  connection: {
+    id: string;
+    userId: string;
+    accessTokenEncrypted: string | null;
+    refreshTokenEncrypted: string | null;
+    tokenExpiresAt: Date | null;
+  };
+  title: string;
+  description: string;
+  tags?: string[];
+  contentType: string;
+  contentLength: number;
+  privacyStatus?: "private" | "unlisted" | "public";
+  publishAt?: Date | null;
+}) {
+  const accessToken = await validAccessToken(input.connection);
+  const scheduled = input.publishAt && input.publishAt.getTime() > Date.now() ? input.publishAt : null;
+  const privacyStatus = scheduled ? "private" : input.privacyStatus || "private";
+  const params = new URLSearchParams({ uploadType: "resumable", part: "snippet,status", notifySubscribers: "false" });
+  const response = await fetch(`https://www.googleapis.com/upload/youtube/v3/videos?${params.toString()}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json; charset=UTF-8",
+      "X-Upload-Content-Type": input.contentType,
+      "X-Upload-Content-Length": String(input.contentLength)
+    },
+    body: JSON.stringify({
+      snippet: {
+        title: input.title.slice(0, 100),
+        description: input.description.slice(0, 5000),
+        tags: (input.tags || []).filter(Boolean).slice(0, 50),
+        categoryId: "27",
+        defaultLanguage: "en"
+      },
+      status: {
+        privacyStatus,
+        selfDeclaredMadeForKids: false,
+        containsSyntheticMedia: true,
+        ...(scheduled ? { publishAt: scheduled.toISOString() } : {})
+      }
+    })
+  });
+  const responseText = await response.text();
+  if (!response.ok) {
+    const payload = responseText ? JSON.parse(responseText) as { error?: { message?: string } } : {};
+    throw new Error(payload.error?.message || `YouTube upload initialization failed with status ${response.status}.`);
+  }
+  const uploadUrl = response.headers.get("location");
+  if (!uploadUrl) throw new Error("YouTube did not return a resumable upload URL.");
+  return { uploadUrl, privacyStatus, publishAt: scheduled };
+}
+
+export async function setYoutubeThumbnail(input: {
+  connection: {
+    id: string;
+    userId: string;
+    accessTokenEncrypted: string | null;
+    refreshTokenEncrypted: string | null;
+    tokenExpiresAt: Date | null;
+  };
+  youtubeVideoId: string;
+  imageUrl: string;
+}) {
+  const imageResponse = await fetch(input.imageUrl);
+  if (!imageResponse.ok) throw new Error("PolicyForge could not download the selected thumbnail.");
+  const contentType = imageResponse.headers.get("content-type") || "image/jpeg";
+  if (!/^image\/(?:jpeg|png)$/i.test(contentType)) throw new Error("YouTube thumbnails must be JPEG or PNG images.");
+  const image = await imageResponse.arrayBuffer();
+  if (image.byteLength > 2 * 1024 * 1024) throw new Error("YouTube thumbnails must be 2 MB or smaller.");
+  const accessToken = await validAccessToken(input.connection);
+  const params = new URLSearchParams({ videoId: input.youtubeVideoId, uploadType: "media" });
+  const response = await fetch(`https://www.googleapis.com/upload/youtube/v3/thumbnails/set?${params.toString()}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": contentType },
+    body: image
+  });
+  const payload = await response.json().catch(() => ({})) as { error?: { message?: string } };
+  if (!response.ok) throw new Error(payload.error?.message || `YouTube thumbnail upload failed with status ${response.status}.`);
+  return payload;
+}
+
 export function verifyYoutubeState(value: string) {
   const [encoded, signature] = value.split(".");
   if (!encoded || !signature) throw new Error("Invalid YouTube OAuth state.");
@@ -450,14 +546,23 @@ async function fetchAnalyticsForVideos(accessToken: string, periodStart: Date, p
     "subscribersGained",
     "subscribersLost",
     "impressions",
-    "impressionClickThroughRate"
+    "impressionClickThroughRate",
+    "cardImpressions",
+    "cardClicks",
+    "cardClickRate"
   ];
   let response: YoutubeAnalyticsResponse;
   try {
     response = await analyticsReport(accessToken, periodStart, periodEnd, videos, metrics);
   } catch {
-    response = await analyticsReport(accessToken, periodStart, periodEnd, videos, metrics.filter((metric) => !/^impression/.test(metric)));
+    response = await analyticsReport(accessToken, periodStart, periodEnd, videos, metrics.filter((metric) => !/^(?:impression|card)/.test(metric)));
   }
+
+  const [trafficByVideo, searchByVideo, retentionByVideo] = await Promise.all([
+    fetchTrafficSources(accessToken, periodStart, periodEnd, videos).catch(() => new Map<string, Prisma.InputJsonValue>()),
+    fetchSearchTerms(accessToken, periodStart, periodEnd, videos).catch(() => new Map<string, Prisma.InputJsonValue>()),
+    fetchRetentionCurves(accessToken, periodStart, periodEnd, videos.slice(0, 12)).catch(() => new Map<string, Prisma.InputJsonValue>())
+  ]);
 
   const headers = response.columnHeaders?.map((header) => header.name) ?? [];
   const output: VideoMetricInput[] = [];
@@ -479,9 +584,102 @@ async function fetchAnalyticsForVideos(accessToken: string, periodStart: Date, p
       subscribersLost: toNumber(raw.subscribersLost),
       impressions: toNumber(raw.impressions),
       impressionCtr: toFloat(raw.impressionClickThroughRate),
-      rawMetrics: raw
+      cardImpressions: toNumber(raw.cardImpressions),
+      cardClicks: toNumber(raw.cardClicks),
+      cardClickRate: toFloat(raw.cardClickRate),
+      trafficSources: trafficByVideo.get(videoId) ?? [],
+      searchTerms: searchByVideo.get(videoId) ?? [],
+      retentionCurve: retentionByVideo.get(videoId) ?? [],
+      rawMetrics: {
+        ...raw,
+        trafficSources: trafficByVideo.get(videoId) ?? [],
+        searchTerms: searchByVideo.get(videoId) ?? [],
+        retentionCurve: retentionByVideo.get(videoId) ?? []
+      }
     });
   }
+  return output;
+}
+
+async function fetchTrafficSources(accessToken: string, periodStart: Date, periodEnd: Date, videos: VideoMetadata[]) {
+  const params = new URLSearchParams({
+    ids: "channel==MINE",
+    startDate: formatDate(periodStart),
+    endDate: formatDate(periodEnd),
+    dimensions: "video,insightTrafficSourceType",
+    metrics: "views,estimatedMinutesWatched",
+    filters: `video==${videos.map((video) => video.youtubeVideoId).join(",")}`,
+    sort: "-estimatedMinutesWatched",
+    maxResults: "200"
+  });
+  const response = await youtubeFetch<YoutubeAnalyticsResponse>(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, accessToken);
+  return groupReportByVideo(response, "insightTrafficSourceType");
+}
+
+async function fetchSearchTerms(accessToken: string, periodStart: Date, periodEnd: Date, videos: VideoMetadata[]) {
+  const output = new Map<string, Prisma.InputJsonValue>();
+  for (const video of videos.slice(0, 20)) {
+    const params = new URLSearchParams({
+      ids: "channel==MINE",
+      startDate: formatDate(periodStart),
+      endDate: formatDate(periodEnd),
+      dimensions: "insightTrafficSourceDetail",
+      metrics: "views,estimatedMinutesWatched",
+      filters: `video==${video.youtubeVideoId};insightTrafficSourceType==YT_SEARCH`,
+      sort: "-views",
+      maxResults: "25"
+    });
+    try {
+      const response = await youtubeFetch<YoutubeAnalyticsResponse>(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, accessToken);
+      output.set(video.youtubeVideoId, reportRows(response));
+    } catch {
+      output.set(video.youtubeVideoId, []);
+    }
+  }
+  return output;
+}
+
+async function fetchRetentionCurves(accessToken: string, periodStart: Date, periodEnd: Date, videos: VideoMetadata[]) {
+  const output = new Map<string, Prisma.InputJsonValue>();
+  for (const video of videos) {
+    const params = new URLSearchParams({
+      ids: "channel==MINE",
+      startDate: formatDate(periodStart),
+      endDate: formatDate(periodEnd),
+      dimensions: "elapsedVideoTimeRatio",
+      metrics: "audienceWatchRatio,relativeRetentionPerformance",
+      filters: `video==${video.youtubeVideoId}`,
+      sort: "elapsedVideoTimeRatio",
+      maxResults: "200"
+    });
+    try {
+      const response = await youtubeFetch<YoutubeAnalyticsResponse>(`https://youtubeanalytics.googleapis.com/v2/reports?${params.toString()}`, accessToken);
+      output.set(video.youtubeVideoId, reportRows(response));
+    } catch {
+      output.set(video.youtubeVideoId, []);
+    }
+  }
+  return output;
+}
+
+function reportRows(response: YoutubeAnalyticsResponse): Prisma.InputJsonValue {
+  const headers = response.columnHeaders?.map((header) => header.name) ?? [];
+  return (response.rows ?? []).map((row) => Object.fromEntries(headers.map((name, index) => [name, row[index] ?? 0]))) as Prisma.InputJsonValue;
+}
+
+function groupReportByVideo(response: YoutubeAnalyticsResponse, labelField: string) {
+  const headers = response.columnHeaders?.map((header) => header.name) ?? [];
+  const output = new Map<string, Prisma.InputJsonValue>();
+  const grouped = new Map<string, Array<Record<string, string | number>>>();
+  for (const row of response.rows ?? []) {
+    const record = Object.fromEntries(headers.map((name, index) => [name, row[index] ?? 0])) as Record<string, string | number>;
+    const videoId = String(record.video || "");
+    if (!videoId) continue;
+    const values = grouped.get(videoId) ?? [];
+    values.push({ label: record[labelField] || "Unknown", views: record.views || 0, estimatedMinutesWatched: record.estimatedMinutesWatched || 0 });
+    grouped.set(videoId, values);
+  }
+  for (const [videoId, values] of grouped.entries()) output.set(videoId, values as Prisma.InputJsonValue);
   return output;
 }
 

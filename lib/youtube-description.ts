@@ -8,6 +8,8 @@ export type YoutubeDescriptionInput = {
   hook?: string | null;
   targetLengthMinutes?: number | null;
   actualLengthMinutes?: number | null;
+  conversionUrl?: string | null;
+  leadEndpoint?: string | null;
 };
 
 const AGENCY_NAME = "Baxter Insurance Agency, Inc.";
@@ -18,7 +20,7 @@ const AGENCY_ADDRESS = "450 N Sam Houston Pkwy E Ste 103, Houston, TX 77060";
 export function formatYoutubeDescription(input: YoutubeDescriptionInput) {
   const existing = input.description?.trim() ?? "";
   if (looksLikeFormulaDescription(existing) && timestampRangeFits(existing, input.actualLengthMinutes ?? input.targetLengthMinutes)) {
-    return ensureAgencyContactBlocks(existing);
+    return ensureAgencyContactBlocks(existing, input.conversionUrl);
   }
 
   const tags = input.tags ?? [];
@@ -30,21 +32,21 @@ export function formatYoutubeDescription(input: YoutubeDescriptionInput) {
   const partTwo = compactSentences(
     sentences.slice(5, 10),
     [
-      `This video is built as a careful long-form documentary, separating what can be said responsibly from what remains uncertain.`,
-      `Watch for the timeline, the competing explanations, and the details that usually get flattened in shorter retellings.`
+      "This video provides plain-English Texas insurance education so homeowners, drivers, families, and business owners can prepare better questions before buying, renewing, or requesting a quote.",
+      "Coverage depends on policy terms, conditions, exclusions, limits, deductibles, endorsements, underwriting, carrier appetite, and Texas regulations."
     ],
     input.title
   );
 
   return ensureAgencyContactBlocks([
     mainKeyword(input.title, tags),
-    primaryCta(input.sponsorBlurb, sponsorLink),
+    primaryCta(input.sponsorBlurb, sponsorLink, input.conversionUrl),
     partOne,
     timestampBlock(existing, input.actualLengthMinutes ?? input.targetLengthMinutes),
     partTwo,
-    finalCta(input.sponsorBlurb, sponsorLink),
+    finalCta(input.sponsorBlurb, sponsorLink, input.conversionUrl),
     hashtagLine(tags, input.title)
-  ].filter(Boolean).join("\n\n"));
+  ].filter(Boolean).join("\n\n"), input.conversionUrl);
 }
 
 export function formatPublishingPackContent(content: string, input: Omit<YoutubeDescriptionInput, "description" | "tags"> = {}) {
@@ -65,7 +67,7 @@ export function formatPublishingPackContent(content: string, input: Omit<Youtube
           })
         };
       });
-      return JSON.stringify({ ...parsed, episodePacks }, null, 2);
+      return JSON.stringify({ ...parsed, episodePacks, conversionAssets: enhanceConversionAssets((parsed as { conversionAssets?: unknown }).conversionAssets, input) }, null, 2);
     }
     const tags = Array.isArray(parsed.tags) ? parsed.tags.filter((item): item is string => typeof item === "string") : [];
     return JSON.stringify(
@@ -75,7 +77,8 @@ export function formatPublishingPackContent(content: string, input: Omit<Youtube
           ...input,
           description: typeof parsed.description === "string" ? parsed.description : "",
           tags
-        })
+        }),
+        conversionAssets: enhanceConversionAssets((parsed as { conversionAssets?: unknown }).conversionAssets, input)
       },
       null,
       2
@@ -85,9 +88,10 @@ export function formatPublishingPackContent(content: string, input: Omit<Youtube
   }
 }
 
-export function ensureAgencyContactBlocks(description: string) {
+export function ensureAgencyContactBlocks(description: string, conversionUrl?: string | null) {
   const body = stripAgencyContactBlocks(description).trim();
-  return [agencyTopContactBlock(), body, agencyBottomContactBlock()].filter(Boolean).join("\n\n");
+  const conversion = conversionUrl?.trim() ? `Request a Texas quote or policy review:\n${conversionUrl.trim()}` : "";
+  return [agencyTopContactBlock(), conversion, body, conversion, agencyBottomContactBlock()].filter(Boolean).join("\n\n");
 }
 
 function agencyTopContactBlock() {
@@ -156,22 +160,42 @@ function splitSentences(value: string) {
 function compactSentences(primary: string[], fallback: string[], title?: string | null) {
   const selected = primary.length ? primary : fallback;
   if (selected.length) return selected.slice(0, 4).join(" ");
-  return `This long-form documentary investigates ${title?.trim() || "this story"} with a focus on the timeline, the evidence, and the questions still worth asking.`;
+  return `This video explains ${title?.trim() || "this Texas insurance question"} in plain English so viewers can prepare for a useful quote or policy-review conversation.`;
 }
 
 function mainKeyword(title?: string | null, tags: string[] = []) {
-  const keyword = tags.find((tag) => tag.trim().length >= 5) ?? title ?? "Long Form Documentary";
+  const keyword = tags.find((tag) => tag.trim().length >= 5) ?? title ?? "Texas Insurance Guide";
   return keyword.trim();
 }
 
-function primaryCta(sponsorBlurb?: string | null, sponsorLink = "") {
+function primaryCta(sponsorBlurb?: string | null, sponsorLink = "", conversionUrl?: string | null) {
+  if (conversionUrl?.trim()) return `Request a Texas insurance quote or policy review:\n${conversionUrl.trim()}`;
   if (sponsorLink) return `${sponsorLead(sponsorBlurb)}\n${sponsorLink}`;
-  return "Subscribe for more long-form documentary stories, and leave your questions or theories in the comments.";
+  return `Call ${AGENCY_PHONE} to request a Texas insurance quote or policy review.`;
 }
 
-function finalCta(sponsorBlurb?: string | null, sponsorLink = "") {
+function finalCta(sponsorBlurb?: string | null, sponsorLink = "", conversionUrl?: string | null) {
+  if (conversionUrl?.trim()) return `Ready to review your Texas insurance options?\n${conversionUrl.trim()}`;
   if (sponsorLink) return `Learn more from ${sponsorName(sponsorBlurb)} here:\n${sponsorLink}`;
-  return "If this story kept you thinking, subscribe, like the video, and share it with someone who would want to follow the mystery.";
+  return `Call ${AGENCY_PHONE} with your Texas home, auto, commercial, life, renewal, or coverage-review questions.`;
+}
+
+function enhanceConversionAssets(value: unknown, input: Omit<YoutubeDescriptionInput, "description" | "tags">) {
+  const currentAssets = isRecord(value) ? value : {};
+  const tracking = [
+    input.conversionUrl ? `Tracked YouTube CTA URL: ${input.conversionUrl}` : "",
+    input.leadEndpoint ? `PolicyForge lead endpoint: ${input.leadEndpoint}` : "",
+    input.leadEndpoint
+      ? "Build the lead form to POST JSON to the endpoint with name, email, phone, zipCode, product, message, visitorId, and content. Include a hidden empty company field as a bot trap. On first form interaction, POST FORM_START to the sibling /event endpoint."
+      : "",
+    "Preserve utm_source, utm_medium, utm_campaign, and utm_content query parameters through form submission."
+  ].filter(Boolean).join("\n");
+  const current = typeof currentAssets.macalyLandingPagePrompt === "string" ? currentAssets.macalyLandingPagePrompt.trim() : "";
+  return {
+    ...currentAssets,
+    shortClipHooks: Array.isArray(currentAssets.shortClipHooks) ? currentAssets.shortClipHooks : [],
+    macalyLandingPagePrompt: [current, tracking].filter(Boolean).join("\n\n")
+  };
 }
 
 function sponsorLead(sponsorBlurb?: string | null) {

@@ -5890,6 +5890,147 @@ button.text-link {
   }
 }
 
+.conversion-campaign-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.conversion-campaign-card,
+.youtube-publisher-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.conversion-campaign-head,
+.conversion-project-row,
+.conversion-lead-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.conversion-campaign-head > div,
+.conversion-project-row > div,
+.conversion-lead-row > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.conversion-campaign-head span,
+.conversion-project-row span,
+.conversion-lead-row span,
+.conversion-lead-row small {
+  color: var(--muted);
+}
+
+.conversion-link-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  align-items: center;
+  margin: 12px 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f7faf9;
+}
+
+.conversion-link-box span {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.conversion-link-box strong {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.conversion-project-list,
+.conversion-lead-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.conversion-project-row,
+.conversion-lead-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.conversion-project-row input {
+  width: min(440px, 42vw);
+}
+
+.youtube-publisher-panel {
+  display: grid;
+  gap: 14px;
+  margin: 16px 0;
+  border-color: var(--teal);
+}
+
+.youtube-publisher-panel p {
+  margin: 5px 0 0;
+  color: var(--muted);
+}
+
+.youtube-publisher-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(150px, .7fr) minmax(210px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.file-picker {
+  display: grid;
+  gap: 7px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.file-picker input {
+  min-height: 42px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.youtube-thumbnail-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.youtube-thumbnail-picker button {
+  display: grid;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--teal-dark);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.youtube-thumbnail-picker img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
 @media (max-width: 1220px) {
   .policyforge-app {
     grid-template-columns: 76px minmax(0, 1fr);
@@ -5922,6 +6063,10 @@ button.text-link {
   }
 
   .money-analytics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .youtube-publisher-controls {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -5990,5 +6135,21 @@ button.text-link {
 
   .idea-table {
     overflow: hidden;
+  }
+
+  .conversion-campaign-grid,
+  .youtube-publisher-controls,
+  .youtube-thumbnail-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .conversion-project-row,
+  .conversion-lead-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .conversion-project-row input {
+    width: 100%;
   }
 }

@@ -91,6 +91,7 @@ export async function GET(request: Request) {
         nextSyncAt: connection.nextSyncAt,
         syncEnabled: connection.syncEnabled
       },
+      syncHealth: syncHealthForConnection(connection),
       connections: connectionSummaries,
       summary: summarizeMetrics(currentMetrics, yearMetrics),
       videos: currentMetrics.map((metric) => ({
@@ -108,7 +109,13 @@ export async function GET(request: Request) {
         comments: metric.comments,
         subscribersGained: metric.subscribersGained,
         impressions: metric.impressions,
-        impressionCtr: metric.impressionCtr
+        impressionCtr: metric.impressionCtr,
+        cardImpressions: metric.cardImpressions,
+        cardClicks: metric.cardClicks,
+        cardClickRate: metric.cardClickRate,
+        trafficSources: metric.trafficSources,
+        searchTerms: metric.searchTerms,
+        retentionCurve: metric.retentionCurve
       })),
       recommendations: connection.recommendations.map((item) => ({
         id: item.id,
@@ -135,6 +142,23 @@ export async function GET(request: Request) {
   } catch (error) {
     return jsonError(error);
   }
+}
+
+function syncHealthForConnection(connection: {
+  syncEnabled: boolean;
+  lastSyncedAt: Date | null;
+  nextSyncAt: Date | null;
+  syncRuns: Array<{ status: string; errorMessage: string | null; startedAt: Date }>;
+}) {
+  const latestRun = connection.syncRuns[0];
+  const stale = !connection.lastSyncedAt || Date.now() - connection.lastSyncedAt.getTime() > 8 * 24 * 60 * 60 * 1000;
+  return {
+    status: !connection.syncEnabled ? "PAUSED" : latestRun?.status === "FAILED" ? "FAILED" : stale ? "STALE" : "HEALTHY",
+    stale,
+    lastSyncedAt: connection.lastSyncedAt,
+    nextSyncAt: connection.nextSyncAt,
+    latestError: latestRun?.status === "FAILED" ? latestRun.errorMessage : null
+  };
 }
 
 function summarizeMetrics(

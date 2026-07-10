@@ -30,7 +30,9 @@ import {
   Navigation,
   Newspaper,
   Play,
+  PhoneCall,
   RefreshCw,
+  Rocket,
   Save,
   Search,
   Settings,
@@ -38,6 +40,7 @@ import {
   SlidersHorizontal,
   Star,
   Trash2,
+  UploadCloud,
   UserCog,
   Zap
 } from "lucide-react";
@@ -208,6 +211,7 @@ type AppSection =
   | "media"
   | "exports"
   | "analytics"
+  | "quote-tracking"
   | "guides"
   | "settings";
 type ExperienceMode = "GUIDED" | "POWER";
@@ -409,6 +413,10 @@ type StoryProject = {
   sourceMaterial?: string | null;
   sponsorBlurb?: string | null;
   sponsorLink?: string | null;
+  youtubeVideoId?: string | null;
+  youtubeUploadStatus?: string | null;
+  youtubePrivacyStatus?: string | null;
+  youtubeScheduledAt?: string | null;
   status: StoryProjectStatus;
   createdAt: string;
   updatedAt: string;
@@ -715,6 +723,13 @@ type YoutubeAnalyticsPayload = {
     nextSyncAt?: string | null;
     syncEnabled: boolean;
   } | null;
+  syncHealth?: {
+    status: "HEALTHY" | "STALE" | "FAILED" | "PAUSED";
+    stale: boolean;
+    lastSyncedAt?: string | null;
+    nextSyncAt?: string | null;
+    latestError?: string | null;
+  };
   connections: Array<{
     id: string;
     channelId: string;
@@ -760,6 +775,12 @@ type YoutubeAnalyticsPayload = {
     subscribersGained: number;
     impressions: number;
     impressionCtr: number;
+    cardImpressions: number;
+    cardClicks: number;
+    cardClickRate: number;
+    trafficSources?: unknown;
+    searchTerms?: unknown;
+    retentionCurve?: unknown;
   }>;
   recommendations: Array<{
     id: string;
@@ -780,6 +801,50 @@ type YoutubeAnalyticsPayload = {
     videosSynced: number;
     recommendationCount: number;
     errorMessage?: string | null;
+  }>;
+};
+
+type ConversionAnalyticsPayload = {
+  summary: {
+    campaigns: number;
+    clicks: number;
+    formStarts: number;
+    leads: number;
+    quoted: number;
+    bound: number;
+    boundPremium: number;
+    clickToLeadRate: number;
+    leadToQuoteRate: number;
+    quoteToBindRate: number;
+  };
+  campaigns: Array<{
+    id: string;
+    storyProjectId: string;
+    name: string;
+    slug: string;
+    publicToken: string;
+    destinationUrl?: string | null;
+    cta: string;
+    phone: string;
+    status: string;
+    trackedUrl: string;
+    leadEndpoint: string;
+    storyProject: { title: string; youtubeVideoId?: string | null };
+    leads: Array<{
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      phone?: string | null;
+      zipCode?: string | null;
+      product?: string | null;
+      message?: string | null;
+      status: string;
+      quotedPremium?: string | number | null;
+      boundPremium?: string | number | null;
+      notes?: string | null;
+      createdAt: string;
+    }>;
+    events: Array<{ id: string; eventType: string; createdAt: string }>;
   }>;
 };
 
@@ -1051,6 +1116,30 @@ const AUTO_SCRIPT_SEQUENCE: ScriptPassType[] = [
   "SCENE_CARDS",
   "PUBLISHING_PACK"
 ];
+const QUOTE_VIDEO_FAST_TRACK_SEQUENCE: ScriptPassType[] = [
+  "INTRO",
+  "DOSSIER",
+  "HOOK_LAB",
+  "STRUCTURE",
+  "DRAFT",
+  "FACT_CHECK",
+  "REWRITE",
+  "QUALITY_GATE",
+  "FINAL",
+  "OUTRO",
+  "SCENE_CARDS",
+  "PUBLISHING_PACK"
+];
+const GUIDED_HIDDEN_WORKFLOW_STEPS = new Set([
+  "analytics-brief",
+  "story-spine",
+  "retention-map",
+  "length-governor",
+  "open-loop-ledger",
+  "retention-analysis",
+  "critique",
+  "voice-polish"
+]);
 const EPISODE_AUTO_SEQUENCE: ScriptPassType[] = [
   "INTRO",
   "ANALYTICS_BRIEF",
@@ -1078,10 +1167,11 @@ const navItems: Array<{ id: AppSection; label: string; icon: LucideIcon }> = [
   { id: "dashboard", label: "Growth Plan", icon: Home },
   { id: "campaign-builder", label: "Campaign Builder", icon: Zap },
   { id: "idea-factory", label: "Video Ideas", icon: Lightbulb },
-  { id: "projects", label: "Projects", icon: FolderKanban },
+  { id: "projects", label: "Production", icon: FolderKanban },
   { id: "media", label: "Assets", icon: ImageIcon },
   { id: "calendar", label: "Calendar", icon: CalendarDays },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "quote-tracking", label: "Quote Tracking", icon: PhoneCall },
   { id: "guides", label: "User Guide", icon: BookOpen },
   { id: "settings", label: "Settings", icon: Settings }
 ];
@@ -1132,7 +1222,7 @@ const campaignGoalOptions: Array<{
   },
   {
     key: "germania-home",
-    label: "Promote Germania Home",
+    label: "Texas Home Coverage Review",
     detail: "Germania-focused Texas homeowners education without carrier promises.",
     goal: "Create Germania-focused Texas home insurance conversations while avoiding carrier eligibility, rate, or coverage promises.",
     cta: "Ask Baxter Insurance Agency whether Germania may be worth reviewing for your Texas home situation.",
@@ -1532,9 +1622,9 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Pick the correct channel or growth lane in the top bar.",
         "Open Video Ideas and generate topic ideas for the active lane.",
         "Save the strongest idea, then start a project from it.",
-        "Open Projects or Content Lab, select the project, and run the workflow.",
-        "Generate the Business Campaign Kit, HeyGen scene script, scene backgrounds, thumbnails, and export pack.",
-        "Schedule the item, produce the video or article, then mark it Produced or Published at the right time."
+        "Open Production, select the project, and use Quote Video Fast Track in Guided mode. Power mode keeps every specialist pass available.",
+        "Generate the Business Campaign Kit, HeyGen scene script, scene backgrounds, thumbnails, tracked CTA, and export pack.",
+        "Upload the finished HeyGen file privately or schedule it with YouTube Publisher, then track clicks, leads, quotes, binds, and premium in Quote Tracking."
       ]
     },
     {
@@ -1713,6 +1803,16 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
         "Archived means the idea or project should be protected from accidental reuse.",
         "Keeping status accurate helps duplicate prevention and the dashboard stay useful."
       ]
+    },
+    {
+      title: "YouTube Publisher And Quote Tracking",
+      items: [
+        "Reconnect YouTube once after this upgrade so the saved OAuth grant includes upload permission.",
+        "The publisher defaults to Private and marks HeyGen output as synthetic media; scheduling also uploads privately first.",
+        "Every Business Campaign Kit creates a video-specific tracked URL and Macaly lead endpoint.",
+        "Use the tracked URL in the description and pinned comment, and wire the generated Macaly form to the supplied endpoint.",
+        "Move leads through Contacted, Quote Started, Quoted, Bound, or Lost and record premium so PolicyForge learns which videos produce business."
+      ]
     }
   ],
   "Settings & Models": [
@@ -1752,7 +1852,8 @@ const guidesByTab: Record<GuideTab, Array<{ title: string; body?: string; items:
       title: "YouTube Analytics",
       items: [
         "Connect YouTube when you want PolicyForge to pull performance data.",
-        "Use analytics to identify topics with strong watch time, views, engagement, and subscriber conversion.",
+        "Use analytics to identify topics with strong watch time, views, engagement, subscriber conversion, cards, search terms, traffic sources, and retention curves.",
+        "The sync health banner confirms whether automatic weekly analysis is current; use Sync Now when it reports stale or failed.",
         "Review weekly suggestions before building the next batch of ideas.",
         "Let the strongest categories influence future idea generation and campaign planning.",
         "Use analytics as a business signal, not just a vanity metric."
@@ -1848,8 +1949,8 @@ const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
     subtitle: "Generate, score, save, triage, and protect against duplicate insurance growth ideas."
   },
   projects: {
-    title: "Campaign Projects",
-    subtitle: "Turn promising ideas into long-form content projects."
+    title: "Video Production",
+    subtitle: "Turn the strongest ideas into HeyGen-ready scripts, scenes, images, campaign kits, and tracked quote paths."
   },
   "script-lab": {
     title: "Content Lab",
@@ -1874,6 +1975,10 @@ const sectionCopy: Record<AppSection, { title: string; subtitle: string }> = {
   analytics: {
     title: "Analytics",
     subtitle: "Understand category mix, scoring, queue health, and production status."
+  },
+  "quote-tracking": {
+    title: "Quote Tracking",
+    subtitle: "Connect each YouTube video to clicks, leads, quotes, bound policies, and premium."
   },
   guides: {
     title: "User Guide",
@@ -1934,6 +2039,11 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
   const [apiTestResults, setApiTestResults] = useState<Partial<Record<ApiProvider, ApiTestResult>>>({});
   const [youtubeAnalytics, setYoutubeAnalytics] = useState<YoutubeAnalyticsPayload | null>(null);
   const [loadingYoutubeAnalytics, setLoadingYoutubeAnalytics] = useState(false);
+  const [conversionAnalytics, setConversionAnalytics] = useState<ConversionAnalyticsPayload | null>(null);
+  const [conversionDestinationByProjectId, setConversionDestinationByProjectId] = useState<Record<string, string>>({});
+  const [youtubeFileByProjectId, setYoutubeFileByProjectId] = useState<Record<string, File | null>>({});
+  const [youtubePrivacyByProjectId, setYoutubePrivacyByProjectId] = useState<Record<string, "private" | "unlisted" | "public">>({});
+  const [youtubeScheduleByProjectId, setYoutubeScheduleByProjectId] = useState<Record<string, string>>({});
   const [uploadPackagesByProjectId, setUploadPackagesByProjectId] = useState<Record<string, UploadReadinessPackage>>({});
   const [modelQuery, setModelQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabLabel>("Generated Ideas");
@@ -2020,19 +2130,22 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       if (typeof window !== "undefined") {
         window.localStorage.setItem("policyforge-lab-channel-id", activeChannelId);
       }
-      const [ideasPayload, projectsPayload, calendarPayload, settingsPayload, blockedIdeasPayload, usageLedgerPayload] = await Promise.all([
+      const [ideasPayload, projectsPayload, calendarPayload, settingsPayload, blockedIdeasPayload, usageLedgerPayload, conversionsPayload] = await Promise.all([
         fetchJson<{ ideas: StoryIdea[] }>(channelUrl("/api/ideas", activeChannelId)),
         fetchJson<{ projects: StoryProject[] }>(channelUrl("/api/projects", activeChannelId)),
         fetchJson<{ slots: PublishingSlot[] }>(channelUrl("/api/calendar", activeChannelId)),
         fetchJson<UserSettings>("/api/settings"),
         fetchJson<{ blockedIdeas: BlockedChannelIdea[] }>("/api/channels/blocked-ideas"),
-        fetchJson<UsageLedger>("/api/usage/ledger")
+        fetchJson<UsageLedger>("/api/usage/ledger"),
+        fetchJson<ConversionAnalyticsPayload>(channelUrl("/api/conversions", activeChannelId))
       ]);
       setIdeas(sortIdeas(ideasPayload.ideas));
       setProjects(projectsPayload.projects);
       setPublishingSlots(sortSlots(calendarPayload.slots));
       setBlockedChannelIdeas(blockedIdeasPayload.blockedIdeas);
       setUsageLedger(usageLedgerPayload);
+      setConversionAnalytics(conversionsPayload);
+      setConversionDestinationByProjectId(Object.fromEntries(conversionsPayload.campaigns.map((campaign) => [campaign.storyProjectId, campaign.destinationUrl || "https://baxterinsuranceagency.com"])));
       const mergedSettings = {
         ...defaultSettings,
         ...settingsPayload,
@@ -2132,6 +2245,18 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     }
   }, [selectedChannelId]);
 
+  const loadConversionAnalytics = useCallback(async (channelId?: string) => {
+    const targetChannelId = channelId || selectedChannelId;
+    if (!targetChannelId) return;
+    try {
+      const payload = await fetchJson<ConversionAnalyticsPayload>(channelUrl("/api/conversions", targetChannelId));
+      setConversionAnalytics(payload);
+      setConversionDestinationByProjectId(Object.fromEntries(payload.campaigns.map((campaign) => [campaign.storyProjectId, campaign.destinationUrl || "https://baxterinsuranceagency.com"])));
+    } catch (error) {
+      setWorkflowErrors((current) => ({ ...current, conversions: error instanceof Error ? error.message : "Could not load quote tracking." }));
+    }
+  }, [selectedChannelId]);
+
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       void loadAppData();
@@ -2142,10 +2267,11 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
   }, [loadAppData, loadOpenRouterModels, loadFallbackModels]);
 
   useEffect(() => {
-    if (!loading && (activeSection === "analytics" || activeSection === "dashboard")) {
+    if (!loading && (activeSection === "analytics" || activeSection === "dashboard" || activeSection === "quote-tracking")) {
       void loadYoutubeAnalytics(selectedChannelId);
+      void loadConversionAnalytics(selectedChannelId);
     }
-  }, [activeSection, loadYoutubeAnalytics, loading, selectedChannelId]);
+  }, [activeSection, loadConversionAnalytics, loadYoutubeAnalytics, loading, selectedChannelId]);
 
   const counts = useMemo(() => {
     const usedIdeas = ideas.filter((idea) => isUsedStatus(idea.status));
@@ -3358,6 +3484,51 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     return { ideas: sortedIdeas, projects: projectsPayload.projects, slots: sortSlots(calendarPayload.slots) };
   }
 
+  async function saveConversionCampaign(project: StoryProject) {
+    await runAction(`conversion-campaign-${project.id}`, async () => {
+      const destinationUrl = conversionDestinationByProjectId[project.id] || "https://baxterinsuranceagency.com";
+      const payload = await fetchJson<{ campaign: ConversionAnalyticsPayload["campaigns"][number] }>("/api/conversions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storyProjectId: project.id,
+          destinationUrl,
+          cta: channelBlueprintDraft.primaryCta || businessCta
+        })
+      });
+      await loadConversionAnalytics(project.channelId || selectedChannelId);
+      setMessage(`Quote tracking is ready for "${project.title}". Use ${payload.campaign.trackedUrl} in the video description and pinned comment.`);
+    }, { errorKey: "conversions" });
+  }
+
+  async function updateConversionLead(leadId: string, status: string, campaignId: string) {
+    let premium: number | undefined;
+    if (status === "QUOTED" || status === "BOUND") {
+      const entered = window.prompt(`${status === "BOUND" ? "Bound" : "Quoted"} annual premium (optional)`, "");
+      if (entered?.trim()) {
+        const parsed = Number(entered.replace(/[$,]/g, ""));
+        if (!Number.isFinite(parsed) || parsed < 0) {
+          setMessage("Enter a valid premium amount or leave it blank.");
+          return;
+        }
+        premium = parsed;
+      }
+    }
+    await runAction(`conversion-lead-${leadId}`, async () => {
+      await fetchJson(`/api/conversions/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status,
+          ...(status === "QUOTED" && premium !== undefined ? { quotedPremium: premium } : {}),
+          ...(status === "BOUND" && premium !== undefined ? { boundPremium: premium } : {})
+        })
+      });
+      await loadConversionAnalytics(selectedChannelId);
+      setMessage(`Lead moved to ${status.replace(/_/g, " ").toLowerCase()}.`);
+    }, { errorKey: `conversion-lead-${campaignId}` });
+  }
+
   async function runMonthlyAuto() {
     const confirmed = window.confirm(
       "Create a monthly publishing batch?\n\nBaxter Growth Lab will create 6 standalone HeyGen video projects with randomized 7, 10, or 20 minute targets, plus one 5-episode series, then schedule them after any existing future calendar items."
@@ -3489,12 +3660,12 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       return;
     }
 
-    const sequence = autoScriptSequenceForProject(selectedProject);
+    const sequence = autoScriptSequenceForProject(selectedProject, experienceMode);
     const longBookNote = selectedProject.format === "LONG_BOOK"
       ? "\n\nLong form books are drafted in chapter batches to protect the requested word count, so this can take significantly longer than a script or article."
       : "";
     const confirmed = window.confirm(
-      `Run fully auto for "${selectedProject.title}"?\n\nBaxter Growth Lab will run the ${projectOutputNoun(selectedProject.format)} workflow in order: ${passLabelForProject("INTRO", selectedProject.format)}, Research, ${sequence.filter((passType) => passType !== "INTRO").map((passType) => passLabelForProject(passType, selectedProject.format)).join(", ")}. This can take several minutes and will use your configured models.${longBookNote}`
+      `Run ${experienceMode === "GUIDED" ? "Quote Video Fast Track" : "fully auto"} for "${selectedProject.title}"?\n\nPolicyForge will run the ${projectOutputNoun(selectedProject.format)} workflow in order: ${passLabelForProject("INTRO", selectedProject.format)}, Research, ${sequence.filter((passType) => passType !== "INTRO").map((passType) => passLabelForProject(passType, selectedProject.format)).join(", ")}. This can take several minutes and will use your configured models.${longBookNote}`
     );
     if (!confirmed) return;
 
@@ -4251,7 +4422,6 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             <strong>{user.name || "Baxter Growth Lab User"}</strong>
             <span>{user.email || "Signed in"}</span>
           </div>
-          <ChevronDown size={16} />
         </div>
       </aside>
 
@@ -4287,11 +4457,11 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 ) : null}
               </select>
             </label>
-            <div className="select-pill">
+            <button className="select-pill" type="button" onClick={() => goToSection("settings")} title="Open model routing settings">
               <span>Model</span>
               <strong>{settings.autoModelRouting ? "Auto routing" : settings.defaultModel}</strong>
-              <ChevronDown size={15} />
-            </div>
+              <Settings size={15} />
+            </button>
             <div className="status-pill">
               <span>API Key</span>
               <span className={cn("status-dot", !hasTextGenerationProvider(settings) && "muted")} />
@@ -4315,9 +4485,6 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             </button>
             <button className="icon-button" aria-label="Help" type="button" onClick={() => goToSection("guides")}>
               <HelpCircle size={20} />
-            </button>
-            <button className="icon-button" aria-label="Notifications" type="button">
-              <Bell size={20} />
             </button>
             <button className="icon-button" aria-label="Sign out" type="button" onClick={() => void signOut({ callbackUrl: "/login" })}>
               <LogOut size={19} />
@@ -4344,6 +4511,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         {!loading && activeSection === "media" ? renderMedia() : null}
         {!loading && activeSection === "exports" ? renderExports() : null}
         {!loading && activeSection === "analytics" ? renderAnalytics() : null}
+        {!loading && activeSection === "quote-tracking" ? renderQuoteTracking() : null}
         {!loading && activeSection === "guides" ? renderGuides() : null}
         {!loading && activeSection === "settings" ? renderSettings() : null}
       </main>
@@ -5981,7 +6149,10 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
         action: () => void generateArticleImagesForProject()
       }] : [])
     ];
-    const numberedWorkflowSteps = workflowSteps.map((step, index) => ({ ...step, number: index + 1 }));
+    const visibleWorkflowSteps = experienceMode === "GUIDED"
+      ? workflowSteps.filter((step) => !GUIDED_HIDDEN_WORKFLOW_STEPS.has(step.id))
+      : workflowSteps;
+    const numberedWorkflowSteps = visibleWorkflowSteps.map((step, index) => ({ ...step, number: index + 1 }));
     const completedStepCount = numberedWorkflowSteps.filter((step) => step.complete).length;
     const nextWorkflowStep = numberedWorkflowSteps.find((step) => step.enabled && !step.complete);
     const selectedProjectReadiness = selectedProject ? projectReadinessState(selectedProject, publishingSlots) : null;
@@ -6392,7 +6563,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                     {!projectHasCompletedEpisodePlan(selectedProject) ? (
                       <button className="primary-button fit" type="button" onClick={() => void runFullyAuto()} disabled={Boolean(busy)}>
                         {busy === "auto" ? <Loader2 size={15} className="spin" /> : <Zap size={15} />}
-                        {busy === "auto" ? "Auto Running" : "Fully Auto"}
+                        {busy === "auto" ? "Fast Track Running" : experienceMode === "GUIDED" ? "Quote Video Fast Track" : "Fully Auto"}
                       </button>
                     ) : null}
                     <span>{completedStepCount} / {numberedWorkflowSteps.length}</span>
@@ -6693,6 +6864,71 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                       imageCount={outputAssets.length}
                       sourceReady={hasSourceMaterial}
                     />
+                    {latestPublishingPack && !isArticleProject && !isPodcastProject && !isBookProject ? (
+                      <div className="youtube-publisher-panel">
+                        <div>
+                          <strong>YouTube Publisher</strong>
+                          <p>Upload the finished HeyGen video with the selected title, tracked description, tags, and a direct project-to-video analytics link.</p>
+                        </div>
+                        {selectedProject.youtubeVideoId ? (
+                          <>
+                            <a className="secondary-button compact" href={`https://www.youtube.com/watch?v=${selectedProject.youtubeVideoId}`} target="_blank" rel="noreferrer">
+                              <Globe2 size={15} />
+                              Open YouTube Video
+                            </a>
+                            {thumbnailAssetsForProject(selectedProject).length ? (
+                              <div className="youtube-thumbnail-picker">
+                                {thumbnailAssetsForProject(selectedProject).slice(0, 6).map((asset) => (
+                                  <button type="button" key={asset.id} onClick={() => void setProjectYoutubeThumbnail(selectedProject, asset)} disabled={Boolean(busy)} title={`Use ${asset.title || `thumbnail ${asset.variant}`}`}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element -- generated project assets may use remote Runware URLs. */}
+                                    <img src={asset.imageUrl} alt={asset.title || `Thumbnail ${asset.variant}`} />
+                                    <span>{busy === `youtube-thumbnail-${asset.id}` ? "Setting..." : "Set thumbnail"}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            ) : null}
+                          </>
+                        ) : (
+                          <div className="youtube-publisher-controls">
+                            <label className="file-picker">
+                              <span>Finished video</span>
+                              <input
+                                type="file"
+                                accept="video/mp4,video/quicktime,video/webm"
+                                onChange={(event) => setYoutubeFileByProjectId((current) => ({ ...current, [selectedProject.id]: event.target.files?.[0] || null }))}
+                              />
+                            </label>
+                            <Field label="Visibility">
+                              <select
+                                value={youtubePrivacyByProjectId[selectedProject.id] || "private"}
+                                onChange={(event) => setYoutubePrivacyByProjectId((current) => ({ ...current, [selectedProject.id]: event.target.value as "private" | "unlisted" | "public" }))}
+                              >
+                                <option value="private">Private (recommended)</option>
+                                <option value="unlisted">Unlisted</option>
+                                <option value="public">Public</option>
+                              </select>
+                            </Field>
+                            <Field label="Schedule (optional)">
+                              <input
+                                type="datetime-local"
+                                value={youtubeScheduleByProjectId[selectedProject.id] || ""}
+                                onChange={(event) => setYoutubeScheduleByProjectId((current) => ({ ...current, [selectedProject.id]: event.target.value }))}
+                              />
+                            </Field>
+                            <button
+                              className="primary-button fit"
+                              type="button"
+                              onClick={() => void uploadProjectToYoutube(selectedProject)}
+                              disabled={Boolean(busy) || !youtubeFileByProjectId[selectedProject.id]}
+                            >
+                              {busy === `youtube-upload-${selectedProject.id}` ? <Loader2 size={15} className="spin" /> : <UploadCloud size={15} />}
+                              Upload To YouTube
+                            </button>
+                          </div>
+                        )}
+                        {workflowErrors["youtube-upload"] ? <div className="workflow-step-error"><CircleSlash size={15} /><span>{workflowErrors["youtube-upload"]}</span></div> : null}
+                      </div>
+                    ) : null}
                   </>
                 ) : null}
                 {qualityScorecard ? (
@@ -7646,6 +7882,86 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     }, { errorKey: "youtube" });
   }
 
+  async function uploadProjectToYoutube(project: StoryProject) {
+    const file = youtubeFileByProjectId[project.id];
+    if (!file) {
+      setMessage("Choose the finished HeyGen video file first.");
+      return;
+    }
+    const packDraft = latestDraftForPass(project, "PUBLISHING_PACK");
+    if (!packDraft) {
+      setMessage("Create the Business Campaign Kit before uploading to YouTube.");
+      return;
+    }
+    const pack = parsePublishingPack(packDraft.content);
+    const title = pack.episodePacks?.[0]?.titles?.[0]?.title || pack.titles[0]?.title || project.title;
+    const description = pack.episodePacks?.[0]?.description || pack.description;
+    const tags = pack.episodePacks?.[0]?.tags || pack.tags;
+    const requestedPrivacy = youtubePrivacyByProjectId[project.id] || "private";
+    const scheduleValue = youtubeScheduleByProjectId[project.id];
+    const publishAt = scheduleValue ? new Date(scheduleValue) : null;
+    const privacyStatus = publishAt ? "private" : requestedPrivacy;
+    const confirmed = window.confirm(
+      `Upload "${title}" to YouTube?\n\nThe video will upload as ${publishAt ? `private and scheduled for ${publishAt.toLocaleString()}` : privacyStatus}. PolicyForge marks AI/synthetic media accurately and does not notify subscribers during the upload.`
+    );
+    if (!confirmed) return;
+
+    await runAction(`youtube-upload-${project.id}`, async () => {
+      const session = await fetchJson<{ uploadUrl: string; privacyStatus: "private" | "unlisted" | "public"; publishAt?: string | null }>("/api/youtube/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "start",
+          storyProjectId: project.id,
+          title,
+          description,
+          tags,
+          contentType: file.type || "video/mp4",
+          contentLength: file.size,
+          privacyStatus,
+          publishAt: publishAt?.toISOString() || null
+        })
+      });
+      const uploadResponse = await fetch(session.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type || "video/mp4" },
+        body: file
+      });
+      const uploaded = await uploadResponse.json().catch(() => ({})) as { id?: string; error?: { message?: string } };
+      if (!uploadResponse.ok || !uploaded.id) throw new Error(uploaded.error?.message || `YouTube upload failed with status ${uploadResponse.status}.`);
+      await fetchJson("/api/youtube/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "finish",
+          storyProjectId: project.id,
+          youtubeVideoId: uploaded.id,
+          privacyStatus: session.privacyStatus,
+          publishAt: publishAt?.toISOString() || null
+        })
+      });
+      setYoutubeFileByProjectId((current) => ({ ...current, [project.id]: null }));
+      await loadProjectsAndIdeas();
+      setMessage(`Uploaded "${title}" to YouTube and linked it to this PolicyForge project.`);
+    }, { errorKey: "youtube-upload" });
+  }
+
+  async function setProjectYoutubeThumbnail(project: StoryProject, asset: ThumbnailAsset) {
+    if (!project.youtubeVideoId) return;
+    await runAction(`youtube-thumbnail-${asset.id}`, async () => {
+      await fetchJson("/api/youtube/thumbnail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storyProjectId: project.id,
+          youtubeVideoId: project.youtubeVideoId,
+          thumbnailAssetId: asset.id
+        })
+      });
+      setMessage(`Set "${asset.title || `Thumbnail ${asset.variant}`}" on the linked YouTube video.`);
+    }, { errorKey: "youtube-upload" });
+  }
+
   async function disconnectYoutubeAnalytics(channelId = currentChannel?.id) {
     if (!channelId) return;
     await runAction(`youtube-disconnect-${channelId}`, async () => {
@@ -7680,6 +7996,128 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     }, { errorKey: "youtube" });
   }
 
+  function renderQuoteTracking() {
+    const summary = conversionAnalytics?.summary;
+    const campaigns = conversionAnalytics?.campaigns ?? [];
+    const eligibleProjects = projects.filter((project) => project.format === "STANDALONE" || project.format === "EPISODIC_SERIES");
+    const campaignProjectIds = new Set(campaigns.map((campaign) => campaign.storyProjectId));
+    return (
+      <SectionStack>
+        <div className="stats-grid">
+          <Metric label="Tracked clicks" value={summary?.clicks ?? 0} />
+          <Metric label="Quote leads" value={summary?.leads ?? 0} />
+          <Metric label="Quoted" value={summary?.quoted ?? 0} />
+          <Metric label="Bound" value={summary?.bound ?? 0} />
+          <Metric label="Bound premium" value={formatCurrency(summary?.boundPremium ?? 0)} />
+          <Metric label="Click to lead" value={`${(summary?.clickToLeadRate ?? 0).toFixed(1)}%`} />
+        </div>
+
+        <Panel title="Video Conversion Campaigns">
+          <p className="settings-note">
+            Each tracked URL records the YouTube click, adds campaign UTMs, and routes the visitor to the saved quote or landing page.
+            The public form endpoint lets a Macaly landing page send leads back to this exact video.
+          </p>
+          <div className="conversion-campaign-grid">
+            {campaigns.map((campaign) => {
+              const project = projects.find((item) => item.id === campaign.storyProjectId);
+              const clicks = campaign.events.filter((event) => event.eventType === "LINK_CLICK").length;
+              const quoted = campaign.leads.filter((lead) => ["QUOTED", "BOUND"].includes(lead.status)).length;
+              return (
+                <article className="conversion-campaign-card" key={campaign.id}>
+                  <div className="conversion-campaign-head">
+                    <div>
+                      <strong>{campaign.storyProject.title}</strong>
+                      <span>{clicks} clicks · {campaign.leads.length} leads · {quoted} quoted</span>
+                    </div>
+                    <span className={cn("status-chip", campaign.status === "ACTIVE" && "ready")}>{campaign.status}</span>
+                  </div>
+                  <Field label="Landing Or Quote Page">
+                    <input
+                      value={conversionDestinationByProjectId[campaign.storyProjectId] ?? campaign.destinationUrl ?? ""}
+                      onChange={(event) => setConversionDestinationByProjectId((current) => ({ ...current, [campaign.storyProjectId]: event.target.value }))}
+                      placeholder="https://baxterinsuranceagency.com/quote"
+                    />
+                  </Field>
+                  <div className="conversion-link-box">
+                    <span>Tracked YouTube URL</span>
+                    <strong>{campaign.trackedUrl}</strong>
+                    <button className="secondary-button compact" type="button" onClick={() => void copyText(campaign.trackedUrl, "Tracked quote URL copied.")}>
+                      <Copy size={15} />
+                      Copy URL
+                    </button>
+                  </div>
+                  <div className="conversion-link-box">
+                    <span>Macaly Form Endpoint</span>
+                    <strong>{campaign.leadEndpoint}</strong>
+                    <button className="secondary-button compact" type="button" onClick={() => void copyText(campaign.leadEndpoint, "Macaly lead endpoint copied.")}>
+                      <Copy size={15} />
+                      Copy Endpoint
+                    </button>
+                  </div>
+                  {project ? (
+                    <button className="primary-button compact" type="button" onClick={() => void saveConversionCampaign(project)} disabled={busy === `conversion-campaign-${project.id}`}>
+                      {busy === `conversion-campaign-${project.id}` ? <Loader2 size={15} className="spin" /> : <Save size={15} />}
+                      Save Tracking
+                    </button>
+                  ) : null}
+                </article>
+              );
+            })}
+            {!campaigns.length ? <EmptyState title="No tracked video campaigns yet" body="Create tracking for a video project below, then use its URL in the YouTube description and pinned comment." /> : null}
+          </div>
+        </Panel>
+
+        <Panel title="Projects Without Quote Tracking">
+          <div className="conversion-project-list">
+            {eligibleProjects.filter((project) => !campaignProjectIds.has(project.id)).map((project) => (
+              <div className="conversion-project-row" key={project.id}>
+                <div>
+                  <strong>{project.title}</strong>
+                  <span>{formatProjectFormat(project.format)} · {displayProjectStatus(project.status)}</span>
+                </div>
+                <input
+                  value={conversionDestinationByProjectId[project.id] ?? "https://baxterinsuranceagency.com"}
+                  onChange={(event) => setConversionDestinationByProjectId((current) => ({ ...current, [project.id]: event.target.value }))}
+                  aria-label={`Landing page for ${project.title}`}
+                />
+                <button className="primary-button compact" type="button" onClick={() => void saveConversionCampaign(project)} disabled={busy === `conversion-campaign-${project.id}`}>
+                  <Rocket size={15} />
+                  Create Tracking
+                </button>
+              </div>
+            ))}
+            {!eligibleProjects.filter((project) => !campaignProjectIds.has(project.id)).length ? <EmptyState title="Every video project is tracked" body="New video projects will appear here until a tracked CTA is created." /> : null}
+          </div>
+        </Panel>
+
+        <Panel title="Lead Pipeline">
+          <div className="conversion-lead-list">
+            {campaigns.flatMap((campaign) => campaign.leads.map((lead) => ({ campaign, lead }))).map(({ campaign, lead }) => (
+              <div className="conversion-lead-row" key={lead.id}>
+                <div>
+                  <strong>{lead.name || lead.phone || lead.email || "New quote lead"}</strong>
+                  <span>{lead.product || "Texas insurance"} · {lead.zipCode || "ZIP not supplied"} · {campaign.name}</span>
+                  <small>{lead.phone || lead.email || "Contact details unavailable"} · {formatDateTime(lead.createdAt)}</small>
+                </div>
+                <select
+                  value={lead.status}
+                  onChange={(event) => void updateConversionLead(lead.id, event.target.value, campaign.id)}
+                  aria-label={`Lead status for ${lead.name || lead.phone || lead.email || "lead"}`}
+                >
+                  {["NEW", "CONTACTED", "QUOTE_STARTED", "QUOTED", "BOUND", "LOST"].map((status) => (
+                    <option value={status} key={status}>{status.replace(/_/g, " ")}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+            {!campaigns.some((campaign) => campaign.leads.length) ? <EmptyState title="No quote leads yet" body="Leads submitted through a connected Macaly form will appear here automatically." /> : null}
+          </div>
+        </Panel>
+        {workflowErrors.conversions ? <div className="inline-warning">{workflowErrors.conversions}</div> : null}
+      </SectionStack>
+    );
+  }
+
   function renderAnalytics() {
     const analytics = youtubeAnalytics;
     const summary = analytics?.summary;
@@ -7698,7 +8136,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               <p className="settings-note">
                 {connected && analytics?.connection
                   ? `Connected to ${analytics.connection.youtubeChannelTitle}. Last sync: ${analytics.connection.lastSyncedAt ? formatDateTime(analytics.connection.lastSyncedAt) : "not synced yet"}.`
-                  : "Connect the active Policyinsurance channel to YouTube, then sync weekly performance automatically."}
+                  : "Connect the active PolicyForge channel to YouTube, then sync weekly performance automatically."}
               </p>
             </div>
             <div className="inline-actions">
@@ -7726,6 +8164,14 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               )}
             </div>
           </div>
+          {connected && analytics?.syncHealth && analytics.syncHealth.status !== "HEALTHY" ? (
+            <div className="inline-warning">
+              YouTube sync is {analytics.syncHealth.status.toLowerCase()}.
+              {analytics.syncHealth.latestError ? ` ${analytics.syncHealth.latestError}` : " Run Sync Now to refresh recommendations and verify the weekly connection."}
+            </div>
+          ) : connected && analytics?.syncHealth ? (
+            <div className="inline-info">Weekly YouTube sync is healthy. Next check: {analytics.syncHealth.nextSyncAt ? formatDateTime(analytics.syncHealth.nextSyncAt) : "scheduled automatically"}.</div>
+          ) : null}
           {!settings.hasYoutubeOAuthCredentials ? (
             <div className="youtube-credentials-box">
               <div className="inline-warning">Add and save a YouTube OAuth Client ID and Client Secret before connecting the channel.</div>
@@ -7755,7 +8201,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           {loadingYoutubeAnalytics ? <div className="inline-info">Loading YouTube analytics...</div> : null}
         </div>
         <Panel title="YouTube Channel Connections">
-          <p className="settings-note">Manage one YouTube connection per Policyinsurance channel. Switch the active channel at the top to review detailed analytics for that channel.</p>
+          <p className="settings-note">Manage one YouTube connection per PolicyForge channel. Switch the active channel at the top to review detailed analytics for that channel.</p>
           <div className="youtube-connection-list">
             {channels.map((channel) => {
               const connection = youtubeConnectionsByChannel.get(channel.id);
@@ -7858,7 +8304,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                     ) : null}
                     <div>
                       <strong>{video.title}</strong>
-                      <span>{formatCompact(video.views)} views · {formatOneDecimal(video.watchHours)} watch hours · {formatOneDecimal(video.averageViewPercentage)}% retained · {formatSigned(video.subscribersGained)} audience growth</span>
+                      <span>{formatCompact(video.views)} views · {formatOneDecimal(video.watchHours)} watch hours · {formatOneDecimal(video.averageViewPercentage)}% retained · {formatSigned(video.subscribersGained)} audience growth · {formatCompact(video.cardClicks)} card clicks</span>
                     </div>
                   </div>
                 ))}
@@ -8829,7 +9275,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 placeholder={settings.hasYoutubeOAuthCredentials ? "Saved client secret is configured. Enter a new secret to replace it." : "Google OAuth client secret"}
               />
               <CredentialStatus configured={Boolean(settings.hasYoutubeOAuthCredentials)} label="YouTube OAuth credentials" />
-              <small className="field-hint">Scopes requested: YouTube readonly and YouTube Analytics readonly. These power weekly subscriber, watch-time, CTR, and retention analysis.</small>
+              <small className="field-hint">Scopes requested: YouTube read, upload, and Analytics read access. These power private-first publishing plus weekly subscriber, watch-time, CTR, and retention analysis.</small>
             </Field>
             <Field label="Thumbnail Style Guide">
               <textarea
@@ -9572,9 +10018,10 @@ function calendarIntelligence(projects: StoryProject[], slots: PublishingSlot[])
   return tips;
 }
 
-function autoScriptSequenceForProject(project: StoryProject) {
-  if (!projectHasEpisodePlan(project)) return AUTO_SCRIPT_SEQUENCE;
-  const sequence = [...AUTO_SCRIPT_SEQUENCE];
+function autoScriptSequenceForProject(project: StoryProject, experienceMode: ExperienceMode = "POWER") {
+  const baseSequence = experienceMode === "GUIDED" ? QUOTE_VIDEO_FAST_TRACK_SEQUENCE : AUTO_SCRIPT_SEQUENCE;
+  if (!projectHasEpisodePlan(project)) return baseSequence;
+  const sequence = [...baseSequence];
   const hookIndex = sequence.indexOf("HOOK_LAB");
   sequence.splice(hookIndex, 0, "EPISODES");
   return sequence;

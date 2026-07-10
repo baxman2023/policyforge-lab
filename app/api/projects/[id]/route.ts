@@ -17,9 +17,10 @@ const ProjectPatchSchema = z.object({
   targetLengthMinutes: z.number().int().min(7).max(60).optional(),
   platform: z.string().trim().optional(),
   publishedUrl: z.string().trim().optional(),
+  youtubeVideoId: z.string().trim().max(32).optional(),
   notes: z.string().trim().optional()
 }).refine(
-  (value) => value.status !== undefined || value.sourceMaterial !== undefined || value.sponsorBlurb !== undefined || value.sponsorLink !== undefined || value.targetLengthMinutes !== undefined,
+  (value) => value.status !== undefined || value.sourceMaterial !== undefined || value.sponsorBlurb !== undefined || value.sponsorLink !== undefined || value.targetLengthMinutes !== undefined || value.youtubeVideoId !== undefined,
   "Provide a status, source material, sponsor blurb, sponsor link, or target length to update."
 );
 
@@ -52,6 +53,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
           ...(input.sourceMaterial !== undefined ? { sourceMaterial: input.sourceMaterial } : {}),
           ...(input.sponsorBlurb !== undefined || !sponsorAllowed ? { sponsorBlurb } : {}),
           ...(input.sponsorLink !== undefined || !sponsorAllowed ? { sponsorLink: sponsorAllowed ? (input.sponsorLink ?? "").trim() || null : null } : {}),
+          ...(input.youtubeVideoId !== undefined ? { youtubeVideoId: input.youtubeVideoId || null } : {}),
           ...(input.targetLengthMinutes !== undefined
             ? {
                 targetLengthMinutes: input.targetLengthMinutes,
