@@ -180,7 +180,7 @@ const q = (value) => `'${String(value).replace(/'/g, `'\\''`)}'`;
 console.log(`MYSQL_PWD=${q(decodeURIComponent(url.password))} mysqldump --single-transaction --quick --skip-lock-tables -h ${q(url.hostname)} -P ${q(url.port || '3306')} -u ${q(decodeURIComponent(url.username))} ${q(url.pathname.slice(1))} | gzip > ${q(process.env.BACKUP_FILE)}`);
 NODE
 test -s "$BACKUP_FILE"
-npx prisma db push
+npx prisma db push --accept-data-loss
 node scripts/post-fork-upgrade.cjs
 
 SYNC_SECRET="$(sed -n 's/^YOUTUBE_SYNC_SECRET="\{0,1\}\([^"[:space:]]*\)"\{0,1\}$/\1/p' .env | head -n 1)"
