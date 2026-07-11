@@ -1,13 +1,14 @@
-import Link from "next/link";
-import { apiPath } from "@/lib/client-api";
+"use client";
+
+import { signIn } from "next-auth/react";
 
 export function LoginForm({ googleConfigured, inviteToken = "" }: { googleConfigured: boolean; inviteToken?: string }) {
   return (
     <>
       {googleConfigured ? (
-        <Link className="login-button" href={`${apiPath("/api/auth/signin/google")}?callbackUrl=${encodeURIComponent(inviteToken ? `/?invite=${inviteToken}` : "/")}`}>
+        <button className="login-button" type="button" onClick={() => void signIn("google", { callbackUrl: inviteToken ? `/?invite=${inviteToken}` : "/" })}>
           Continue with Google
-        </Link>
+        </button>
       ) : (
         <p className="login-warning">Google sign-in is not configured. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET on the server.</p>
       )}
