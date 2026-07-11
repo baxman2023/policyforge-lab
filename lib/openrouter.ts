@@ -160,36 +160,28 @@ async function providerAttempts(input: GenerateInput, settings: Awaited<ReturnTy
     getOpenAiApiKey(input.userId)
   ]);
   const openRouterModel = routeModelForPass(settings, input.passType, input.model);
-  const attempts: ProviderAttempt[] = [];
-
-  if (openRouterKey) {
-    attempts.push({
+  const auditPass = input.passType === "CRITIQUE" || input.passType === "FACT_CHECK" || input.passType === "QUALITY_GATE";
+  const highRiskEvidence = auditPass && input.messages.some((message) => /ambiguous|disputed|high[- ]risk|contradict|legal risk|policy risk/i.test(message.content));
+  const openRouterAttempt: ProviderAttempt | null = openRouterKey ? {
       id: "openrouter",
       apiKey: openRouterKey,
       model: openRouterModel,
       label: `openrouter:${openRouterModel}`
-    });
-  }
-  if (anthropicKey) {
-    const model = settings.anthropicModel || process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
-    attempts.push({
-      id: "anthropic",
-      apiKey: anthropicKey,
-      model,
-      label: `anthropic:${model}`
-    });
-  }
-  if (openAiKey) {
-    const model = settings.openAiModel || process.env.OPENAI_MODEL || "gpt-5.4";
-    attempts.push({
+    } : null;
+  const openAiModel = settings.openAiModel || "gpt-5.6-luna";
+  const openAiAttempt: ProviderAttempt | null = openAiKey ? {
       id: "openai",
       apiKey: openAiKey,
-      model,
-      label: `openai:${model}`
-    });
-  }
+      model: openAiModel,
+      label: `openai:${openAiModel}`
+    } : null;
+  const anthropicModel = highRiskEvidence ? (settings.anthropicModel || "claude-opus-4-8") : "claude-sonnet-5";
+  const anthropicAttempt: ProviderAttempt | null = anthropicKey ? { id: "anthropic", apiKey: anthropicKey, model: anthropicModel, label: `anthropic:${anthropicModel}` } : null;
 
-  return attempts;
+  return (auditPass
+    ? [openRouterAttempt, openAiAttempt, anthropicAttempt]
+    : [openRouterAttempt, anthropicAttempt, openAiAttempt]
+  ).filter((attempt): attempt is ProviderAttempt => Boolean(attempt));
 }
 
 async function callProvider(provider: ProviderAttempt, input: GenerateInput): Promise<ProviderResult> {
@@ -204,7 +196,9 @@ async function callOpenRouter(provider: ProviderAttempt, input: GenerateInput) {
     headers: openRouterHeaders(provider.apiKey),
     body: JSON.stringify({
       model: provider.model,
-      messages: input.messages,
+      messages: input.messages.map((message, index) => index === 0
+        ? { ...message, cache_control: { type: "ephemeral" } }
+        : message),
       temperature: input.temperature ?? 0.7,
       max_tokens: input.maxTokens ?? 2500
     })
@@ -237,7 +231,7 @@ async function callAnthropic(provider: ProviderAttempt, input: GenerateInput) {
     body: JSON.stringify({
       model: provider.model,
       max_tokens: input.maxTokens ?? 2500,
-      ...(system ? { system } : {}),
+      ...(system ? { system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }] } : {}),
       messages: normalizeAnthropicMessages(messages)
     })
   });

@@ -14,6 +14,8 @@ export async function GET(request: Request, context: { params: Promise<{ project
       where: { id: projectId, workspaceId: workspace.id },
       include: {
         storyIdea: true,
+        channel: true,
+        shortAssets: { orderBy: { shortIndex: "asc" } },
         drafts: { orderBy: { createdAt: "desc" } }
       }
     });
@@ -39,7 +41,7 @@ export async function GET(request: Request, context: { params: Promise<{ project
     ].filter(Boolean).join("\n\n");
     const body = format === "txt"
       ? `${project.title}\n\n${scriptBody || "No script output yet."}`
-      : `# ${project.title}\n\n${project.storyIdea?.hook ? `> ${project.storyIdea.hook}\n\n` : ""}${scriptBody || "No script output yet."}`;
+      : `# ${project.title}\n\n${project.storyIdea?.hook ? `> ${project.storyIdea.hook}\n\n` : ""}${scriptBody || "No script output yet."}${project.channel?.shaziStyle ? `\n\n## Shazi Channel Style\n\n\`\`\`json\n${JSON.stringify(project.channel.shaziStyle, null, 2)}\n\`\`\`` : ""}${project.shortAssets.length ? `\n\n## Nine Shorts\n\n${project.shortAssets.map((item) => `### Short ${item.shortIndex}: ${item.title}\n\n${item.script}\n\nCaption: ${item.caption}\n\nSource safety: ${item.sourceSafety}`).join("\n\n")}` : ""}`;
 
     return new Response(body, {
       headers: {

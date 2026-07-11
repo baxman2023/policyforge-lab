@@ -83,6 +83,9 @@ type Channel = {
   slug: string;
   description?: string | null;
   archivedAt?: string | null;
+  sourceFoundation?: unknown;
+  sourceFoundationBuiltAt?: string | null;
+  shaziStyle?: { styleName?: string; visualRecipe?: string; stockVideoPct?: number; archivalStillsPct?: number; aiImagesPct?: number; syncMode?: string; outputQuality?: string; motion?: string; transitions?: string; guardrails?: string[] } | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -423,6 +426,7 @@ type StoryProject = {
   storyIdea?: StoryIdea | null;
   drafts?: ScriptDraft[];
   thumbnails?: ThumbnailAsset[];
+  shortAssets?: Array<{ id: string; shortIndex: number; hook: string; payoff: string; script: string; title: string; caption: string; sourceSafety: string; exportAssets?: unknown; status: string; scheduledAt?: string | null }>;
   publishingSlots?: PublishingSlot[];
 };
 
@@ -442,6 +446,9 @@ type PublishingSlot = {
   updatedAt: string;
   storyProject?: StoryProject;
 };
+
+type CalendarShort = { id: string; storyProjectId: string; shortIndex: number; title: string; status: string; scheduledAt?: string | null };
+type EditorialOpportunity = { id: string; title: string; description: string; opportunityDate: string; relevance: "RELEVANT" | "POSSIBLE" | "IRRELEVANT"; relevanceReason: string; suggestedAngle?: string | null };
 
 type CurrentScriptOutput = ScriptDraft & {
   displayLabel?: string;
@@ -699,6 +706,8 @@ type UserSettings = {
   narrationStyle: string;
   defaultLengthMinutes: number;
   ttsPauseMarkers: boolean;
+  alwaysFinishScripts: boolean;
+  monthlyRunBudgetUsd: number;
   openRouterApiKey?: string;
   anthropicApiKey?: string;
   openAiApiKey?: string;
@@ -1032,15 +1041,15 @@ type PipelineColumn = {
 };
 
 const defaultSettings: UserSettings = {
-  defaultModel: "openai/gpt-4o-mini",
-  discoveryModel: "openai/gpt-4o-mini",
-  dossierModel: "anthropic/claude-3.5-sonnet",
-  structureModel: "anthropic/claude-3.5-sonnet",
-  draftingModel: "openai/gpt-4o",
-  critiqueModel: "anthropic/claude-3.5-sonnet",
-  rewriteModel: "openai/gpt-4o",
+  defaultModel: "anthropic/claude-sonnet-5",
+  discoveryModel: "anthropic/claude-sonnet-5",
+  dossierModel: "anthropic/claude-sonnet-5",
+  structureModel: "anthropic/claude-sonnet-5",
+  draftingModel: "anthropic/claude-sonnet-5",
+  critiqueModel: "openai/gpt-5.6-luna",
+  rewriteModel: "anthropic/claude-sonnet-5",
   anthropicModel: "claude-opus-4-8",
-  openAiModel: "gpt-5.4",
+  openAiModel: "gpt-5.6-luna",
   runwareModel: "ideogram:4@0",
   thumbnailStyleGuide: DEFAULT_THUMBNAIL_STYLE_GUIDE,
   workspaceName: "Baxter Growth Lab",
@@ -1051,8 +1060,10 @@ const defaultSettings: UserSettings = {
   autoModelRouting: true,
   preferredTone: "Helpful, local, consultative",
   narrationStyle: "Journalistic",
-  defaultLengthMinutes: 7,
+  defaultLengthMinutes: 8,
   ttsPauseMarkers: false,
+  alwaysFinishScripts: false,
+  monthlyRunBudgetUsd: 75,
   openRouterApiKey: "",
   anthropicApiKey: "",
   openAiApiKey: "",
@@ -2022,6 +2033,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
   const [ideas, setIdeas] = useState<StoryIdea[]>([]);
   const [projects, setProjects] = useState<StoryProject[]>([]);
   const [publishingSlots, setPublishingSlots] = useState<PublishingSlot[]>([]);
+  const [calendarShorts, setCalendarShorts] = useState<CalendarShort[]>([]);
+  const [editorialOpportunities, setEditorialOpportunities] = useState<EditorialOpportunity[]>([]);
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [settingsDraft, setSettingsDraft] = useState<UserSettings>(defaultSettings);
   const [channelBlueprintDraft, setChannelBlueprintDraft] = useState<ChannelBlueprint>(defaultChannelBlueprint);
@@ -2144,7 +2157,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       const [ideasPayload, projectsPayload, calendarPayload, settingsPayload, blockedIdeasPayload, usageLedgerPayload, conversionsPayload] = await Promise.all([
         fetchJson<{ ideas: StoryIdea[] }>(channelUrl("/api/ideas", activeChannelId)),
         fetchJson<{ projects: StoryProject[] }>(channelUrl("/api/projects", activeChannelId)),
-        fetchJson<{ slots: PublishingSlot[] }>(channelUrl("/api/calendar", activeChannelId)),
+        fetchJson<{ slots: PublishingSlot[]; shorts?: CalendarShort[]; opportunities?: EditorialOpportunity[] }>(channelUrl("/api/calendar", activeChannelId)),
         fetchJson<UserSettings>("/api/settings"),
         fetchJson<{ blockedIdeas: BlockedChannelIdea[] }>("/api/channels/blocked-ideas"),
         fetchJson<UsageLedger>("/api/usage/ledger"),
@@ -2153,6 +2166,8 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       setIdeas(sortIdeas(ideasPayload.ideas));
       setProjects(projectsPayload.projects);
       setPublishingSlots(sortSlots(calendarPayload.slots));
+      setCalendarShorts(calendarPayload.shorts ?? []);
+      setEditorialOpportunities(calendarPayload.opportunities ?? []);
       setBlockedChannelIdeas(blockedIdeasPayload.blockedIdeas);
       setUsageLedger(usageLedgerPayload);
       setConversionAnalytics(conversionsPayload);
@@ -3217,6 +3232,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     });
   }
 
+  async function developIdeaAsSeason(idea: StoryIdea) {
+    await runAction(`season-${idea.id}`, async () => {
+      const payload = await fetchJson<{ url: string }>("/api/seasons", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ideaId: idea.id, createProjects: true }) });
+      window.location.href = payload.url;
+    }, { errorKey: `season-${idea.id}` });
+  }
+
   function campaignBuilderContext() {
     const goal = campaignGoalOptions.find((item) => item.key === campaignGoal) ?? campaignGoalOptions[0];
     const asset = campaignAssetOptions.find((item) => item.key === campaignAsset) ?? campaignAssetOptions[0];
@@ -3486,12 +3508,14 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     const [ideasPayload, projectsPayload, calendarPayload] = await Promise.all([
       fetchJson<{ ideas: StoryIdea[] }>(channelUrl("/api/ideas", channelId)),
       fetchJson<{ projects: StoryProject[] }>(channelUrl("/api/projects", channelId)),
-      fetchJson<{ slots: PublishingSlot[] }>(channelUrl("/api/calendar", channelId))
+      fetchJson<{ slots: PublishingSlot[]; shorts?: CalendarShort[]; opportunities?: EditorialOpportunity[] }>(channelUrl("/api/calendar", channelId))
     ]);
     const sortedIdeas = sortIdeas(ideasPayload.ideas);
     setIdeas(sortedIdeas);
     setProjects(projectsPayload.projects);
     setPublishingSlots(sortSlots(calendarPayload.slots));
+    setCalendarShorts(calendarPayload.shorts ?? []);
+    setEditorialOpportunities(calendarPayload.opportunities ?? []);
     return { ideas: sortedIdeas, projects: projectsPayload.projects, slots: sortSlots(calendarPayload.slots) };
   }
 
@@ -3542,7 +3566,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
 
   async function runMonthlyAuto() {
     const confirmed = window.confirm(
-      "Create a monthly publishing batch?\n\nBaxter Growth Lab will create 6 standalone HeyGen video projects with randomized 7, 10, or 20 minute targets, plus one 5-episode series, then schedule them after any existing future calendar items."
+      "Create a monthly publishing batch?\n\nPolicyForge will create four standalone 8, 10, or 12 minute video projects plus one tightly scheduled series using the episode count already recommended by the idea."
     );
     if (!confirmed) return;
     if (!activeChannelId) {
@@ -3612,6 +3636,16 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
       setPublishingSlots((current) => current.filter((item) => item.id !== slot.id));
       setMessage(`"${slot.title}" removed from the publishing calendar.`);
     });
+  }
+
+  async function developCalendarOpportunity(item: EditorialOpportunity, mode: "VIDEO" | "SEASON") {
+    await runAction(`calendar-opportunity-${item.id}`, async () => {
+      const payload = await fetchJson<{ url?: string }>(`/api/calendar/opportunities/${item.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode }) });
+      if (payload.url) { window.location.href = payload.url; return; }
+      await loadProjectsAndIdeas();
+      goToSection("projects");
+      setMessage(`Production project created from "${item.title}".`);
+    }, { errorKey: `calendar-opportunity-${item.id}` });
   }
 
   async function generateProjectPass(passType: ScriptPassType, options: { forceSave?: boolean } = {}) {
@@ -3684,6 +3718,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     if (!confirmed) return;
 
     const project = selectedProject;
+    if (settings.alwaysFinishScripts) {
+      await runAction("auto", async () => {
+        const payload = await fetchJson<{ job: { id: string; status: string }; created: boolean }>("/api/automation/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: project.id, mode: "FULL" }) });
+        setMessage(`${payload.created ? "Always-finish job queued" : "Always-finish job already active"} for "${project.title}". Three bounded worker slots continue even if you close this page.`);
+      }, { errorKey: "auto" });
+      return;
+    }
     await runAction("auto", async () => {
       try {
         let material = sourceMaterial;
@@ -3743,6 +3784,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
     if (!confirmed) return;
 
     const project = selectedProject;
+    if (settings.alwaysFinishScripts) {
+      await runAction("episode-auto", async () => {
+        const payload = await fetchJson<{ job: { id: string; status: string }; created: boolean }>("/api/automation/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId: project.id, mode: "EPISODE" }) });
+        setMessage(`${payload.created ? "Episode always-finish job queued" : "Episode job already active"} for "${project.title}".`);
+      }, { errorKey: "episode-auto" });
+      return;
+    }
     await runAction("episode-auto", async () => {
       try {
         const material = sourceMaterial;
@@ -4228,7 +4276,9 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           preferredTone: settingsDraft.preferredTone,
           narrationStyle: settingsDraft.narrationStyle,
           defaultLengthMinutes: Number(settingsDraft.defaultLengthMinutes),
-          ttsPauseMarkers: settingsDraft.ttsPauseMarkers
+          ttsPauseMarkers: settingsDraft.ttsPauseMarkers,
+          alwaysFinishScripts: settingsDraft.alwaysFinishScripts,
+          monthlyRunBudgetUsd: Number(settingsDraft.monthlyRunBudgetUsd)
         })
       });
       const mergedSettings = {
@@ -4406,6 +4456,10 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
               <span>{item.label}</span>
             </button>
           ))}
+          <Link className="nav-item" href="/trends">
+            <Search size={19} />
+            <span>Trends</span>
+          </Link>
           {user.role === "ADMIN" ? (
             <Link className="nav-item" href="/admin">
               <UserCog size={19} />
@@ -5244,7 +5298,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             </Field>
             <Field label="Number of Ideas">
               <div className="count-grid">
-                {[5, 10, 20, 50].map((count) => (
+                {[5, 8, 10, 20, 50].map((count) => (
                   <button
                     key={count}
                     type="button"
@@ -5292,10 +5346,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                 <span />
               </button>
             </div>
-            <button className="primary-button" type="button" onClick={() => void generateIdeas()} disabled={busy === "generate"}>
-              {busy === "generate" ? <Loader2 size={16} className="spin" /> : <Zap size={16} />}
-              {busy === "generate" ? "Generating..." : "Generate Ideas"}
-            </button>
+            <div className="inline-actions">
+              <button className="primary-button" type="button" onClick={() => void generateIdeas({ ideaCount: 8 })} disabled={busy === "generate"}>
+                {busy === "generate" ? <Loader2 size={16} className="spin" /> : <Zap size={16} />}
+                {busy === "generate" ? "Generating..." : "Suggest 8 Ideas"}
+              </button>
+              <button className="secondary-button" type="button" onClick={() => void generateIdeas()} disabled={busy === "generate"}>Use Selected Count</button>
+            </div>
             <small className="generate-time">Ideas are saved and checked against used story history.</small>
           </div>
 
@@ -5479,13 +5536,13 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                           <button
                             className="row-action build-action"
                             type="button"
-                            onClick={() => void startProject(idea, "EPISODIC_SERIES")}
-                            aria-label="Build episodic series with this idea"
-                            disabled={busy === `project-${idea.id}-EPISODIC_SERIES`}
-                            title={`Build as ${idea.bestFormat || "episodic series"}`}
+                            onClick={() => void developIdeaAsSeason(idea)}
+                            aria-label="Develop this idea as a season"
+                            disabled={busy === `season-${idea.id}`}
+                            title={`Develop the recommended ${idea.bestFormat || "episodic series"} as separate production projects`}
                           >
-                            {busy === `project-${idea.id}-EPISODIC_SERIES` ? <Loader2 size={14} className="spin" /> : <CalendarDays size={14} />}
-                            <span>Build Series</span>
+                            {busy === `season-${idea.id}` ? <Loader2 size={14} className="spin" /> : <CalendarDays size={14} />}
+                            <span>Develop as Season</span>
                           </button>
                         ) : null}
                         <button
@@ -6881,6 +6938,14 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                       imageCount={outputAssets.length}
                       sourceReady={hasSourceMaterial}
                     />
+                    {selectedProject.shortAssets?.length ? (
+                      <div className="panel pad">
+                        <div className="panel-title-row"><div><h2 className="panel-title">Nine Shorts</h2><p className="settings-note">Each Short has its own hook, payoff, caption, source safety, and export metadata.</p></div></div>
+                        <div className="episode-output-grid">
+                          {selectedProject.shortAssets.map((item) => <div className="episode-output-card" key={item.id}><div className="episode-output-head"><div><span>Short {item.shortIndex}</span><strong>{item.title}</strong></div><button className="secondary-button compact" type="button" onClick={() => void copyText(item.script, `Short ${item.shortIndex} copied.`)}><Copy size={14} />Copy</button></div><p>{item.hook}</p><p>{item.script}</p><small>{item.sourceSafety}</small></div>)}
+                        </div>
+                      </div>
+                    ) : null}
                     {latestPublishingPack && !isArticleProject && !isPodcastProject && !isBookProject ? (
                       <div className="youtube-publisher-panel">
                         <div>
@@ -7373,6 +7438,29 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
           </button>
         </div>
         <PublishingStatusLegend />
+        <Panel title="Editorial Opportunities">
+          <div className="calendar-intelligence">
+            {editorialOpportunities.map((item) => (
+              <div className={cn("calendar-tip", item.relevance === "IRRELEVANT" ? "low" : item.relevance === "RELEVANT" ? "high" : "medium")} key={item.id} style={item.relevance === "IRRELEVANT" ? { opacity: 0.48 } : undefined}>
+                <strong>{formatDate(item.opportunityDate)} · {item.title}</strong>
+                <span>{item.relevanceReason}</span>
+                {item.suggestedAngle ? <span>{item.suggestedAngle}</span> : null}
+                {item.relevance !== "IRRELEVANT" ? <div className="inline-actions"><button className="secondary-button compact" type="button" onClick={() => void developCalendarOpportunity(item, "VIDEO")}>Create Video</button><button className="secondary-button compact" type="button" onClick={() => void developCalendarOpportunity(item, "SEASON")}>Develop Season</button></div> : null}
+              </div>
+            ))}
+          </div>
+        </Panel>
+        <Panel title={`Scheduled Shorts (${calendarShorts.filter((item) => item.scheduledAt).length})`}>
+          <div className="calendar-intelligence">
+            {calendarShorts.filter((item) => item.scheduledAt).map((item) => (
+              <div className="calendar-tip medium" key={item.id}>
+                <strong>{item.scheduledAt ? formatDate(item.scheduledAt) : "Unscheduled"} · Short {item.shortIndex}</strong>
+                <span>{item.title}</span>
+              </div>
+            ))}
+            {!calendarShorts.some((item) => item.scheduledAt) ? <EmptyState compact title="No Shorts scheduled" body="Complete a long script to create nine Shorts, then schedule the parent video." /> : null}
+          </div>
+        </Panel>
         <Panel title="Calendar Intelligence">
           <div className="calendar-intelligence">
             {calendarTips.map((tip) => (
@@ -9102,6 +9190,21 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
             </button>
           </div>
 
+          {currentChannel?.shaziStyle ? (
+            <div className="panel pad">
+              <h2 className="panel-title">Recommended Shazi Style</h2>
+              <p><strong>{currentChannel.shaziStyle.styleName}</strong></p>
+              <p>{currentChannel.shaziStyle.visualRecipe}</p>
+              <div className="business-fit-strip large">
+                <span className="business-fit-chip high">{currentChannel.shaziStyle.stockVideoPct}% stock</span>
+                <span className="business-fit-chip medium">{currentChannel.shaziStyle.archivalStillsPct}% stills</span>
+                <span className="business-fit-chip medium">{currentChannel.shaziStyle.aiImagesPct}% AI images</span>
+                <span className="business-fit-chip high">{currentChannel.shaziStyle.outputQuality}</span>
+              </div>
+              <small className="field-hint">Stored with this channel and included automatically in Markdown exports.</small>
+            </div>
+          ) : null}
+
           <div className="panel pad">
             <div className="panel-title-row">
               <div>
@@ -9115,6 +9218,7 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
                   {fallbackModelsFetchedAt ? ` · refreshed ${formatDateTime(fallbackModelsFetchedAt)}` : ""}
                 </p>
                 <p className="settings-note">Saved API keys are encrypted in the database and stay in place until you enter a replacement key.</p>
+                <p className="settings-note"><b>Routing:</b> Claude Sonnet 5 writes, structures, revises, extracts routine sources, and creates Shorts. GPT-5.6 Luna independently verifies, audits, checks policy risk, and rescues failed writing. Claude Opus is reserved for ambiguous or high-risk evidence.</p>
               </div>
               <button
                 className="secondary-button compact"
@@ -9369,6 +9473,31 @@ export function IdeaFactoryApp({ user }: { user: AppUser }) {
 
           <div className="panel pad">
             <h2 className="panel-title">Story Defaults</h2>
+            <div className="toggle-row routing-toggle-row">
+              <div>
+                <strong>Always finish scripts</strong>
+                <span>Use bounded retries, targeted repair, provider rescue, and best-safe continuation without pausing for routine approval.</span>
+              </div>
+              <button
+                type="button"
+                className={cn("switch", settingsDraft.alwaysFinishScripts && "on")}
+                onClick={() => setSettingsDraft((current) => ({ ...current, alwaysFinishScripts: !current.alwaysFinishScripts }))}
+                aria-label="Toggle always finish scripts"
+              >
+                <span />
+              </button>
+            </div>
+            <Field label="Fresh Run Budget (USD)">
+              <input
+                type="number"
+                min={5}
+                max={500}
+                step={5}
+                value={settingsDraft.monthlyRunBudgetUsd}
+                onChange={(event) => setSettingsDraft((current) => ({ ...current, monthlyRunBudgetUsd: Number(event.target.value) || 75 }))}
+              />
+              <small className="field-hint">Each rerun receives a fresh bounded budget. Historical and monthly usage remain intact.</small>
+            </Field>
             <Field label="Preferred Tone">
               <select
                 value={settingsDraft.preferredTone}

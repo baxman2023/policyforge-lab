@@ -13,6 +13,7 @@ import { fallbackIdeas, ideaGenerationPrompt, type IdeaFactoryInput } from "@/li
 import { checkRateLimit } from "@/lib/rate-limit";
 import { requireActiveWorkspace } from "@/lib/workspaces";
 import { slugify } from "@/lib/utils";
+import { ensureChannelSourceFoundation } from "@/lib/channel-foundation";
 
 const GenerateIdeasSchema = z.object({
   niche: z.string().min(1),
@@ -172,6 +173,7 @@ export async function POST(request: Request) {
       channelId?: string;
     };
     const channel = await getUserChannel(user.id, workspace.id, input.channelId);
+    const sourceFoundation = await ensureChannelSourceFoundation({ userId: user.id, workspaceId: workspace.id, channelId: channel.id });
     const forgeNiche = forgeNicheByChannel(channel);
     const baseGenerationInput = forgeNiche
       ? {
@@ -194,7 +196,7 @@ export async function POST(request: Request) {
     const generationInput = {
       ...baseGenerationInput,
       analyticsGuide: await channelAnalyticsGuideForIdeas(channel.id, workspace.id),
-      whiteSpaceGuide: buildWhiteSpaceGuide(existing)
+      whiteSpaceGuide: `${buildWhiteSpaceGuide(existing)}\n\nReusable channel source foundation:\n${JSON.stringify(sourceFoundation)}`
     };
     let generated: GeneratedIdea[] = [];
     const modelUsed = new Set<string>();
@@ -435,7 +437,7 @@ function normalizeLengthMinutes(value?: number, label?: string, format?: string)
     return 45;
   }
   const matched = storyLengthOptions.find((item) => lengthLabelMatches(item, label));
-  return matched?.minutes ?? 7;
+  return matched?.minutes ?? 8;
 }
 
 function normalizeLengthLabel(value?: string, minutes?: number, format?: string) {
@@ -450,7 +452,7 @@ function normalizeLengthLabel(value?: string, minutes?: number, format?: string)
     return "Standard long form book - about 60,000 words";
   }
   const matched = storyLengthOptions.find((item) => lengthLabelMatches(item, value) || item.minutes === minutes);
-  return matched?.label ?? "7 min";
+  return matched?.label ?? "8 min";
 }
 
 function lengthLabelMatches(item: { label: string; minutes: number }, label?: string) {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { KeyRound, ShieldCheck, Trash2, UserCheck, UserX } from "lucide-react";
+import { ShieldCheck, Trash2, UserCheck, UserX } from "lucide-react";
 import { apiPath } from "@/lib/client-api";
 
 type AdminUser = {
@@ -22,7 +22,6 @@ type AdminUser = {
 export function AdminUsers({ users, currentUserId }: { users: AdminUser[]; currentUserId: string }) {
   const [rows, setRows] = useState(users);
   const [message, setMessage] = useState("");
-  const [resetLinks, setResetLinks] = useState<Record<string, string>>({});
   const activeCount = rows.filter((user) => !user.disabledAt).length;
 
   async function updateUser(userId: string, action: string) {
@@ -47,27 +46,6 @@ export function AdminUsers({ users, currentUserId }: { users: AdminUser[]; curre
     if (payload.user) {
       setRows((current) => current.map((user) => (user.id === userId ? { ...user, ...payload.user } : user)));
       setMessage("User updated.");
-    }
-  }
-
-  async function createResetLink(user: AdminUser) {
-    setMessage("");
-    const response = await fetch(apiPath(`/api/admin/users/${user.id}/password-reset`), {
-      method: "POST"
-    });
-    const payload = (await response.json()) as { resetPath?: string; error?: string };
-    if (!response.ok || !payload.resetPath) {
-      setMessage(payload.error || "Could not create reset link.");
-      return;
-    }
-
-    const resetUrl = `${window.location.origin}${payload.resetPath}`;
-    setResetLinks((current) => ({ ...current, [user.id]: resetUrl }));
-    try {
-      await navigator.clipboard.writeText(resetUrl);
-      setMessage(`Password reset link copied for ${user.email || user.name || "member"}.`);
-    } catch {
-      setMessage(`Password reset link created for ${user.email || user.name || "member"}.`);
     }
   }
 
@@ -138,22 +116,10 @@ export function AdminUsers({ users, currentUserId }: { users: AdminUser[]; curre
                   <ShieldCheck size={15} />
                   {user.role === "ADMIN" ? "Make user" : "Make admin"}
                 </button>
-                <button type="button" disabled={!user.email} onClick={() => createResetLink(user)}>
-                  <KeyRound size={15} />
-                  Reset link
-                </button>
                 <button className="danger" type="button" disabled={isSelf} onClick={() => updateUser(user.id, "delete")}>
                   <Trash2 size={15} />
                   Delete
                 </button>
-                {resetLinks[user.id] ? (
-                  <input
-                    className="reset-link-output"
-                    readOnly
-                    value={resetLinks[user.id]}
-                    onFocus={(event) => event.currentTarget.select()}
-                  />
-                ) : null}
               </div>
             </div>
           );

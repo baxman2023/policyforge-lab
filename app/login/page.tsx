@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: { searchParams?: Promi
       <section className="login-panel">
         <div className="brand-mark" aria-label="Baxter Growth Lab" />
         <h1>Sign in to Baxter Growth Lab</h1>
-        <p>Create an account or sign in with email and password. The first account becomes the admin.</p>
+        <p>Sign in securely with Google. New accounts receive a private PolicyForge workspace automatically.</p>
         <LoginForm googleConfigured={googleConfigured} inviteToken={params?.invite || ""} />
       </section>
     </main>

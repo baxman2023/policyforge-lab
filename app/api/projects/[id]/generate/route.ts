@@ -20,6 +20,7 @@ import { formatScriptForTts } from "@/lib/tts-format";
 import { estimatedMinutesFromWords, targetWordsForMinutes, wordCount } from "@/lib/utils";
 import { formatPublishingPackContent } from "@/lib/youtube-description";
 import { ensureConversionCampaign, publicLeadEndpoint, trackedCampaignUrl } from "@/lib/conversions";
+import { ensureNineShortAssets } from "@/lib/short-assets";
 
 const GenerateProjectSchema = z.object({
   passType: z.nativeEnum(ScriptPassType),
@@ -169,6 +170,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       });
 
       await auditLog({ userId: user.id, workspaceId: workspace.id, action: "story_project.generated", metadata: { projectId: project.id, passType: input.passType, model: localBookFinal.modelUsed } });
+      if (input.passType === ScriptPassType.FINAL && project.channelId && !isBookProjectFormat(project.format) && project.format !== "ARTICLE") {
+        await ensureNineShortAssets({ userId: user.id, workspaceId: workspace.id, channelId: project.channelId, storyProjectId: project.id, title: project.title, script: draft.content });
+      }
       const shouldContinuePass = "continuePass" in localBookFinal ? localBookFinal.continuePass : undefined;
       const progressMessage = "progressMessage" in localBookFinal ? localBookFinal.progressMessage : undefined;
       return Response.json({
@@ -301,6 +305,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     });
 
     await auditLog({ userId: user.id, workspaceId: workspace.id, action: "story_project.generated", metadata: { projectId: project.id, passType: input.passType, model: enforced.modelUsed } });
+    if (input.passType === ScriptPassType.FINAL && project.channelId && !isBookProjectFormat(project.format) && project.format !== "ARTICLE") {
+      await ensureNineShortAssets({ userId: user.id, workspaceId: workspace.id, channelId: project.channelId, storyProjectId: project.id, title: project.title, script: draft.content });
+    }
     return Response.json({ draft: formatDraftForResponse(draft, { ...project, sponsorBlurb, sponsorLink }), modelUsed: enforced.modelUsed });
   } catch (error) {
     return jsonError(error, 400);

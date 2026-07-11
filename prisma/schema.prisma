@@ -89,6 +89,35 @@ enum GenerationStatus {
   FAILED
 }
 
+enum AutomationJobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+enum TrendOpportunityStatus {
+  OPEN
+  SELECTED
+  DEVELOPED
+  DISMISSED
+  COMPLETED
+}
+
+enum SeasonStatus {
+  PLANNING
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum CalendarOpportunityRelevance {
+  RELEVANT
+  POSSIBLE
+  IRRELEVANT
+}
+
 enum PublishingSlotType {
   STANDALONE
   EPISODE
@@ -132,6 +161,12 @@ model User {
   conversionEvents       ConversionEvent[]
   generationLogs         GenerationLog[]
   auditLogs              AuditLog[]
+  canonicalSubjects      CanonicalSubject[]
+  trendOpportunities     TrendOpportunity[]
+  seasons                ContentSeason[]
+  shortAssets            ShortAsset[]
+  editorialOpportunities EditorialOpportunity[]
+  automationJobs         AutomationJob[]
 
   @@index([activeWorkspaceId])
 }
@@ -164,6 +199,12 @@ model Workspace {
   conversionEvents       ConversionEvent[]
   generationLogs         GenerationLog[]
   auditLogs              AuditLog[]
+  canonicalSubjects      CanonicalSubject[]
+  trendOpportunities     TrendOpportunity[]
+  seasons                ContentSeason[]
+  shortAssets            ShortAsset[]
+  editorialOpportunities EditorialOpportunity[]
+  automationJobs         AutomationJob[]
 
   @@index([subscriptionStatus])
 }
@@ -200,24 +241,34 @@ model WorkspaceInvite {
 }
 
 model Channel {
-  id                     String                  @id @default(cuid())
-  userId                 String
-  workspaceId            String?
-  name                   String
-  slug                   String
-  description            String?                 @db.Text
-  archivedAt             DateTime?
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
-  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace              Workspace?              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  ideas                  StoryIdea[]
-  youtubeConnection      YoutubeConnection?
-  youtubeVideoMetrics    YoutubeVideoMetric[]
-  youtubeRecommendations YoutubeRecommendation[]
-  conversionCampaigns    ConversionCampaign[]
-  conversionLeads        ConversionLead[]
-  conversionEvents       ConversionEvent[]
+  id                      String                  @id @default(cuid())
+  userId                  String
+  workspaceId             String?
+  name                    String
+  slug                    String
+  description             String?                 @db.Text
+  archivedAt              DateTime?
+  sourceFoundation        Json?
+  sourceFoundationBuiltAt DateTime?
+  shaziStyle              Json?
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+  user                    User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace               Workspace?              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  ideas                   StoryIdea[]
+  projects                StoryProject[]
+  youtubeConnection       YoutubeConnection?
+  youtubeVideoMetrics     YoutubeVideoMetric[]
+  youtubeRecommendations  YoutubeRecommendation[]
+  conversionCampaigns     ConversionCampaign[]
+  conversionLeads         ConversionLead[]
+  conversionEvents        ConversionEvent[]
+  canonicalSubjects       CanonicalSubject[]
+  trendOpportunities      TrendOpportunity[]
+  seasons                 ContentSeason[]
+  shortAssets             ShortAsset[]
+  editorialOpportunities  EditorialOpportunity[]
+  automationJobs          AutomationJob[]
 
   @@unique([workspaceId, slug])
   @@index([userId])
@@ -267,15 +318,15 @@ model UserSettings {
   openRouterApiKeyEncrypted    String?  @db.Text
   anthropicApiKeyEncrypted     String?  @db.Text
   openAiApiKeyEncrypted        String?  @db.Text
-  defaultModel                 String   @default("openai/gpt-4o-mini")
-  discoveryModel               String   @default("openai/gpt-4o-mini")
-  dossierModel                 String   @default("anthropic/claude-3.5-sonnet")
-  structureModel               String   @default("anthropic/claude-3.5-sonnet")
-  draftingModel                String   @default("openai/gpt-4o")
-  critiqueModel                String   @default("anthropic/claude-3.5-sonnet")
-  rewriteModel                 String   @default("openai/gpt-4o")
+  defaultModel                 String   @default("anthropic/claude-sonnet-5")
+  discoveryModel               String   @default("anthropic/claude-sonnet-5")
+  dossierModel                 String   @default("anthropic/claude-sonnet-5")
+  structureModel               String   @default("anthropic/claude-sonnet-5")
+  draftingModel                String   @default("anthropic/claude-sonnet-5")
+  critiqueModel                String   @default("openai/gpt-5.6-luna")
+  rewriteModel                 String   @default("anthropic/claude-sonnet-5")
   anthropicModel               String   @default("claude-opus-4-8")
-  openAiModel                  String   @default("gpt-5.4")
+  openAiModel                  String   @default("gpt-5.6-luna")
   runwareApiKeyEncrypted       String?  @db.Text
   runwareModel                 String   @default("ideogram:4@0")
   dataForSeoLoginEncrypted     String?  @db.Text
@@ -294,23 +345,25 @@ model UserSettings {
   autoModelRouting             Boolean  @default(true)
   preferredTone                String   @default("Mysterious & gripping")
   narrationStyle               String   @default("Calm suspense")
-  defaultLengthMinutes         Int      @default(7)
+  defaultLengthMinutes         Int      @default(8)
   defaultCategories            Json?
   ttsPauseMarkers              Boolean  @default(false)
+  alwaysFinishScripts          Boolean  @default(false)
+  monthlyRunBudgetUsd          Decimal  @default(75) @db.Decimal(12, 2)
   createdAt                    DateTime @default(now())
   updatedAt                    DateTime @updatedAt
   user                         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model StoryIdea {
-  id                        String          @id @default(cuid())
+  id                        String            @id @default(cuid())
   userId                    String
   workspaceId               String?
   channelId                 String?
   title                     String
   slug                      String
-  hook                      String          @db.Text
-  summary                   String          @db.Text
+  hook                      String            @db.Text
+  summary                   String            @db.Text
   category                  String
   sourceType                String?
   sourceUrls                Json?
@@ -318,32 +371,34 @@ model StoryIdea {
   location                  String?
   eventDate                 DateTime?
   eventName                 String?
-  originalityScore          Int             @default(0)
-  curiosityScore            Int             @default(0)
-  emotionalScore            Int             @default(0)
-  escalationScore           Int             @default(0)
-  lengthPotentialScore      Int             @default(0)
-  researchDifficultyScore   Int             @default(0)
+  originalityScore          Int               @default(0)
+  curiosityScore            Int               @default(0)
+  emotionalScore            Int               @default(0)
+  escalationScore           Int               @default(0)
+  lengthPotentialScore      Int               @default(0)
+  researchDifficultyScore   Int               @default(0)
   estimatedLengthPotential  String?
   recommendedLengthMinutes  Int?
   episodeFit                String?
   bestFormat                String?
-  episodeWhy                String?         @db.Text
+  episodeWhy                String?           @db.Text
   episodeArc                Json?
-  episodeBusinessValue      String?         @db.Text
+  episodeBusinessValue      String?           @db.Text
   recommendedTone           String?
   recommendedNarrationStyle String?
-  totalScore                Int             @default(0)
-  productionPriority        String          @default("Medium")
-  suggestedAngle            String          @db.Text
-  status                    StoryIdeaStatus @default(UNUSED)
+  totalScore                Int               @default(0)
+  productionPriority        String            @default("Medium")
+  suggestedAngle            String            @db.Text
+  status                    StoryIdeaStatus   @default(UNUSED)
   usedAt                    DateTime?
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
-  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace                 Workspace?      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  channel                   Channel?        @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
+  user                      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace                 Workspace?        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel                   Channel?          @relation(fields: [channelId], references: [id], onDelete: SetNull)
   projects                  StoryProject[]
+  trendOpportunity          TrendOpportunity?
+  seasons                   ContentSeason[]
 
   @@index([userId, status])
   @@index([userId, channelId, status])
@@ -362,10 +417,12 @@ model StoryProject {
   workspaceId          String?
   channelId            String?
   storyIdeaId          String?
+  canonicalSubjectId   String?
+  seasonEpisodeId      String?             @unique
   title                String
   format               StoryProjectFormat  @default(STANDALONE)
-  targetLengthMinutes  Int                 @default(7)
-  targetWordCount      Int                 @default(1120)
+  targetLengthMinutes  Int                 @default(8)
+  targetWordCount      Int                 @default(1240)
   tone                 String              @default("Mysterious & gripping")
   narrationStyle       String              @default("Calm suspense")
   sourceMaterial       String?             @db.LongText
@@ -380,7 +437,10 @@ model StoryProject {
   updatedAt            DateTime            @updatedAt
   user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace            Workspace?          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel              Channel?            @relation(fields: [channelId], references: [id], onDelete: SetNull)
   storyIdea            StoryIdea?          @relation(fields: [storyIdeaId], references: [id], onDelete: SetNull)
+  canonicalSubject     CanonicalSubject?   @relation(fields: [canonicalSubjectId], references: [id], onDelete: SetNull)
+  seasonEpisode        SeasonEpisode?      @relation(fields: [seasonEpisodeId], references: [id], onDelete: SetNull)
   dossier              StoryDossier?
   outline              StoryOutline?
   drafts               ScriptDraft[]
@@ -391,6 +451,8 @@ model StoryProject {
   conversionCampaign   ConversionCampaign?
   conversionLeads      ConversionLead[]
   conversionEvents     ConversionEvent[]
+  shortAssets          ShortAsset[]
+  automationJobs       AutomationJob[]
 
   @@unique([userId, channelId, storyIdeaId, format])
   @@unique([workspaceId, channelId, storyIdeaId, format])
@@ -399,6 +461,8 @@ model StoryProject {
   @@index([workspaceId, status])
   @@index([workspaceId, channelId, status])
   @@index([storyIdeaId])
+  @@index([canonicalSubjectId])
+  @@index([seasonEpisodeId])
 }
 
 model ThumbnailAsset {
@@ -765,16 +829,210 @@ model AuditLog {
   @@index([action])
 }
 
+model CanonicalSubject {
+  id                     String         @id @default(cuid())
+  userId                 String
+  workspaceId            String
+  channelId              String
+  subjectKey             String
+  canonicalName          String
+  aliases                Json?
+  verifiedSources        Json?
+  approvedClaims         Json?
+  quotations             Json?
+  classifications        Json?
+  evidence               Json?
+  processedSourceUrls    Json?
+  sourceFingerprint      String?
+  noProgressCount        Int            @default(0)
+  searchStrategy         String         @default("authoritative-first")
+  researchLeaseProjectId String?
+  researchLeaseUntil     DateTime?
+  extractionCost         Decimal        @default(0) @db.Decimal(12, 6)
+  verifiedAt             DateTime?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  user                   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace              Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel                Channel        @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  projects               StoryProject[]
+
+  @@unique([workspaceId, channelId, subjectKey])
+  @@index([userId, channelId])
+  @@index([workspaceId, canonicalName])
+  @@index([researchLeaseUntil])
+}
+
+model TrendOpportunity {
+  id              String                 @id @default(cuid())
+  userId          String
+  workspaceId     String
+  channelId       String
+  storyIdeaId     String?                @unique
+  eventKey        String
+  subject         String
+  headline        String
+  summary         String                 @db.Text
+  sourceUrls      Json?
+  score           Int
+  relevanceReason String                 @db.Text
+  suggestedAngle  String                 @db.Text
+  riskLevel       String                 @default("LOW")
+  status          TrendOpportunityStatus @default(OPEN)
+  selectedAt      DateTime?
+  completedAt     DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace       Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel         Channel                @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  storyIdea       StoryIdea?             @relation(fields: [storyIdeaId], references: [id], onDelete: SetNull)
+  seasons         ContentSeason[]
+
+  @@unique([workspaceId, channelId, eventKey])
+  @@index([workspaceId, channelId, status, score])
+  @@index([userId, createdAt])
+}
+
+model ContentSeason {
+  id                 String            @id @default(cuid())
+  userId             String
+  workspaceId        String
+  channelId          String
+  storyIdeaId        String?
+  trendOpportunityId String?
+  title              String
+  premise            String            @db.Text
+  continuityRules    Json?
+  status             SeasonStatus      @default(PLANNING)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace          Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel            Channel           @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  storyIdea          StoryIdea?        @relation(fields: [storyIdeaId], references: [id], onDelete: SetNull)
+  trendOpportunity   TrendOpportunity? @relation(fields: [trendOpportunityId], references: [id], onDelete: SetNull)
+  episodes           SeasonEpisode[]
+
+  @@index([workspaceId, channelId, status])
+  @@index([storyIdeaId])
+  @@index([trendOpportunityId])
+}
+
+model SeasonEpisode {
+  id                    String        @id @default(cuid())
+  seasonId              String
+  episodeNumber         Int
+  title                 String
+  hook                  String        @db.Text
+  promise               String        @db.Text
+  deltaResearchQuestion String?       @db.Text
+  scheduledAt           DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  season                ContentSeason @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  project               StoryProject?
+
+  @@unique([seasonId, episodeNumber])
+  @@index([scheduledAt])
+}
+
+model ShortAsset {
+  id             String       @id @default(cuid())
+  userId         String
+  workspaceId    String
+  channelId      String
+  storyProjectId String
+  shortIndex     Int
+  hook           String       @db.Text
+  payoff         String       @db.Text
+  script         String       @db.Text
+  title          String
+  caption        String       @db.Text
+  sourceSafety   String       @db.Text
+  exportAssets   Json?
+  status         String       @default("DRAFT")
+  scheduledAt    DateTime?
+  publishedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace      Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel        Channel      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  storyProject   StoryProject @relation(fields: [storyProjectId], references: [id], onDelete: Cascade)
+
+  @@unique([storyProjectId, shortIndex])
+  @@index([workspaceId, channelId, scheduledAt])
+  @@index([userId, status])
+}
+
+model EditorialOpportunity {
+  id              String                       @id @default(cuid())
+  userId          String
+  workspaceId     String
+  channelId       String
+  opportunityKey  String
+  title           String
+  description     String                       @db.Text
+  opportunityDate DateTime
+  relevance       CalendarOpportunityRelevance @default(POSSIBLE)
+  relevanceReason String                       @db.Text
+  suggestedAngle  String?                      @db.Text
+  createdAt       DateTime                     @default(now())
+  updatedAt       DateTime                     @updatedAt
+  user            User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace       Workspace                    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel         Channel                      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, channelId, opportunityKey])
+  @@index([workspaceId, channelId, opportunityDate])
+}
+
+model AutomationJob {
+  id                 String              @id @default(cuid())
+  userId             String
+  workspaceId        String
+  channelId          String?
+  storyProjectId     String?
+  type               String
+  status             AutomationJobStatus @default(QUEUED)
+  payload            Json?
+  idempotencyKey     String              @unique
+  priority           Int                 @default(0)
+  attempts           Int                 @default(0)
+  maxAttempts        Int                 @default(5)
+  runAfter           DateTime            @default(now())
+  lockedBy           String?
+  lockedAt           DateTime?
+  leaseExpiresAt     DateTime?
+  lastError          String?             @db.Text
+  runBudgetUsd       Decimal             @default(10) @db.Decimal(12, 2)
+  runCostBaselineUsd Decimal             @default(0) @db.Decimal(12, 6)
+  completedAt        DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace          Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channel            Channel?            @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  storyProject       StoryProject?       @relation(fields: [storyProjectId], references: [id], onDelete: Cascade)
+
+  @@index([status, runAfter, priority])
+  @@index([workspaceId, status])
+  @@index([storyProjectId, status])
+  @@index([leaseExpiresAt])
+}
+
 model AdminSettings {
   id                           String   @id @default(cuid())
   openRouterGlobalKeyEncrypted String?  @db.Text
-  defaultModel                 String   @default("openai/gpt-4o-mini")
-  discoveryModel               String   @default("openai/gpt-4o-mini")
-  dossierModel                 String   @default("anthropic/claude-3.5-sonnet")
-  structureModel               String   @default("anthropic/claude-3.5-sonnet")
-  draftingModel                String   @default("openai/gpt-4o")
-  critiqueModel                String   @default("anthropic/claude-3.5-sonnet")
-  rewriteModel                 String   @default("openai/gpt-4o")
+  defaultModel                 String   @default("anthropic/claude-sonnet-5")
+  discoveryModel               String   @default("anthropic/claude-sonnet-5")
+  dossierModel                 String   @default("anthropic/claude-sonnet-5")
+  structureModel               String   @default("anthropic/claude-sonnet-5")
+  draftingModel                String   @default("anthropic/claude-sonnet-5")
+  critiqueModel                String   @default("openai/gpt-5.6-luna")
+  rewriteModel                 String   @default("anthropic/claude-sonnet-5")
   createdAt                    DateTime @default(now())
   updatedAt                    DateTime @updatedAt
 }

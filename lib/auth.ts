@@ -1,12 +1,11 @@
 import type { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword } from "@/lib/password";
 
 const googleConfigured = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+const ADMIN_EMAIL = "keithbax@gmail.com";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -17,32 +16,6 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login"
   },
   providers: [
-    CredentialsProvider({
-      name: "Email",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        const email = credentials?.email?.trim().toLowerCase();
-        const password = credentials?.password ?? "";
-        if (!email || !password) return null;
-
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user || user.disabledAt) return null;
-        const valid = await verifyPassword(password, user.passwordHash);
-        if (!valid) return null;
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-          role: user.role,
-          disabledAt: user.disabledAt
-        };
-      }
-    }),
     ...(googleConfigured
       ? [
         GoogleProvider({
@@ -53,12 +26,27 @@ export const authOptions: NextAuthOptions = {
       : [])
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "google") return false;
+      const email = user.email?.trim().toLowerCase();
+      if (!email) return false;
+      const existing = await prisma.user.findUnique({ where: { email }, select: { id: true, disabledAt: true, role: true } });
+      if (existing?.disabledAt) return false;
+      if (existing && email === ADMIN_EMAIL && existing.role !== UserRole.ADMIN) {
+        await prisma.user.update({ where: { id: existing.id }, data: { role: UserRole.ADMIN } });
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
       }
 
       if (token.sub) {
+        const tokenEmail = typeof token.email === "string" ? token.email.trim().toLowerCase() : "";
+        if (tokenEmail === ADMIN_EMAIL) {
+          await prisma.user.updateMany({ where: { id: token.sub, role: { not: UserRole.ADMIN } }, data: { role: UserRole.ADMIN } });
+        }
         const dbUser = await prisma.user.findUnique({
           where: { id: token.sub },
           select: { role: true, disabledAt: true }

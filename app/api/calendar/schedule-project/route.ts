@@ -6,6 +6,7 @@ import { jsonError } from "@/lib/http";
 import { dateKey, nextAppendCursor, nextOpenDate, normalizePublishDate } from "@/lib/publishing-calendar";
 import { prisma } from "@/lib/prisma";
 import { requireActiveWorkspace } from "@/lib/workspaces";
+import { shortScheduleDates } from "@/lib/editorial-calendar";
 
 const ScheduleProjectSchema = z.object({
   projectId: z.string().min(1),
@@ -77,6 +78,19 @@ export async function POST(request: Request) {
     });
 
     if (!slot) return Response.json({ error: "Calendar item not found." }, { status: 404 });
+    const shortDates = shortScheduleDates(slot.scheduledDate);
+    const shorts = await prisma.shortAsset.findMany({ where: { storyProjectId: slot.storyProjectId }, orderBy: { shortIndex: "asc" } });
+    for (const [index, short] of shorts.slice(0, 9).entries()) {
+      let scheduledAt = shortDates[index];
+      for (let attempt = 0; attempt < 21; attempt += 1) {
+        const dayStart = new Date(scheduledAt); dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate() + 1);
+        const count = await prisma.shortAsset.count({ where: { workspaceId: workspace.id, channelId: slot.channelId || undefined, id: { not: short.id }, scheduledAt: { gte: dayStart, lt: dayEnd } } });
+        if (count < 2) break;
+        scheduledAt = new Date(scheduledAt); scheduledAt.setDate(scheduledAt.getDate() + 1);
+      }
+      await prisma.shortAsset.update({ where: { id: short.id }, data: { scheduledAt, status: "SCHEDULED" } });
+    }
 
     await auditLog({
       userId: user.id,

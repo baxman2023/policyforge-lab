@@ -38,6 +38,21 @@ module.exports = {
         HOSTNAME: "127.0.0.1",
         PATH: runtime.binDir ? `${runtime.binDir}:${process.env.PATH || ""}` : process.env.PATH
       }
+    },
+    {
+      name: "policyforge-worker",
+      script: "scripts/policyforge-worker.cjs",
+      cwd: __dirname,
+      interpreter: process.env.TSL_NODE_INTERPRETER || runtime.interpreter,
+      instances: 1,
+      autorestart: true,
+      max_memory_restart: "512M",
+      env: {
+        NODE_ENV: "production",
+        PORT: "3138",
+        WORKER_CONCURRENCY: "3",
+        PATH: runtime.binDir ? `${runtime.binDir}:${process.env.PATH || ""}` : process.env.PATH
+      }
     }
   ]
 };

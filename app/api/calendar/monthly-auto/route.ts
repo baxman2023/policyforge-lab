@@ -20,7 +20,7 @@ const MonthlyAutoSchema = z.object({
   channelId: z.string().optional()
 });
 
-const standaloneLengths = [7, 10, 20] as const;
+const standaloneLengths = [8, 10, 12] as const;
 
 export async function POST(request: Request) {
   try {
@@ -44,8 +44,8 @@ export async function POST(request: Request) {
         take: 80
       });
 
-      if (candidates.length < 7) {
-        throw new Error("Monthly Auto needs at least 7 unused or saved ideas that do not already have projects.");
+      if (candidates.length < 5) {
+        throw new Error("Monthly Auto needs at least 5 unused or saved ideas that do not already have projects.");
       }
 
       const shuffled = shuffle(candidates);
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
           b.totalScore - a.totalScore ||
           a.title.localeCompare(b.title)
       )[0];
-      const standaloneIdeas = shuffled.filter((idea) => idea.id !== seriesIdea.id).slice(0, 6);
+      const standaloneIdeas = shuffled.filter((idea) => idea.id !== seriesIdea.id).slice(0, 4);
 
       const existingSlots = await tx.publishingSlot.findMany({
         where: { workspaceId: workspace.id, channelId: channel.id, scheduledDate: { gte: startDate } },
@@ -132,8 +132,9 @@ export async function POST(request: Request) {
       });
 
       const seriesStart = nextOpenSeriesWeek(cursor, usedDates);
-      for (let episodeIndex = 0; episodeIndex < 5; episodeIndex += 1) {
-        const scheduledDate = addDays(seriesStart, episodeIndex);
+      const plannedEpisodeCount = Array.isArray(seriesIdea.episodeArc) ? Math.max(2, Math.min(5, seriesIdea.episodeArc.length)) : 3;
+      for (let episodeIndex = 0; episodeIndex < plannedEpisodeCount; episodeIndex += 1) {
+        const scheduledDate = addDays(seriesStart, episodeIndex * 2);
         usedDates.add(dateKey(scheduledDate));
         const episodeNumber = episodeIndex + 1;
         const slot = await tx.publishingSlot.create({
@@ -147,8 +148,8 @@ export async function POST(request: Request) {
             slotType: PublishingSlotType.EPISODE,
             status: PublishingSlotStatus.SCHEDULED,
             episodeNumber,
-            episodeCount: 5,
-            durationMinutes: 30,
+            episodeCount: plannedEpisodeCount,
+            durationMinutes: Math.min(15, Math.max(8, seriesIdea.recommendedLengthMinutes || 10)),
             batchId
           }
         });

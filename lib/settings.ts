@@ -45,6 +45,8 @@ export async function saveUserSettings(
     narrationStyle?: string;
     defaultLengthMinutes?: number;
     ttsPauseMarkers?: boolean;
+    alwaysFinishScripts?: boolean;
+    monthlyRunBudgetUsd?: number;
   }
 ) {
   const encryptedKey = input.openRouterApiKey?.trim()
@@ -123,15 +125,6 @@ export async function getOpenRouterApiKey(userId: string) {
     return decryptSecret(settings.openRouterApiKeyEncrypted);
   }
 
-  if (process.env.OPENROUTER_GLOBAL_API_KEY) {
-    return process.env.OPENROUTER_GLOBAL_API_KEY;
-  }
-
-  const adminSettings = await prisma.adminSettings.findFirst({ orderBy: { createdAt: "asc" } });
-  if (adminSettings?.openRouterGlobalKeyEncrypted) {
-    return decryptSecret(adminSettings.openRouterGlobalKeyEncrypted);
-  }
-
   return null;
 }
 
@@ -139,10 +132,6 @@ export async function getAnthropicApiKey(userId: string) {
   const settings = await getOrCreateUserSettings(userId);
   if (settings.anthropicApiKeyEncrypted) {
     return decryptSecret(settings.anthropicApiKeyEncrypted);
-  }
-
-  if (process.env.ANTHROPIC_API_KEY) {
-    return process.env.ANTHROPIC_API_KEY;
   }
 
   return null;
@@ -154,10 +143,6 @@ export async function getOpenAiApiKey(userId: string) {
     return decryptSecret(settings.openAiApiKeyEncrypted);
   }
 
-  if (process.env.OPENAI_API_KEY) {
-    return process.env.OPENAI_API_KEY;
-  }
-
   return null;
 }
 
@@ -165,10 +150,6 @@ export async function getRunwareApiKey(userId: string) {
   const settings = await getOrCreateUserSettings(userId);
   if (settings.runwareApiKeyEncrypted) {
     return decryptSecret(settings.runwareApiKeyEncrypted);
-  }
-
-  if (process.env.RUNWARE_API_KEY) {
-    return process.env.RUNWARE_API_KEY;
   }
 
   return null;
@@ -183,8 +164,8 @@ export async function getDataForSeoCredentials(userId: string) {
     ? decryptSecret(settings.dataForSeoPasswordEncrypted)
     : null;
 
-  const login = savedLogin || process.env.DATAFORSEO_LOGIN || null;
-  const password = savedPassword || process.env.DATAFORSEO_PASSWORD || null;
+  const login = savedLogin || null;
+  const password = savedPassword || null;
 
   if (!login || !password) return null;
   return { login, password };
@@ -199,9 +180,9 @@ export async function getWordPressCredentials(userId: string) {
     ? decryptSecret(settings.wordpressPasswordEncrypted)
     : null;
 
-  const siteUrl = normalizeWordPressSiteUrl(settings.wordpressSiteUrl || process.env.WORDPRESS_SITE_URL || "");
-  const username = savedUsername || process.env.WORDPRESS_USERNAME || null;
-  const applicationPassword = savedPassword || process.env.WORDPRESS_APPLICATION_PASSWORD || null;
+  const siteUrl = normalizeWordPressSiteUrl(settings.wordpressSiteUrl || "");
+  const username = savedUsername || null;
+  const applicationPassword = savedPassword || null;
 
   if (!siteUrl || !username || !applicationPassword) return null;
   return { siteUrl, username, applicationPassword };

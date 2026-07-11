@@ -37,8 +37,10 @@ const SettingsSchema = z.object({
   autoModelRouting: z.boolean().optional(),
   preferredTone: z.string().refine((value) => toneOptions.includes(value), "Choose a supported tone.").optional(),
   narrationStyle: z.string().refine((value) => narrationStyleOptions.includes(value), "Choose a supported narration style.").optional(),
-  defaultLengthMinutes: z.number().int().min(10).max(60).optional(),
-  ttsPauseMarkers: z.boolean().optional()
+  defaultLengthMinutes: z.number().int().min(8).max(15).optional(),
+  ttsPauseMarkers: z.boolean().optional(),
+  alwaysFinishScripts: z.boolean().optional(),
+  monthlyRunBudgetUsd: z.number().min(5).max(500).optional()
 });
 
 export async function GET() {
@@ -63,16 +65,14 @@ export async function GET() {
       wordpressSiteUrl: settings.wordpressSiteUrl ?? "",
       youtubeClientId: settings.youtubeClientId ?? "",
       hasOpenRouterApiKey: Boolean(settings.openRouterApiKeyEncrypted),
-      hasAnthropicApiKey: Boolean(settings.anthropicApiKeyEncrypted || process.env.ANTHROPIC_API_KEY),
-      hasOpenAiApiKey: Boolean(settings.openAiApiKeyEncrypted || process.env.OPENAI_API_KEY),
-      hasRunwareApiKey: Boolean(settings.runwareApiKeyEncrypted || process.env.RUNWARE_API_KEY),
+      hasAnthropicApiKey: Boolean(settings.anthropicApiKeyEncrypted),
+      hasOpenAiApiKey: Boolean(settings.openAiApiKeyEncrypted),
+      hasRunwareApiKey: Boolean(settings.runwareApiKeyEncrypted),
       hasDataForSeoCredentials: Boolean(
-        (settings.dataForSeoLoginEncrypted && settings.dataForSeoPasswordEncrypted) ||
-          (process.env.DATAFORSEO_LOGIN && process.env.DATAFORSEO_PASSWORD)
+        settings.dataForSeoLoginEncrypted && settings.dataForSeoPasswordEncrypted
       ),
       hasWordPressCredentials: Boolean(
-        (settings.wordpressSiteUrl && settings.wordpressUsernameEncrypted && settings.wordpressPasswordEncrypted) ||
-          (process.env.WORDPRESS_SITE_URL && process.env.WORDPRESS_USERNAME && process.env.WORDPRESS_APPLICATION_PASSWORD)
+        settings.wordpressSiteUrl && settings.wordpressUsernameEncrypted && settings.wordpressPasswordEncrypted
       ),
       hasYoutubeOAuthCredentials: Boolean(
         (settings.youtubeClientId && settings.youtubeClientSecretEncrypted) ||
@@ -121,16 +121,14 @@ export async function PUT(request: Request) {
       wordpressSiteUrl: settings.wordpressSiteUrl ?? "",
       youtubeClientId: settings.youtubeClientId ?? "",
       hasOpenRouterApiKey: Boolean(settings.openRouterApiKeyEncrypted),
-      hasAnthropicApiKey: Boolean(settings.anthropicApiKeyEncrypted || process.env.ANTHROPIC_API_KEY),
-      hasOpenAiApiKey: Boolean(settings.openAiApiKeyEncrypted || process.env.OPENAI_API_KEY),
-      hasRunwareApiKey: Boolean(settings.runwareApiKeyEncrypted || process.env.RUNWARE_API_KEY),
+      hasAnthropicApiKey: Boolean(settings.anthropicApiKeyEncrypted),
+      hasOpenAiApiKey: Boolean(settings.openAiApiKeyEncrypted),
+      hasRunwareApiKey: Boolean(settings.runwareApiKeyEncrypted),
       hasDataForSeoCredentials: Boolean(
-        (settings.dataForSeoLoginEncrypted && settings.dataForSeoPasswordEncrypted) ||
-          (process.env.DATAFORSEO_LOGIN && process.env.DATAFORSEO_PASSWORD)
+        settings.dataForSeoLoginEncrypted && settings.dataForSeoPasswordEncrypted
       ),
       hasWordPressCredentials: Boolean(
-        (settings.wordpressSiteUrl && settings.wordpressUsernameEncrypted && settings.wordpressPasswordEncrypted) ||
-          (process.env.WORDPRESS_SITE_URL && process.env.WORDPRESS_USERNAME && process.env.WORDPRESS_APPLICATION_PASSWORD)
+        settings.wordpressSiteUrl && settings.wordpressUsernameEncrypted && settings.wordpressPasswordEncrypted
       ),
       hasYoutubeOAuthCredentials: Boolean(
         (settings.youtubeClientId && settings.youtubeClientSecretEncrypted) ||

@@ -14,7 +14,7 @@ const ProjectPatchSchema = z.object({
   sourceMaterial: z.string().optional(),
   sponsorBlurb: z.string().optional(),
   sponsorLink: z.string().optional(),
-  targetLengthMinutes: z.number().int().min(7).max(60).optional(),
+  targetLengthMinutes: z.number().int().min(8).max(60).optional(),
   platform: z.string().trim().optional(),
   publishedUrl: z.string().trim().optional(),
   youtubeVideoId: z.string().trim().max(32).optional(),
@@ -40,8 +40,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       });
 
       if (!project) return null;
-      if (input.targetLengthMinutes !== undefined && isRuntimeScriptFormat(project.format) && input.targetLengthMinutes > 30) {
-        throw new Error("HeyGen video and podcast scripts must be 30 minutes or less.");
+      const maxRuntime = project.format === StoryProjectFormat.EPISODIC_SERIES ? 15 : 12;
+      if (input.targetLengthMinutes !== undefined && isRuntimeScriptFormat(project.format) && input.targetLengthMinutes > maxRuntime) {
+        throw new Error("Standard videos must be 8-12 minutes; season episodes may run up to 15 minutes.");
       }
       const sponsorAllowed = supportsSponsorBlurb(project.format);
       const sponsorBlurb = sponsorAllowed ? normalizeSponsorBlurbForFormat(input.sponsorBlurb ?? project.sponsorBlurb ?? "", project.format) : null;
@@ -65,6 +66,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
           storyIdea: true,
           drafts: { orderBy: { createdAt: "desc" }, take: 50 },
           thumbnails: { orderBy: { createdAt: "desc" }, take: 24 },
+          shortAssets: { orderBy: { shortIndex: "asc" }, take: 9 },
           publishingSlots: { orderBy: { scheduledDate: "asc" }, take: 20 },
           publishedStories: { orderBy: { createdAt: "desc" }, take: 1 }
         }

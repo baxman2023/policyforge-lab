@@ -2,6 +2,7 @@ import "server-only";
 import { FORGE_NICHES, forgeChannelDescription } from "@/lib/forge-niches";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
+import { recommendShaziStyle } from "@/lib/upgrade-domain";
 
 export async function listUserChannels(userId: string, workspaceId: string) {
   const defaultChannel = await ensureDefaultChannel(userId, workspaceId);
@@ -59,7 +60,8 @@ export async function createUserChannel(userId: string, workspaceId: string, nam
         workspaceId,
         name: cleanName,
         slug,
-        description: description?.trim() || null
+        description: description?.trim() || null,
+        shaziStyle: recommendShaziStyle({ name: cleanName, description })
       }
     });
   });
@@ -112,7 +114,8 @@ async function ensureForgeChannels(userId: string, workspaceId: string) {
           existingChannel.archivedAt ||
           existingChannel.name !== niche.name ||
           existingChannel.slug !== niche.slug ||
-          !existingChannel.description
+          !existingChannel.description ||
+          !existingChannel.shaziStyle
         ) {
           await tx.channel.update({
             where: { id: existingChannel.id },
@@ -120,6 +123,7 @@ async function ensureForgeChannels(userId: string, workspaceId: string) {
               name: niche.name,
               slug: niche.slug,
               description: existingChannel.description || forgeChannelDescription(niche),
+              shaziStyle: existingChannel.shaziStyle || recommendShaziStyle({ name: niche.name, description: existingChannel.description || forgeChannelDescription(niche) }),
               archivedAt: null
             }
           });
@@ -133,7 +137,8 @@ async function ensureForgeChannels(userId: string, workspaceId: string) {
           workspaceId,
           name: niche.name,
           slug: niche.slug,
-          description: forgeChannelDescription(niche)
+          description: forgeChannelDescription(niche),
+          shaziStyle: recommendShaziStyle({ name: niche.name, description: forgeChannelDescription(niche) })
         }
       });
     }

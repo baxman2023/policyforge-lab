@@ -14,18 +14,19 @@ const ProjectSchema = z.object({
   storyIdeaId: z.string().optional(),
   title: z.string().min(3).optional(),
   format: z.nativeEnum(StoryProjectFormat).default(StoryProjectFormat.STANDALONE),
-  targetLengthMinutes: z.number().int().min(7).max(60).default(7),
+  targetLengthMinutes: z.number().int().min(8).max(60).default(8),
   tone: z.string().default("Mysterious & gripping"),
   narrationStyle: z.string().default("Calm suspense"),
   sponsorBlurb: z.string().optional(),
   sponsorLink: z.string().optional(),
   channelId: z.string().optional()
 }).superRefine((value, ctx) => {
-  if (isRuntimeScriptFormat(value.format) && value.targetLengthMinutes > 30) {
+  const maxRuntime = value.format === StoryProjectFormat.EPISODIC_SERIES ? 15 : 12;
+  if (isRuntimeScriptFormat(value.format) && value.targetLengthMinutes > maxRuntime) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["targetLengthMinutes"],
-      message: "HeyGen video and podcast scripts must be 30 minutes or less."
+      message: `Standard videos must be 8-12 minutes; season episodes may run up to 15 minutes.`
     });
   }
 });
@@ -34,6 +35,7 @@ const storyProjectInclude = {
   storyIdea: true,
   drafts: { orderBy: { createdAt: "desc" as const }, take: 50 },
   thumbnails: { orderBy: { createdAt: "desc" as const }, take: 24 },
+  shortAssets: { orderBy: { shortIndex: "asc" as const }, take: 9 },
   publishingSlots: { orderBy: { scheduledDate: "asc" as const }, take: 20 }
 };
 
@@ -51,6 +53,7 @@ export async function GET(request: Request) {
         storyIdea: true,
         drafts: { orderBy: { createdAt: "desc" }, take: 50 },
         thumbnails: { orderBy: { createdAt: "desc" }, take: 24 },
+        shortAssets: { orderBy: { shortIndex: "asc" }, take: 9 },
         publishingSlots: { orderBy: { scheduledDate: "asc" }, take: 20 }
       },
       orderBy: { updatedAt: "desc" },

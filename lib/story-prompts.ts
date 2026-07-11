@@ -171,8 +171,8 @@ export function ideaGenerationPrompt(input: IdeaFactoryInput, existingTitles: st
               ? "Clearly prefer ideas that can sustain a full long form book with multiple frameworks, buyer education arcs, examples, proof points, and a strong practical payoff."
               : "Clearly prefer ideas that can sustain a full long form book with multiple research layers, chapter arcs, documented depth, and a strong reader payoff."
             : isBusinessMode
-              ? "Clearly prefer ideas that can sustain a complete HeyGen-ready video script under 30 minutes, ideally 7-10 minutes, with clear sections, real audience pain, examples, and a useful CTA path."
-              : "Clearly prefer ideas that can sustain the selected under-30-minute spoken narrative length, ideally 7-10 minutes.";
+              ? "Clearly prefer ideas that can sustain a complete 8-12 minute HeyGen-ready video, with clear sections, real audience pain, examples, and a useful CTA path. Season episodes may run to 15 minutes only when evidence supports it."
+              : "Clearly prefer ideas that can sustain an evidence-rich 8-12 minute spoken narrative. Season episodes may run to 15 minutes only when the material supports it.";
 
   const contextLines = isBusinessMode
     ? `Content mode: ${contentModeLabel(contentMode)}
@@ -343,7 +343,7 @@ ${modeRules}
 - In titleThumbnailPretest, create three packaging options that test different curiosity promises without clickbait or false claims.
 - In thumbnailFirstFit, apply the thumbnail-first rule: if the idea cannot be sold with one clear visual subject plus one mystery/evidence detail, score it lower and explain what stronger visual anchor is needed before scripting.
 - The firstFrameExpectation must say how the opening line or visual immediately pays off the title/thumbnail promise. Good ideas should let the first 5 seconds say or show what the viewer clicked for.
-- In sourceDepthPreflight, flag whether the idea can honestly support 7, 10, 20, or 30 minutes and list the source types needed before writing. Never recommend a video or podcast longer than 30 minutes; prefer 7-10 minutes unless there is a concrete reason to go longer.
+- In sourceDepthPreflight, decide whether the idea can honestly support 8, 10, or 12 minutes and list the source types needed before writing. A season episode may reach 15 minutes when evidence supports it. Never pad thin research.
 - In analyticsFit, use only the YouTube performance guidance above. If no connected analytics exists, say the fit is based on general channel best practices.
 - In ideaCluster, show how the idea fits into a repeatable channel lane with follow-up videos and Shorts cutdowns.
 - In monetizationRisk, rate compliance, trust, and platform risk. Use educational framing and avoid promises about savings, coverage, eligibility, underwriting, carrier appetite, or claim outcomes.
@@ -1716,7 +1716,7 @@ Output rules:
 - Do not add scene titles, timestamps, cues, descriptions, background notes, visual notes, presenter directions, title cards, chapter names, "Part One" labels, bullet points, lists, horizontal rules, or separator lines.
 - Do not include bracketed stage directions or pause markers. Never write [pause], [beat], [music], [sfx], or similar cues.
 - Write only clean narrator text under each scene label.
-- For 7-10 minute videos, use roughly 12-22 scenes, generally 20-40 seconds of spoken narration per scene. For longer scripts under 30 minutes, scale the scene count while keeping one primary idea per scene.
+- For 8-12 minute videos, use roughly 14-24 scenes, generally 20-40 seconds of spoken narration per scene. For a deeper season episode up to 15 minutes, scale the scene count while keeping one primary idea per scene.
 ${ttsOutputRules}
 ${bodySponsorRules}
 - Preserve the strongest hook, clear transitions, tension, and emotional ending.
@@ -1860,7 +1860,7 @@ Asset Checklist
 Rules:
 - This is a production file, not narration. Do not rewrite the script.
 - Keep final narration clean; put all visuals, SFX, music, captions, and editing notes here.
-- Break the whole script into practical HeyGen scenes. For 7-10 minute videos, use roughly 12-22 scenes with one primary idea and about 20-40 seconds of narration per scene. For longer videos under 30 minutes, scale proportionally without creating tiny fragments.
+- Break the whole script into practical HeyGen scenes. For 8-12 minute videos, use roughly 14-24 scenes with one primary idea and about 20-40 seconds of narration per scene. For season episodes up to 15 minutes, scale proportionally without creating tiny fragments.
 - For each scene card include: scene number, approximate timestamp range, narration beat, HeyGen presenter direction, background visual idea, on-screen text if any, SFX/music cue if useful, and one background image prompt.
 - In the "HeyGen Scene Background Prompts" section, list every background in this exact parseable format:
 Scene 01 Background Prompt: [single 16:9 background image prompt, no text, no typography, no logos, no watermark, no fake UI, no FLUX, suitable behind a HeyGen presenter]

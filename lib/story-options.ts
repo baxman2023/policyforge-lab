@@ -52,8 +52,8 @@ export const narrationStyleOptions = [
 ];
 
 export const storyLengthOptions = [
-  { label: "7 min", minutes: 7 },
+  { label: "8 min", minutes: 8 },
   { label: "10 min", minutes: 10 },
-  { label: "20 min", minutes: 20 },
-  { label: "30 min max", minutes: 30 }
+  { label: "12 min", minutes: 12 },
+  { label: "15 min episode", minutes: 15 }
 ];
